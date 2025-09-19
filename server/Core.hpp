@@ -1,14 +1,15 @@
 #ifndef CORE_HPP
 #define CORE_HPP
 #include"Socket.hpp"
+#include"EventLoop.hpp"
 #include<vector>
 
 class Core {
     private :
         std::vector<Socket*> servers;
         // std::map<int, Client*> clients;
-        // EventLoop loop ;
-        // bool riunning;
+        EventLoop loop ;
+        bool riunning;
     public :
         Core();
         ~Core();
