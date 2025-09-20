@@ -28,32 +28,21 @@ bool Client::isConnected() const {
     return connected;
 }
 
-bool Client::writeData(){
+bool Client::readData(){
     char buffer[BUFFER];
 
-    ssize_t bytes = recv(client_fd, buffer, sizeof(buffer), 0);
-    if (bytes > 0)
-    {
-        /*
-            std::vector<int> AB = A;
-            AB.insert(AB.end(), B.begin(), B.end());
-        */
-       std::vector<char> readed(buffer, buffer + bytes);
-       read_buffer.insert(read_buffer.end(), readed.begin(), readed.end());
-       
+    ssize_t bytes = recv(client_fd, buffer, sizeof(buffer), 0); // 
+    if (bytes > 0){
+        std::vector<char> readed(buffer, buffer + bytes);
+        read_buffer.insert(read_buffer.end(), readed.begin(), readed.end());
         return true;
     }
-    else if (bytes == 0)
-    {
+    else if (bytes == 0){
         connected = false; // Client disconnected
     }
-    // else if (errno != EAGAIN && errno != EWOULDBLOCK)
-    // {
-    //     connected = false; // Error occurred
-    // }
     return false;
 }
 
-bool Client::readData(){
-
+bool Client::writeData(){
+    
 }

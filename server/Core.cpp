@@ -10,3 +10,23 @@ Core& Core::operator=(const Core& obj){
     return *this;
 }
 
+// run 
+// stop
+
+
+
+/*  
+    algo
+
+    * add servers (form config to creating sockets)
+    * run webserv 
+        - while true 
+            . get ready events (poll)
+            . handelSocketEvent( if else )
+                isServerSocket
+                    ...
+                isClientEvent
+                    ...
+
+
+*/
