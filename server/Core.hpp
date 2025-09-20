@@ -4,6 +4,7 @@
 #include"Client.hpp"
 #include"EventLoop.hpp"
 #include<vector>
+#include<iostream>
 
 class Core {
     private:
@@ -22,10 +23,10 @@ class Core {
 
 
     public:
-        MultiServer();
-        ~MultiServer();
-        MultiServer(const MultiServer& other);
-        MultiServer& operator=(const MultiServer& other);
+        Core();
+        ~Core();
+        Core(const Core& other);
+        Core& operator=(const Core& other);
         bool addServer(int port);
         void run();
         void stop();

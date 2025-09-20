@@ -40,7 +40,7 @@ void EventLoop::updateSocketEvents(int fd, short events)
         poll_fds[it->second].events = events ;
 }
 
-std::vector<std::pair<int, short> > EventLoop::waitForEvents(int timeout = 0){
+std::vector<std::pair<int, short> > EventLoop::waitForEvents(int timeout){
     std::vector<std::pair<int , short> > ready_fds;
     // passing ptr to 1st poll_fd , poll does understand vecctor and c++ huh
     // and the number of fds to monitor obligatoire
