@@ -3,9 +3,10 @@
 int handleRequest(std::vector<char> requestBuffer){
     struct HttpRequest Req;
     
-    if (parseRequest(requestBuffer, Req) == INCOMPLETE)
+    int status = parseRequest(requestBuffer, Req);
+    if (status == INCOMPLETE)
         return INCOMPLETE;
-    else if (parseRequest(requestBuffer, Req) == ERROR)
+    else if (status == ERROR)
         return ERROR;
     return 0;
 }
@@ -25,6 +26,8 @@ int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
 
     reqLineStream >> Req.method >> Req.uri >> Req.version;
     if (Req.method.empty() || Req.uri.empty() || Req.version.empty())
+        return ERROR;
+    if (Req.method != "GET" && Req.method != "POST" && Req.method != "DELETE")
         return ERROR;
     std::string headerLine;
     while (std::getline(headerStream, headerLine)) {
