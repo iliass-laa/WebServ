@@ -10,3 +10,9 @@ struct HttpRequest {
     std::map<std::string, std::string> headers;
     std::string body;
 };
+
+enum ParseStatus {
+    INCOMPLETE,
+    COMPLETE,
+    ERROR
+};
