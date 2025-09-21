@@ -19,7 +19,7 @@ bool Socket::create()
 bool Socket::bind(int port)
 {
     address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY; // listen in each avaliable ip
+    address.sin_addr.s_addr = INADDR_ANY; // accept from any ip (0.0.0.0)
     address.sin_port = htons(port);
 
     /*
