@@ -83,7 +83,12 @@ void Core::handleClientEvent(int client_fd, short events){
         return ;
     Client* client = it->second;
 
-    // read request
+    if(events & POLLIN ){
+        if(client)
+        client->readData();
+    }
+
+    // send response
     if(events & POLLOUT)
         client->writeData();
 
