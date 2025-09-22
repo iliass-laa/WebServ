@@ -3,19 +3,15 @@
 #include <iostream>
 #include <netinet/in.h>
 #include"Socket.hpp"
-
-
-
-class Server{
-    private:
-        std::vector<Socket*> server;
-};
+#include"Core.hpp"
 
 int main()
 {
-    std::cout << " WebServ A 3zzy " << std::endl ;
-}
 
+    std::cout << " WebServ A 3zzy " << std::endl ;
+    Core c1;
+    c1.run();
+}
 
 /*
 
