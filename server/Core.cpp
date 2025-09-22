@@ -24,9 +24,9 @@ Core& Core::operator=(const Core& obj){
             . get ready events (poll)
             . handelSocketEvent( if else )
                 isServerSocket
-                    ...
+                    handelNewConnection
                 isClientEvent
-                    ...
+                    handelClientEvent
 
 
 */
