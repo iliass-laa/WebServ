@@ -6,13 +6,34 @@
 #include<vector>
 #include<iostream>
 
+class ServerConf{
+    private:
+        std::vector<int> ports;
+        // other stuff
+
+    public :
+        std::vector<int>& getPorts(){return ports;}
+};
+
+
+class Config{
+    private :
+        std::vector<ServerConf* > servs;
+
+    public:
+        std::vector<ServerConf*> getServs(){
+            return servs;
+        }
+};
+
+
 class Core {
     private:
         std::vector<Socket*> servers;
         std::map<int, Client*> clients;
         EventLoop event_loop;
         bool running;
-        // Config obj;
+        Config obj;
 
         void handleSocketEvent(int fd, short events);
         bool isServerSocket(int fd);
@@ -27,7 +48,7 @@ class Core {
         ~Core();
         Core(const Core& other);
         Core& operator=(const Core& other);
-        bool addServer(int port);
+        bool addServers(int port);
         void run();
         void stop();
 };

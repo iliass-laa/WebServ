@@ -9,8 +9,9 @@ class Client {
 private:
     int client_fd;
     bool connected;
-    std::vector<char> read_buffer; // for request
-    std::vector<char> write_buffer; // for response
+    std::vector<char> reqBuff; // for request
+    std::string resBuff; // for response
+    ssize_t resOffset;
 public:
     Client(int);
     ~Client();
