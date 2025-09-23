@@ -9,6 +9,11 @@ int handleRequest(std::vector<char> requestBuffer){
     else if (status == ERROR)
         return ERROR;
     return 0;
+    
+}
+
+int isChunkedBodyComplete(std::vector<char> &body){
+
 }
 
 int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
@@ -18,7 +23,7 @@ int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
     if (pos == std::string::npos)
         return INCOMPLETE;
     std::string headerPart = requestString.substr(0, pos);
-    std::string bodyPart = requestString.substr(pos + 4);
+    std::vector<char> bodyPart(requestString.begin() + pos + 4, requestString.end());
     std::istringstream headerStream(headerPart);
     std::string reqLine;
     std::getline(headerStream, reqLine);
@@ -28,6 +33,8 @@ int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
     if (Req.method.empty() || Req.uri.empty() || Req.version.empty())
         return ERROR;
     if (Req.method != "GET" && Req.method != "POST" && Req.method != "DELETE")
+        return ERROR;
+    if (Req.version != "HTTP/1.1")
         return ERROR;
     std::string headerLine;
     while (std::getline(headerStream, headerLine)) {

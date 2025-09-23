@@ -8,7 +8,7 @@ struct HttpRequest {
     std::string uri;
     std::string version;
     std::map<std::string, std::string> headers;
-    std::string body;
+    std::vector<char> body;
 };
 
 enum ParseStatus {
