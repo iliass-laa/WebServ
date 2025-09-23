@@ -1,19 +1,66 @@
 #include "request.hpp"
 
-int handleRequest(std::vector<char> requestBuffer){
+std::vector<char> buildErrorResponse(int status) {
+    int code;
+    std::string reason;
+    switch (status) {
+        case ERROR_BAD_METHOD:  code = 501; reason = "Not Implemented"; break;
+        case ERROR_BAD_VERSION: code = 505; reason = "HTTP Version Not Supported"; break;
+        case ERROR:             code = 400; reason = "Bad Request"; break;
+        default:                code = 400; reason = "Bad Request"; break;
+    }
+
+    std::stringstream ss;
+    ss << "HTTP/1.1 " << code << " " << reason << "\r\n\r\n";
+    std::string response = ss.str();
+    return std::vector<char>(response.begin(), response.end());
+}
+
+
+int handleRequest(std::vector<char> requestBuffer, std::vector<char> &responseBuffer) {
     struct HttpRequest Req;
     
     int status = parseRequest(requestBuffer, Req);
     if (status == INCOMPLETE)
         return INCOMPLETE;
-    else if (status == ERROR)
-        return ERROR;
-    return 0;
+    else if (status == ERROR_BAD_METHOD || status == ERROR_BAD_VERSION || status == ERROR)
+        responseBuffer = buildErrorResponse(status);
+    return COMPLETE;
     
 }
 
-int isChunkedBodyComplete(std::vector<char> &body){
+int parseChunkedBody(std::vector<char> &body) {
+    size_t pos = 0;
+    std::vector<char> temp;
 
+    while (true) {
+        if (pos >= body.size())
+            return INCOMPLETE;
+        size_t lineEnd = std::string(body.begin() + pos, body.end()).find("\r\n");
+        if (lineEnd == std::string::npos)
+            return INCOMPLETE;
+
+        std::string sizeStr(body.begin() + pos, body.begin() + pos + lineEnd);
+        long chunkSize = strtol(sizeStr.c_str(), NULL, 16);
+        pos += lineEnd + 2;
+        if (chunkSize == 0) {
+            if (pos + 2 > body.size())
+                return INCOMPLETE;
+            if (body[pos] != '\r' || body[pos + 1] != '\n')
+                return ERROR;
+            body = temp;
+            return COMPLETE;
+        }
+
+        if (pos + chunkSize + 2 > body.size())
+            return INCOMPLETE;
+        temp.insert(temp.end(), body.begin() + pos, body.begin() + pos + chunkSize);
+
+        pos += chunkSize;
+        if (body[pos] != '\r' || body[pos + 1] != '\n')
+            return ERROR;
+        pos += 2;
+    }
 }
 
 int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
@@ -33,9 +80,9 @@ int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
     if (Req.method.empty() || Req.uri.empty() || Req.version.empty())
         return ERROR;
     if (Req.method != "GET" && Req.method != "POST" && Req.method != "DELETE")
-        return ERROR;
+        return ERROR_BAD_METHOD;
     if (Req.version != "HTTP/1.1")
-        return ERROR;
+        return ERROR_BAD_VERSION;
     std::string headerLine;
     while (std::getline(headerStream, headerLine)) {
         if (headerLine == "\r")
@@ -45,10 +92,10 @@ int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
             return ERROR;
         std::string key = headerLine.substr(0, colonPos);
         std::string value = headerLine.substr(colonPos + 1);
-        if (!key.empty() && key[0] == ' ')
-            key.erase(0, 1);
-        if (!value.empty() && value[value.size()- 1] == '\r')
-            value.erase(value.size() - 1);
+        while (!value.empty() && (value[0] == ' ' || value[0] == '\t'))
+            value.erase(0,1);
+        while (!value.empty() && (value[value.size()-1] == ' ' || value[value.size()-1] == '\t'))
+            value.erase(value.size()-1);
         Req.headers[key] = value;
     }
     if (Req.headers.find("Content-Length") != Req.headers.end()) {
@@ -58,8 +105,9 @@ int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
     }
     else if (Req.headers.find("Transfer-Encoding") != Req.headers.end() &&
              Req.headers["Transfer-Encoding"] == "chunked") {
-        if (!isChunkedBodyComplete(bodyPart)) //Chunked body parse
-            return INCOMPLETE;
+        int status = (parseChunkedBody(bodyPart));
+        if (status != COMPLETE)
+            return status;
     }
     Req.body = bodyPart;
     return COMPLETE;
