@@ -3,6 +3,7 @@
         "iostream": "cpp",
         "map": "cpp",
         "string": "cpp",
+<<<<<<< HEAD
         "array": "cpp",
         "atomic": "cpp",
         "bit": "cpp",
@@ -47,5 +48,8 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "typeinfo": "cpp"
+=======
+        "vector": "cpp"
+>>>>>>> 692d313ea2b097024a8f872e00e7f1d7c4da0581
     }
 }
