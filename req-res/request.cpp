@@ -16,6 +16,19 @@ std::vector<char> buildErrorResponse(int status) {
     return std::vector<char>(response.begin(), response.end());
 }
 
+void printRequest(const struct HttpRequest &Req) {
+    std::cout << "Method: " << Req.method << "\n";
+    std::cout << "URI: " << Req.uri << "\n";
+    std::cout << "Version: " << Req.version << "\n";
+    std::cout << "Headers:\n";
+    for (const auto &header : Req.headers) {
+        std::cout << header.first << ": " << header.second << "\n";
+    }
+    std::cout << "Body (" << Req.body.size() << " bytes):\n";
+    std::cout.write(Req.body.data(), Req.body.size());
+    std::cout << "\n";
+}
+
 
 int handleRequest(std::vector<char> requestBuffer, std::vector<char> &responseBuffer) {
     struct HttpRequest Req;
@@ -25,6 +38,12 @@ int handleRequest(std::vector<char> requestBuffer, std::vector<char> &responseBu
         return INCOMPLETE;
     else if (status == ERROR_BAD_METHOD || status == ERROR_BAD_VERSION || status == ERROR)
         responseBuffer = buildErrorResponse(status);
+    if (Req.method == "GET")
+        HandleGetResponse(Req, responseBuffer);
+    // else if (Req.method == "POST") {
+    //     HandlePostResponse(Req, responseBuffer);
+    // } else
+    //     HandleDeleteResponse(Req, responseBuffer);
     return COMPLETE;
     
 }
@@ -111,4 +130,29 @@ int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
     }
     Req.body = bodyPart;
     return COMPLETE;
+}
+
+
+int main() {
+    // Example HTTP request (GET with headers)
+    const char* rawRequest =
+        "GET /index.html HTTP/1.1\r\n"
+        "Host: localhost\r\n"
+        "User-Agent: TestClient/1.0\r\n";
+
+    // Fill vector<char> with request bytes
+    std::vector<char> requestBuffer(rawRequest, rawRequest + strlen(rawRequest));
+
+    // Prepare response vector (not used for GET in this example)
+    std::vector<char> responseBuffer;
+
+    int status = handleRequest(requestBuffer, responseBuffer);
+    if (status == INCOMPLETE) {
+        std::cout << "Request is incomplete, waiting for more data...\n";
+    } else
+    if (!responseBuffer.empty()) {
+            std::cout << "Error response:\n";
+            std::cout.write(&responseBuffer[0], responseBuffer.size());
+    }
+    return 0;
 }
