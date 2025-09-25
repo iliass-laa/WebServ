@@ -18,3 +18,6 @@ enum ParseStatus {
     ERROR_BAD_VERSION,
     ERROR
 };
+
+int		parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req);
+void	HandleGetResponse(const struct HttpRequest &Req, std::vector<char> &responseBuffer);
