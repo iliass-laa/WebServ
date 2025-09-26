@@ -105,6 +105,7 @@ BaseNode *creatContextNode(TokenizerData &tk, int &start, int typeC)
         if (tk.tokens[start].compare("}") == 0)
             start++;
     }
+    Node->nbrChilds  = Node->nbrChildsC + Node->nbrChildsD;
     return Node;
 }
 
