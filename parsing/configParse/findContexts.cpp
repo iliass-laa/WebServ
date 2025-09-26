@@ -61,19 +61,27 @@ ContextNode *findHttpContext(BaseNode* root)
 ContextNode *findServerContext(ContextNode* http, std::string serverName , int port)
 {
     ContextNode *tmp, *res;
-
+    std::vector <int> ports;
     res = NULL;
     for (int i = 0 ; i < http->nbrChildsC + http->nbrChildsD ; i++)
     {
         if (http->Childs[i]->typeNode == isContext)
         {   
             tmp = dynamic_cast<ContextNode *>(http->Childs[i]);
-            if (tmp->type_Context == ServerContext && port == getServerPort(tmp))
+            if (tmp->type_Context == ServerContext)
             {
-                if (!res)
-                    res = tmp;
-                if (serverName.compare(getServerName(tmp)) == 0)
-                    return tmp;
+                if (!getServerPorts(tmp, ports)) 
+                {
+                    if (!findPort(port, ports))
+                    {
+                        if (!res)
+                            res = tmp;
+                        if (serverName.compare(getServerName(tmp)) == 0)
+                            return tmp;
+                    }
+                }
+                else
+                    throw (ConfigFileError("Server not Found!"));
             }
         }
     }

@@ -38,8 +38,12 @@ void core(std::string reqStr, int client_fd, BaseNode *root);
 
 /******************Great Tools:***************** */
 std::string getServerName(ContextNode *server);
+// std::string getServerName(ContextNode *server, std::vector <int> &ports);
+// std::string getServerName(ContextNode *server, std::vector <int> &ports);
 int getServerPort(ContextNode *server);
+int getServerPorts(ContextNode *server, std::vector<int> &ports);
 
+int findPort(int port, std::vector<int> ports);
 
 
 // ContextNode *findServerContext(ContextNode* http, std::string serverName);
