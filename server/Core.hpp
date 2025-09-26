@@ -9,7 +9,7 @@
 class ServerConf{
     private:
         std::vector<int> ports;
-        // other stuff
+        std::vector<std::string> ranges;
 
     public :
         std::vector<int>& getPorts(){return ports;}
@@ -40,9 +40,7 @@ class Core {
         void handleNewConnection(int server_fd);
         void handleClientEvent(int client_fd, short events);
         void processClientRequest(Client *client);
-
-
-
+        
     public:
         Core();
         ~Core();
