@@ -1,7 +1,7 @@
 #include "request.hpp"
 #include "response.hpp"
 
-DirectoryListing::DirectoryListing() {}
+DirectoryListing::DirectoryListing() : hasIndexFile(false), autoIndex(false), isDirectory(false) {}
 
 DirectoryListing::~DirectoryListing() {}
 
@@ -29,11 +29,6 @@ void    DirectoryListing::setIndexFile(const std::vector<char> &file)
 bool    DirectoryListing::getHasIndexFile() const
 {
     return hasIndexFile;
-}
-
-std::vector<char>  DirectoryListing::getIndexFile() const
-{
-    return indexFile;
 }
 
 void HandleGetResponse(const struct HttpRequest &Req, std::vector<char> &responseBuffer)

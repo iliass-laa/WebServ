@@ -3,7 +3,7 @@
 class DirectoryListing {
     private :
         std::string directoryPath;
-        std::vector<char> indexFile;
+        std::vector<std::string> indexFile;
         bool    hasIndexFile;
         bool   autoIndex;
         bool   isDirectory;
@@ -13,7 +13,7 @@ class DirectoryListing {
     void    setDirectoryPath(const std::string &path);
     void    setAutoIndex(bool value);
     bool    getAutoIndex() const;
-    void    setIndexFile(const std::vector<char> &file);
+    void    setIndexFile(const std::vector<std::string> &file);
     bool    getHasIndexFile() const;
-    std::vector<char>  getIndexFile() const;
+    
 };
