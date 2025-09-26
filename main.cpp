@@ -9,6 +9,7 @@ int main(int ac, char **av)
     try
     {
         root = parseConfigFile(confPath.c_str());
+        
     }
     catch(const std::exception& e)
     {

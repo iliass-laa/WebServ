@@ -19,12 +19,13 @@ std::string getServerName(ContextNode *server)
     return std::string ("NOT Founded");
 }
 
-int getServerPort(ContextNode *server)
+int getServerPorts(ContextNode *server, std::vector<int> &ports)
 {
     int port;
+    std::vector<int> ports;
     DirectiveNode * tmp;
     if (server->type_Context != ServerContext)  
-        return -1;
+        return 1;
     for(int i = 0;i < server->nbrChildsC + server->nbrChildsD; i++)
     {
         if (server->Childs[i]->typeNode == isDirective)
@@ -33,12 +34,35 @@ int getServerPort(ContextNode *server)
             if (tmp->key.compare("listen") == 0)
             {
                 port = std::atoi((tmp->value.back()).c_str());
-                return (port);
+                ports.push_back(port);
             }
         }
-    }  
-    return -1;
+    }
+    if (ports.size() ==0)
+        return 1;
+    return 0;   
 }
+
+
+// int CheckServerPort(ContextNode *server, int port)
+// {
+//     DirectiveNode * tmp;
+//     if (server->type_Context != ServerContext)  
+//         return 1;
+//     for(int i = 0;i < server->nbrChildsC + server->nbrChildsD; i++)
+//     {
+//         if (server->Childs[i]->typeNode == isDirective)
+//         {
+//             tmp = dynamic_cast<DirectiveNode *>(server->Childs[i]);
+//             // if (tmp->key.compare("listen") == 0)
+//             // {
+//             //     port = std::atoi((tmp->value.back()).c_str());
+//             //     ports.push_back(port);
+//             // }
+//         }
+//     }
+//     return 0;   
+// }
 
 
 std::string findRootDir(BaseNode *root)
@@ -134,4 +158,16 @@ std::string getRootPath(BaseNode *root, t_request req, ContextNode **location)
         res = rootPathHttp;
     *location = tmp;
     return res;
+}
+
+
+
+int findPort(int port, std::vector<int> ports)
+{
+    for(size_t i = 0; i < ports.size(); i++)
+    {
+        if (ports.at(i) == port)
+            return 0;
+    }
+    return 1;
 }
