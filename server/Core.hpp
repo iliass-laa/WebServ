@@ -4,15 +4,15 @@
 #include"Client.hpp"
 #include"EventLoop.hpp"
 #include<vector>
+#include<map>
 #include<iostream>
 
 class ServerConf{
     private:
-        std::vector<int> ports;
-        // other stuff
+        std::map<std::string, std::string > sockAddress; // [interface , port]
 
     public :
-        std::vector<int>& getPorts(){return ports;}
+        // std::vector<int>& getPorts(){return ports;}
 };
 
 
@@ -40,9 +40,7 @@ class Core {
         void handleNewConnection(int server_fd);
         void handleClientEvent(int client_fd, short events);
         void processClientRequest(Client *client);
-
-
-
+        
     public:
         Core();
         ~Core();
