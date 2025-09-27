@@ -10,10 +10,11 @@ class DirectoryListing {
     public :
     DirectoryListing();
     ~DirectoryListing();
-    void    setDirectoryPath(const std::string &path);
+    void    setRoot(const std::string &path);
+    const std::string &getRoot() const;
     void    setAutoIndex(bool value);
     bool    getAutoIndex() const;
     void    setIndexFile(const std::vector<std::string> &file);
     bool    getHasIndexFile() const;
-    bool    getLocationFound() const;
+    std::vector<std::string>    getIndexFile() const;
 };

@@ -90,4 +90,6 @@ ContextNode     *findRightLocation(t_request &req, ContextNode *server);
 void getReqInfos(t_request & req,BaseNode *root);
 char *ft_strcopy(const char *s, int size);
 void handleCGIError(t_request &req, int client_fd);
+void fillReqStruct(BaseNode*root, DirectoryListing &obj, std::string uri, std::string host);
+
 #endif

@@ -5,9 +5,9 @@ DirectoryListing::DirectoryListing() : root(nullptr), indexFile(nullptr), hasInd
 
 DirectoryListing::~DirectoryListing() {}
 
-void    DirectoryListing::setDirectoryPath(const std::string &path)
+void    DirectoryListing::setRoot(const std::string &path)
 {
-    directoryPath = path;
+    root = path;
 }
 
 void    DirectoryListing::setAutoIndex(bool value)
@@ -31,9 +31,15 @@ bool    DirectoryListing::getHasIndexFile() const
     return hasIndexFile;
 }
 
-bool    DirectoryListing::getLocationFound() const
+std::vector<std::string>    DirectoryListing::getIndexFile() const
 {
-    return locationFound;
+    return indexFile;
+}
+
+
+const std::string &DirectoryListing::getRoot() const
+{
+    return root;
 }
 
 void HandleGetResponse(const struct HttpRequest &Req, std::vector<char> &responseBuffer)
@@ -46,12 +52,14 @@ void HandleGetResponse(const struct HttpRequest &Req, std::vector<char> &respons
         {
             std::string location = req.uri.substr(0, pos);
             fillReqStruct(nullptr, locationConfig, location, req.headers.at("Host"));
-            if (!locationConfig.getLocationFound())
+            if (!locationConfig.getRoot())
                 buildErroResponse(404);
         }
         else
         {
             fillReqStruct(nullptr, locationConfig, req.uri, req.headers.at("Host"));
+            if (!locationConfig.getRoot())
+                treatFileRequest(req, responBuffer);
         }
     }
 }
