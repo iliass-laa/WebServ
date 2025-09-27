@@ -4,15 +4,15 @@
 #include"Client.hpp"
 #include"EventLoop.hpp"
 #include<vector>
+#include<map>
 #include<iostream>
 
 class ServerConf{
     private:
-        std::vector<int> ports;
-        std::vector<std::string> ranges;
+        std::map<std::string, std::string > sockAddress; // [interface , port]
 
     public :
-        std::vector<int>& getPorts(){return ports;}
+        // std::vector<int>& getPorts(){return ports;}
 };
 
 
