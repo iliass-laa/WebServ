@@ -2,6 +2,7 @@
 #include <map>
 #include <vector>
 #include <sstream>
+#include <sys/stat.h>
 
 struct HttpRequest {
     std::string method;
