@@ -7,6 +7,7 @@ std::vector<char> buildErrorResponse(int status) {
         case ERROR_BAD_METHOD:  code = 501; reason = "Not Implemented"; break;
         case ERROR_BAD_VERSION: code = 505; reason = "HTTP Version Not Supported"; break;
         case ERROR:             code = 400; reason = "Bad Request"; break;
+        case 404:               code = 404; reason = "Not Found"; break;
         default:                code = 400; reason = "Bad Request"; break;
     }
 
@@ -38,8 +39,9 @@ int handleRequest(std::vector<char> requestBuffer, std::vector<char> &responseBu
         return INCOMPLETE;
     else if (status == ERROR_BAD_METHOD || status == ERROR_BAD_VERSION || status == ERROR)
         responseBuffer = buildErrorResponse(status);
-    if (Req.method == "GET")
-        HandleGetResponse(Req, responseBuffer);
+    printRequest(Req);
+    // if (Req.method == "GET")
+    //     HandleGetResponse(Req, responseBuffer);
     // else if (Req.method == "POST") {
     //     HandlePostResponse(Req, responseBuffer);
     // } else
@@ -138,7 +140,9 @@ int main() {
     const char* rawRequest =
         "GET /index.html HTTP/1.1\r\n"
         "Host: localhost\r\n"
-        "User-Agent: TestClient/1.0\r\n";
+        "User-Agent: TestClient/1.0\r\n"
+        "Accept: */*\r\n"
+        "\r\n";
 
     // Fill vector<char> with request bytes
     std::vector<char> requestBuffer(rawRequest, rawRequest + strlen(rawRequest));
