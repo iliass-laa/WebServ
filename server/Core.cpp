@@ -31,10 +31,14 @@ void Core::run(){
 }   
 
 void Core::handleSocketEvent(int fd, short events){
-    if(isServerSocket(fd))
+    if(isServerSocket(fd)){
+        std::cout << "server socket " << fd << std::endl;
         handleNewConnection(fd);
-    else
+    }
+    else{
+        std::cout << "client " << fd << std::endl;
         handleClientEvent(fd, events);
+    }
 }
 
 bool Core::isServerSocket(int fd){
@@ -101,6 +105,8 @@ void Core::handleClientEvent(int client_fd, short events){
 
     
 }
+
+
 /*  
     algo
 
