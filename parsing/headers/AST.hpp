@@ -41,7 +41,6 @@ class DirectiveNode : public BaseNode
 
 class ContextNode :  public BaseNode
 {
-
     public :
         ContextNode():BaseNode(isContext){
             nbrChildsC = 0;
