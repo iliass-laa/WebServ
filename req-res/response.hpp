@@ -7,6 +7,7 @@ class DirectoryListing {
         std::vector<std::string> indexFile;
         bool    hasIndexFile;
         bool   autoIndex;
+        bool   _default;
     public :
     DirectoryListing();
     ~DirectoryListing();
@@ -17,4 +18,5 @@ class DirectoryListing {
     void    setIndexFile(const std::vector<std::string> &file);
     bool    getHasIndexFile() const;
     std::vector<std::string>    getIndexFile() const;
+    bool   getDefault() const;
 };
