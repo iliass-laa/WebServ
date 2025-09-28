@@ -55,6 +55,27 @@ int checkPath(const std::string &path)
     return pathStat.st_mode;
 }
 
+int buildFileResponse(std::string path, std::vector<char> &responseBuffer)
+{
+    std::ifstream file(path, std::ios::binary);
+    if (!file)
+        return 1;
+    file.seekg(0, std::ios::end);
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+    std::vector<char> buffer(size);
+    if (!file.read(buffer.data(), size))
+        return 1;
+    std::ostringstream responseStream;
+    responseStream << "HTTP/1.1 200 OK\r\n";
+    responseStream << "Content-Length: " << size << "\r\n";
+    responseStream << "Content-Type: " getContentType(path) << "\r\n";
+    responseStream << "\r\n";
+    std::string responseHeaders = responseStream.str();
+    responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
+    return 0;
+}
+
 void HandleGetResponse(const struct HttpRequest &Req, std::vector<char> &responseBuffer)
 {
     DirectoryListing locationConfig;
@@ -72,11 +93,36 @@ void HandleGetResponse(const struct HttpRequest &Req, std::vector<char> &respons
     std::string fileSystemPath = locationConfig.getRoot() + Req.uri;
     if (S_ISDIR(checkPath(fileSystemPath)))
     {
-        //treat directory request
+        if (fileSystemPath.end() != '/' )
+            buildRedirectionResponse(fileSystemPath + '/');
+        if (locationConfig.getHasIndexFile())
+        {
+            std::vector<std::string> indexFiles = locationConfig.getIndexFile();
+            for (size_t i = 0; i < indexFiles.size(); i++)
+            {
+                std::string indexPath = fileSystemPath + '/' + indexFiles[i];
+                if (S_ISREG(checkPath(indexPath)))
+                {
+                    if (!buildFileResponse(indexPath, responseBuffer))
+                        return;
+                }
+            }
+        }
+        if (locationConfig.getAutoIndex())
+        {
+            if (!buildAutoIndexResponse(fileSystemPath, Req.uri, responseBuffer))
+                return;
+        }
+        else
+        {
+            responseBuffer = buildErrorResponse(403);
+            return;
+        }
     }
     else if (S_ISREG(checkPath(fileSystemPath)))
     {
-        //treat file request
+        if (!buildFileResponse(indexPath, responseBuffer))
+            return;
     }
     else
     {
