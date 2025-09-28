@@ -17,6 +17,9 @@ void Core::stop(){
 
 // run 
 void Core::run(){
+    if(!addServer(8080)){
+        return ;
+    }
     running = true ;
     while (running){
         std::vector<std::pair<int,short> > readyEvents = event_loop.waitForEvents(0); 
@@ -106,6 +109,40 @@ void Core::handleClientEvent(int client_fd, short events){
     
 }
 
+bool Core::addServer(int port){
+        Socket* server = new Socket();
+
+        if (!server->create()) {
+            std::cerr << "Failed to create socket for port " << port << std::endl;
+            delete server;
+            return false;
+        }
+        
+        if (!server->bind(port)) {
+            std::cerr << "Failed to bind socket to port " << port << std::endl;
+            delete server;
+            return false;
+        }
+        
+        if (!server->listen(5)) {
+            std::cerr << "Failed to listen on port " << port << std::endl;
+            delete server;
+            return false;
+        }
+        
+        if (!server->setNonBlocking()) {
+            std::cerr << "Failed to set socket to non-blocking on port " << port << std::endl;
+            delete server;
+            return false;
+        }
+
+        // Add server socket to event loop
+        event_loop.addSocket(server->getFd(), POLLIN);
+
+        std::cout << "Server listening on port " << port << std::endl;
+        servers.push_back(server);
+        return true;
+}
 
 /*  
     algo

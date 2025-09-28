@@ -3,6 +3,7 @@
 #include <iostream>
 #include <netinet/in.h>
 #include"Socket.hpp"
+#include"Core.hpp"
 
 
 
@@ -14,6 +15,8 @@ class Server{
 int main()
 {
     std::cout << " WebServ A 3zzy " << std::endl ;
+    Core mainServer;
+    mainServer.run();
 }
 
 

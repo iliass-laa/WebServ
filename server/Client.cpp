@@ -44,5 +44,5 @@ bool Client::readData(){
 }
 
 bool Client::writeData(){
-    
+    return false;
 }

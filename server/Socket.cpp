@@ -13,7 +13,11 @@ bool Socket::create()
         protocol , not specified is 0 
     */
     sockFd = socket(AF_INET, SOCK_STREAM, 0); // 
-    return sockFd != -1;
+    if (sockFd == -1) {
+        perror("socket creation failed");
+        return false;
+    }
+    return true;
 }
 
 bool Socket::bind(int port)
@@ -36,9 +40,16 @@ bool Socket::bind(int port)
 
     */
     int opt = 1 ; // 1 enable , 0 disable
-    setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+    if (setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+        perror("setsockopt failed");
+        return false;
+    }
 
-    return ::bind(sockFd, (struct sockaddr*)&address, sizeof(address)) == 0;
+    if (::bind(sockFd, (struct sockaddr*)&address, sizeof(address)) == -1) {
+        perror("bind failed");
+        return false;
+    }
+    return true;
 }
 
 bool Socket::setNonBlocking()
@@ -55,7 +66,11 @@ bool Socket::setNonBlocking()
 
 bool Socket::listen(int backlog)
 {
-    return ::listen(sockFd, backlog);
+    if (::listen(sockFd, backlog) == -1) {
+        perror("listen failed");
+        return false;
+    }
+    return true;
 }
 
 int Socket::getFd() const 

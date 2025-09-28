@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <netinet/in.h>
+#include <cstdio>
 
 class Socket
 {
