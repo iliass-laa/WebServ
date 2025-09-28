@@ -55,6 +55,29 @@ int checkPath(const std::string &path)
     return pathStat.st_mode;
 }
 
+std::string getContentType(const std::string &path)
+{
+    size_t dotPos = path.find_last_of('.');
+    if (dotPos == std::string::npos)
+        return "application/octet-stream";
+    std::string extension = path.substr(dotPos + 1);
+    if (extension == "html" || extension == "htm")
+        return "text/html";
+    if (extension == "css")
+        return "text/css";
+    if (extension == "js")
+        return "application/javascript";
+    if (extension == "png")
+        return "image/png";
+    if (extension == "jpg" || extension == "jpeg")
+        return "image/jpeg";
+    if (extension == "gif")
+        return "image/gif";
+    if (extension == "txt")
+        return "text/plain";
+    return "application/octet-stream";
+}
+
 int buildFileResponse(std::string path, std::vector<char> &responseBuffer)
 {
     std::ifstream file(path, std::ios::binary);
@@ -129,23 +152,4 @@ void HandleGetResponse(const struct HttpRequest &Req, std::vector<char> &respons
         responseBuffer = buildErrorResponse(404);
         return;
     }
-
-
-    // if (!req.uri.empty() && req.uri[0] == '/')
-    // {
-    //     size_t secondSlash = req.uri.find('/', 1);
-    //     if (secondSlash != std::string::npos)
-    //     {
-    //         std::string location = req.uri.substr(0, pos);
-    //         fillReqStruct(nullptr, locationConfig, location, req.headers.at("Host"));
-    //         if (!locationConfig.getRoot())
-    //             buildErroResponse(404);
-    //     }
-    //     else
-    //     {
-    //         fillReqStruct(nullptr, locationConfig, req.uri, req.headers.at("Host"));
-    //         if (!locationConfig.getRoot())
-    //             treatFileRequest(req, responBuffer);
-    //     }
-    // }
 }
