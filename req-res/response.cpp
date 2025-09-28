@@ -57,7 +57,7 @@ int checkPath(const std::string &path)
 
 std::string getContentType(const std::string &path)
 {
-    size_t dotPos = path.find_last_of('.');
+    size_t dotPosition = path.find_last_of('.');
     if (dotPos == std::string::npos)
         return "application/octet-stream";
     std::string extension = path.substr(dotPos + 1);
