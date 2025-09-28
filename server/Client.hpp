@@ -1,6 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 #include<string>
+#include<iostream>
 #include<vector>
 #include <sys/socket.h>
 #define BUFFER 4096
@@ -9,8 +10,9 @@ class Client {
 private:
     int client_fd;
     bool connected;
-    std::vector<char> read_buffer; // for request
-    std::vector<char> write_buffer; // for response
+    std::vector<char> reqBuff; // for request
+    std::string resBuff; // for response
+    ssize_t resOffset;
 public:
     Client(int);
     ~Client();

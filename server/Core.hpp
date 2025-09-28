@@ -4,7 +4,28 @@
 #include"Client.hpp"
 #include"EventLoop.hpp"
 #include<vector>
+#include<map>
 #include<iostream>
+
+class ServerConf{
+    private:
+        std::map<std::string, std::string > sockAddress; // [interface , port]
+
+    public :
+        // std::vector<int>& getPorts(){return ports;}
+};
+
+
+class Config{
+    private :
+        std::vector<ServerConf* > servs;
+
+    public:
+        std::vector<ServerConf*> getServs(){
+            return servs;
+        }
+};
+
 
 class Core {
     private:
@@ -12,22 +33,20 @@ class Core {
         std::map<int, Client*> clients;
         EventLoop event_loop;
         bool running;
-        // Config obj;
+        Config obj;
 
         void handleSocketEvent(int fd, short events);
         bool isServerSocket(int fd);
         void handleNewConnection(int server_fd);
         void handleClientEvent(int client_fd, short events);
         void processClientRequest(Client *client);
-
-
-
+        
     public:
         Core();
         ~Core();
         Core(const Core& other);
         Core& operator=(const Core& other);
-        bool addServer(int port);
+        bool addServers(int port);
         void run();
         void stop();
 };
