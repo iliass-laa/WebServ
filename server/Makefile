@@ -1,8 +1,8 @@
 CC = c++
 CPPFLAGS = -Werror -Wextra -Werror -std=c++98
 
-SRC =  Socket.cpp webserv.cpp EventLoop.cpp
-HDRS =  Socket.hpp EventLoop.hpp
+SRC =  Socket.cpp webserv.cpp EventLoop.cpp Core.cpp Client.cpp
+HDRS =  Socket.hpp EventLoop.hpp Core.hpp Client.hpp
 OBJ = $(SRC:.cpp=.o)
 
 # SRCCLIN = client.cpp 
