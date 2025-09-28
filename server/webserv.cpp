@@ -5,14 +5,19 @@
 #include"Socket.hpp"
 #include"Core.hpp"
 
+
+
+class Server{
+    private:
+        std::vector<Socket*> server;
+};
+
 int main()
 {
-
     std::cout << " WebServ A 3zzy " << std::endl ;
-    Core c1;
-    c1.run();
+    Core mainServer;
+    mainServer.run();
 }
-
 /*
 
     loop 

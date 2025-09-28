@@ -1,6 +1,7 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 #include<string>
+#include<iostream>
 #include<vector>
 #include <sys/socket.h>
 #define BUFFER 4096
