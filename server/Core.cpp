@@ -1,4 +1,6 @@
 #include"Core.hpp"
+#include"sstream"
+#include<fstream>
 
 Core::Core():running(false){}
 Core::~Core(){}
@@ -17,7 +19,7 @@ void Core::stop(){
 
 // run 
 void Core::run(){
-    if(!addServer(8080)){
+    if(!addServers(8080)){
         return ;
     }
     running = true ;
@@ -39,7 +41,7 @@ void Core::handleSocketEvent(int fd, short events){
         handleNewConnection(fd);
     }
     else{
-        std::cout << "client " << fd << std::endl;
+        std::cout << ">>>>>> client " << fd << std::endl;
         handleClientEvent(fd, events);
     }
 }
@@ -84,6 +86,7 @@ void Core::handleNewConnection(int server_fd){
 }
 
 void Core::handleClientEvent(int client_fd, short events){
+
     // retrive client from map 
     std::map<int, Client*>::iterator it = clients.find(client_fd) ;
     if(it == clients.end())
@@ -92,7 +95,7 @@ void Core::handleClientEvent(int client_fd, short events){
 
     if(events & POLLIN ){
         if(client)
-        client->readData();
+            client->readData();
     }
 
     // send response
@@ -105,11 +108,40 @@ void Core::handleClientEvent(int client_fd, short events){
         delete client;
         clients.erase(it);
     }
-
-    
+    // else{
+    //     short new_events = POLLIN;
+    //     if (client->hasDataToWrite()) // find why
+    //     {
+    //         new_events |= POLLOUT;
+    //     }
+    //     event_loop.updateSocketEvents(client_fd, new_events);
+    // }
 }
 
-bool Core::addServer(int port){
+
+void Core::processClientRequest(Client *client)
+{
+    std::string request = client->getReadBuffer();
+
+    // Simple HTTP response
+    std::string response =
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: text/html\r\n"
+        "Content-Length: 4215\r\n"
+        "\r\n";
+        // "Hello, World!";
+    std::ifstream file("index.html", std::ios::in | std::ios::binary);
+    if (!file) {
+        throw std::ios_base::failure("Failed to open file: index.html");
+    }
+
+    std::stringstream content;
+    content << file.rdbuf();
+    response += content.str();
+    client->queueResponse(response);
+}
+
+bool Core::addServers(int port){
         Socket* server = new Socket();
 
         if (!server->create()) {
@@ -156,5 +188,11 @@ bool Core::addServer(int port){
                 isServerSocket
                     handelNewConnection
                 isClientEvent
-                    HandelCLientEvent
+                    handelClientEvent
+
+
+*/
+
+/* HandelCLientEvent
+
 */

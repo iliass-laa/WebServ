@@ -18,8 +18,6 @@ int main()
     Core mainServer;
     mainServer.run();
 }
-
-
 /*
 
     loop 
