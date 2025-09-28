@@ -10,6 +10,11 @@ void    DirectoryListing::setRoot(const std::string &path)
     root = path;
 }
 
+bool    DirectoryListing::getDefault() const
+{
+    return locationFound;
+}
+
 void    DirectoryListing::setAutoIndex(bool value)
 {
     autoIndex = value;
@@ -57,7 +62,7 @@ void HandleGetResponse(const struct HttpRequest &Req, std::vector<char> &respons
     while (true)
     {
         fillReqStruct(nullptre, locationConfig, longestMatchingPrefix, Req.headers.at("Host"));
-        if (locationConfig.getRoot())
+        if (locationConfig.getDefault())
             break;
         size_t pos = Req.uri.find_last_of('/');
         if (pos == std::string::npos || pos == 0)
