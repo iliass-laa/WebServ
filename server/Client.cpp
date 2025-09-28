@@ -44,6 +44,10 @@ bool Client::readData(){
 
     ssize_t bytes = recv(client_fd, buffer, sizeof(buffer), 0); // 
     if (bytes > 0){
+        std::cout << buffer << std::endl;
+
+
+        
         std::vector<char> readed(buffer, buffer + bytes);
         reqBuff.insert(reqBuff.end(), readed.begin(), readed.end());
         return true;

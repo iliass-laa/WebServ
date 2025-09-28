@@ -19,6 +19,9 @@ void Core::stop(){
 
 // run 
 void Core::run(){
+    if(!addServers(8080)){
+        return ;
+    }
     running = true ;
     while (running){
         std::vector<std::pair<int,short> > readyEvents = event_loop.waitForEvents(0); 
@@ -33,10 +36,14 @@ void Core::run(){
 }   
 
 void Core::handleSocketEvent(int fd, short events){
-    if(isServerSocket(fd))
+    if(isServerSocket(fd)){
+        std::cout << "server socket " << fd << std::endl;
         handleNewConnection(fd);
-    else
+    }
+    else{
+        std::cout << ">>>>>> client " << fd << std::endl;
         handleClientEvent(fd, events);
+    }
 }
 
 bool Core::isServerSocket(int fd){
@@ -86,12 +93,12 @@ void Core::handleClientEvent(int client_fd, short events){
         return ;
     Client* client = it->second;
 
-    if(events & POLLIN){
-        if(client->readData() && client->hasDataToRead())// use parse func here to check is there data to read
-            processClientRequest(client);
+    if(events & POLLIN ){
+        if(client)
+            client->readData();
     }
 
-    // read request
+    // send response
     if(events & POLLOUT)
         client->writeData();
 
@@ -133,6 +140,42 @@ void Core::processClientRequest(Client *client)
     response += content.str();
     client->queueResponse(response);
 }
+
+bool Core::addServers(int port){
+        Socket* server = new Socket();
+
+        if (!server->create()) {
+            std::cerr << "Failed to create socket for port " << port << std::endl;
+            delete server;
+            return false;
+        }
+        
+        if (!server->bind(port)) {
+            std::cerr << "Failed to bind socket to port " << port << std::endl;
+            delete server;
+            return false;
+        }
+        
+        if (!server->listen(5)) {
+            std::cerr << "Failed to listen on port " << port << std::endl;
+            delete server;
+            return false;
+        }
+        
+        if (!server->setNonBlocking()) {
+            std::cerr << "Failed to set socket to non-blocking on port " << port << std::endl;
+            delete server;
+            return false;
+        }
+
+        // Add server socket to event loop
+        event_loop.addSocket(server->getFd(), POLLIN);
+
+        std::cout << "Server listening on port " << port << std::endl;
+        servers.push_back(server);
+        return true;
+}
+
 /*  
     algo
 
@@ -153,29 +196,3 @@ void Core::processClientRequest(Client *client)
 /* HandelCLientEvent
 
 */
-
-bool Core::addServers(int port){
-    std::vector<ServerConf*> servs = obj.getServs();
-    for ( std::vector<ServerConf*>::iterator it = servs.begin();
-        it != servs.end();
-        it++
-
-    ){
-        Socket* server = new Socket();
-
-        if (!server->create() || !server->bind(port) ||
-            !server->listen(5) || !server->setNonBlocking())
-        {
-            std::cerr << "Failed to create server on port " << port << std::endl;
-            delete server;
-            return false;
-        }
-
-        // Add server socket to event loop
-        event_loop.addSocket(server->getFd(), POLLIN);
-
-        std::cout << "Server listening on port " << port << std::endl;
-        servers.push_back(server);
-    }
-    return true;
-}
