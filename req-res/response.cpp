@@ -92,11 +92,27 @@ int buildFileResponse(std::string path, std::vector<char> &responseBuffer)
     std::ostringstream responseStream;
     responseStream << "HTTP/1.1 200 OK\r\n";
     responseStream << "Content-Length: " << size << "\r\n";
-    responseStream << "Content-Type: " getContentType(path) << "\r\n";
+    responseStream << "Content-Type: " << getContentType(path) << "\r\n";
     responseStream << "\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
+    responseBuffer.insert(responseBuffer.end(), buffer.begin(), buffer.end());
     return 0;
+}
+
+void buildRedirectionResponse(const std::string &newLocation, std::vector<char> &responseBuffer)
+{
+    std::ostringstream responseStream;
+    responseStream << "HTTP/1.1 301 Moved Permanently\r\n";
+    responseStream << "Location: " << newLocation << "\r\n";
+    responseStream << "\r\n";
+    std::string responseHeaders = responseStream.str();
+    responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
+}
+
+int buildAutoIndexResponse(const std::string &directoryPath, const std::string &uri, std::vector<char> &responseBuffer)
+{
+
 }
 
 void HandleGetResponse(const struct HttpRequest &Req, std::vector<char> &responseBuffer)
@@ -116,8 +132,11 @@ void HandleGetResponse(const struct HttpRequest &Req, std::vector<char> &respons
     std::string fileSystemPath = locationConfig.getRoot() + Req.uri;
     if (S_ISDIR(checkPath(fileSystemPath)))
     {
-        if (fileSystemPath.end() != '/' )
-            buildRedirectionResponse(fileSystemPath + '/');
+        if ((!fileSystemPath.empty() && fileSystemPath[fileSystemPath.size() - 1] != '/'))
+        {
+            buildRedirectionResponse(fileSystemPath + '/', responseBuffer);
+            return;
+        }
         if (locationConfig.getHasIndexFile())
         {
             std::vector<std::string> indexFiles = locationConfig.getIndexFile();
@@ -136,15 +155,12 @@ void HandleGetResponse(const struct HttpRequest &Req, std::vector<char> &respons
             if (!buildAutoIndexResponse(fileSystemPath, Req.uri, responseBuffer))
                 return;
         }
-        else
-        {
-            responseBuffer = buildErrorResponse(403);
+        responseBuffer = buildErrorResponse(403);
             return;
-        }
     }
     else if (S_ISREG(checkPath(fileSystemPath)))
     {
-        if (!buildFileResponse(indexPath, responseBuffer))
+        if (!buildFileResponse(fileSystemPath, responseBuffer))
             return;
     }
     else

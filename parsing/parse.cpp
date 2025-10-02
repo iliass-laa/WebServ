@@ -12,7 +12,7 @@ int main(int ac, char **av)
         catch (std::exception &e)
         {
             std::cerr << "Caught an Error in the main\n";
-            std::cerr << e.what() << std::endl;
+            st1d::cerr << e.what() << std::endl;
         }
     }
     else    
