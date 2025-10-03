@@ -170,6 +170,6 @@ bool Core::addServers(){
 */
 
 
-void Core::setPairs(std::set<string>& param){
+void Core::setPairs(std::set<std::string>& param){
     pairs.insert(pairs.end(), param.begin(), param.end());
 }

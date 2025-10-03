@@ -26,7 +26,7 @@ class Core {
         void handleNewConnection(int server_fd);
         void handleClientEvent(int client_fd, short events);
         void processClientRequest(Client *client);
-        void setPairs(std::set<string>&);
+        void setPairs(std::set<std::string>&);
         
     public:
         Core();
