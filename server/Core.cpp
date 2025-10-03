@@ -168,3 +168,8 @@ bool Core::addServers(){
                 isClientEvent
                     HandelCLientEvent
 */
+
+
+void Core::setPairs(std::set<string>& param){
+    pairs.insert(pairs.end(), param.begin(), param.end());
+}
