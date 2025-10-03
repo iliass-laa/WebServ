@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <sys/stat.h>
+#include <dirent.h>
 
 struct HttpRequest {
     std::string method;
