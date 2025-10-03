@@ -10,8 +10,11 @@ class Config{
         std::vector<ServerConf* > servs;
 
     public:
+        Config();
+        ~Config();
         std::vector<ServerConf*> getServs();
         void addServerConf(const std::vector<listenPair>);
+        void addServerConf( ServerConf*);
 };
 
 #endif
