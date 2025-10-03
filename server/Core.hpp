@@ -7,24 +7,7 @@
 #include<map>
 #include<iostream>
 
-class ServerConf{
-    private:
-        std::map<std::string, std::string > sockAddress; // [interface , port]
 
-    public :
-        // std::vector<int>& getPorts(){return ports;}
-};
-
-
-class Config{
-    private :
-        std::vector<ServerConf* > servs;
-
-    public:
-        std::vector<ServerConf*> getServs(){
-            return servs;
-        }
-};
 
 
 class Core {
