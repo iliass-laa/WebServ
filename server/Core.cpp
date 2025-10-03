@@ -1,5 +1,5 @@
 #include"Core.hpp"
-#include"../"
+// #include"../"
 
 Core::Core():running(false){}
 Core::~Core(){}
