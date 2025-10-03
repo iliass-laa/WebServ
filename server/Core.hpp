@@ -4,7 +4,7 @@
 #include"Client.hpp"
 #include"EventLoop.hpp"
 #include<vector>
-#include<map>
+#include<set>
 #include<iostream>
 
 
@@ -16,7 +16,9 @@ class Core {
         std::map<int, Client*> clients;
         EventLoop event_loop;
         bool running;
-        Config obj;
+        // Config obj;
+        // std::list<pair<std::> >
+        std::set<std::string> pairs;
 
         void handleSocketEvent(int fd, short events);
         bool isServerSocket(int fd);
@@ -29,7 +31,8 @@ class Core {
         ~Core();
         Core(const Core& other);
         Core& operator=(const Core& other);
-        bool addServers(int port);
+        bool addServers();
+        bool addServer(int port);
         void run();
         void stop();
 };
