@@ -8,11 +8,21 @@ std::vector<char> buildErrorResponse(int status) {
         case ERROR_BAD_VERSION: code = 505; reason = "HTTP Version Not Supported"; break;
         case ERROR:             code = 400; reason = "Bad Request"; break;
         case 404:               code = 404; reason = "Not Found"; break;
+        case 403:               code = 403; reason = "Forbidden"; break;
         default:                code = 400; reason = "Bad Request"; break;
     }
 
-    std::stringstream ss;
-    ss << "HTTP/1.1 " << code << " " << reason << "\r\n\r\n";
+    std::ostringstream body;
+    body << "<html><body><h1>" << code << " " << reason << "</h1></body></html>";
+    std::string bodyStr = body.str();
+
+    std::ostringstream ss;
+    ss << "HTTP/1.1 " << code << " " << reason << "\r\n";
+    ss << "Content-Type: text/html\r\n";
+    ss << "Content-Length: " << bodyStr.size() << "\r\n";
+    ss << "\r\n";
+    ss << bodyStr;
+
     std::string response = ss.str();
     return std::vector<char>(response.begin(), response.end());
 }
@@ -40,8 +50,8 @@ int handleRequest(std::vector<char> requestBuffer, std::vector<char> &responseBu
     else if (status == ERROR_BAD_METHOD || status == ERROR_BAD_VERSION || status == ERROR)
         responseBuffer = buildErrorResponse(status);
     printRequest(Req);
-    // if (Req.method == "GET")
-    //     HandleGetResponse(Req, responseBuffer);
+    if (Req.method == "GET")
+        HandleGetResponse(Req, responseBuffer);
     // else if (Req.method == "POST") {
     //     HandlePostResponse(Req, responseBuffer);
     // } else
