@@ -13,7 +13,7 @@ class Config{
         Config();
         ~Config();
         std::vector<ServerConf*> getServs();
-        void addServerConf(const std::vector<listenPair>);
+        void addServerConf(const std::vector<ServerConf*>);
         void addServerConf( ServerConf*);
 };
 

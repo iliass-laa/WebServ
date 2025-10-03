@@ -14,7 +14,7 @@ std::vector<ServerConf*> Config::getServs(){
     return servs;
 }
 
-void Config::addServerConf(const std::vector<listenPair> range){
+void Config::addServerConf(const std::vector<ServerConf*> range){
     servs.insert(servs.end(),range.begin(), range.end() );
 }
 
