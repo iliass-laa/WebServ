@@ -20,10 +20,13 @@ class ServerConf{
     public :
         // std::vector<int>& getPorts(){return ports;}
         ServerConf();
+        ServerConf(std::string, std::string);
+        ServerConf( std::vector<listenPair>& );
         ~ServerConf();
         const std::vector<listenPair>& getListens();
-        void addListen(const listenPair&);
-        void addListen(const std::string&, const std::string&);
+        void addListen( listenPair&);
+        void addListens( std::vector<listenPair>&);
+        void addListen( std::string&,  std::string&);
 };
 
 #endif
