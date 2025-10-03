@@ -1,4 +1,5 @@
 #include"Core.hpp"
+#include"../"
 
 Core::Core():running(false){}
 Core::~Core(){}
@@ -16,7 +17,8 @@ void Core::stop(){
 } 
 
 // run 
-void Core::run(){
+void Core::run(BaseNode* root){
+    // Fill pairs here 
     if(!addServer(8080)){
         return ;
     }
@@ -127,6 +129,29 @@ bool Core::addServer(int port){
         std::cout << "Server listening on port " << port << std::endl;
         servers.push_back(server);
         return true;
+}
+
+bool Core::addServers(){
+    for(std::set<std::string>::iterator it = pairs.begin() ; it != pairs ; it++ ){
+
+        Socket* server = new Socket();
+        
+        if (!server->create() || !server->bind(port) ||
+            !server->listen(5) )
+            // || !server->setNonBlocking())
+        {
+            std::cerr << "Failed to create server on port " << port << std::endl;
+            delete server;
+            return false;
+        }
+
+        // Add server socket to event loop
+        event_loop.addSocket(server->getFd(), POLLIN);
+
+        std::cout << "Server listening on port " << port << std::endl;
+        servers.push_back(server);
+    }
+    return true;
 }
 
 /*  

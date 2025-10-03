@@ -1,4 +1,5 @@
 #include "parsing/headers/webserver.hpp"
+#include "server/Core.hpp"
 
 int main(int ac, char **av)
 {
@@ -9,6 +10,10 @@ int main(int ac, char **av)
     try
     {
         root = parseConfigFile(confPath.c_str());
+        Core magicSystem;
+        magicSystem.run(root);
+
+
         
     }
     catch(const std::exception& e)
