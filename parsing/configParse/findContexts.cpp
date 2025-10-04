@@ -34,6 +34,17 @@ ContextNode *findStaticLocation(BaseNode* root, t_request &req, std::string loca
 
 
 
+bool checkBestMatch(std::string uri, std::string locPath, int &nbr)
+{
+    if (uri.find(locPath) == 0 && locPath.length() > nbr)
+    {
+        nbr = locPath.length();
+        return true;
+    }
+    return false;
+}
+
+
 ContextNode *findHttpContext(BaseNode* root)
 {
     ContextNode *tmp, *res;
@@ -92,8 +103,10 @@ ContextNode *findLocationContext(ContextNode* server, std::string path)
 {
     ContextNode *tmp, *tmpRes;
     std:: size_t pos;
-    
-    int def = 0;
+    int def , bestMatch;
+
+    def= 0;
+    bestMatch = 0;
     tmpRes = NULL;
     if (!server)
     {
@@ -112,7 +125,8 @@ ContextNode *findLocationContext(ContextNode* server, std::string path)
     int max = server->nbrChildsC + server->nbrChildsD;
     // std::cout << GREEN <<"\n>>>>>MAX :"<< max <<"<<\n" <<DEF; 
     // std::cout << GREEN <<">>>>>MAX :"<< server->nbrChildsC + server->nbrChildsD <<"<<\n" <<DEF; 
-    for(int i = 0;  i < max ; i++)
+    // for(int i = 0;  i < max ; i++)
+    for(int i = 0;  i < server->nbrChilds ; i++)
     {
         if (server->Childs[i]->typeNode == isContext)
         {
@@ -124,6 +138,8 @@ ContextNode *findLocationContext(ContextNode* server, std::string path)
                 pos = tmp->val.back().find(path); 
                 if ( pos != std::string::npos && pos == 0)
                     return tmp;
+                else if(checkBestMatch(path, tmp->val.back(), bestMatch))
+                    tmpRes = tmp;
             }
             else if(tmp->val.back().compare(path) == 0)
                 return tmp;

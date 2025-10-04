@@ -13,21 +13,37 @@ void fillReqStruct(BaseNode*root, DirectoryListing &obj, std::string uri, std::s
 
     cNode = findHttpContext(root);
     cNode = findServerContext(cNode, serverName,std::atoi(port.c_str()));
-    cNode = findLocationContext(cNode, uri);
-    for(int i = 0; i < cNode->nbrChilds; i++)
+    
+    cNode = findLocationContext(cNode, "/");
+    if (cNode)
     {
-        if (cNode->Childs[i]->typeNode == isDirective)
+         for(int i = 0; i < cNode->nbrChilds; i++)
         {
-            dNode = dynamic_cast<DirectiveNode *>(cNode->Childs[i]);
-            if (!dNode->key.compare("autoindex"))
-                if (!dNode->value.back().compare("on"))
-                    obj.setAutoIndex(true);
-            if (!dNode->key.compare("root"))
-                obj.setDirectoryPath(dNode->value.back());
-            if (!dNode->key.compare("index"))
+            if (cNode->Childs[i]->typeNode == isDirective)
             {
-                //bool hasIndex don't have a setter
-                obj.setIndexFile(dNode->value); 
+                dNode = dynamic_cast<DirectiveNode *>(cNode->Childs[i]);
+                if (!dNode->key.compare("root"))
+                    obj.setRoot(dNode->value.back());
+                if (!dNode->key.compare("index"))
+                        obj.setIndexFile(dNode->value);
+            }
+        }
+    }
+    cNode = findLocationContext(cNode, uri);
+    if (cNode)
+    {
+        for(int i = 0; i < cNode->nbrChilds; i++)
+        {
+            if (cNode->Childs[i]->typeNode == isDirective)
+            {
+                dNode = dynamic_cast<DirectiveNode *>(cNode->Childs[i]);
+                if (!dNode->key.compare("autoindex"))
+                    if (!dNode->value.back().compare("on"))
+                        obj.setAutoIndex(true);
+                if (!dNode->key.compare("root"))
+                    obj.setRoot(dNode->value.back());
+                if (!dNode->key.compare("index"))
+                        obj.setIndexFile(dNode->value);
             }
         }
     }
