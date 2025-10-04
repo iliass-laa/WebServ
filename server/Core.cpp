@@ -19,7 +19,8 @@ void Core::stop(){
 // run 
 void Core::run(BaseNode* root){
     // Fill pairs here 
-    if(!addServer(8080)){
+    fillServerConf(root, this);
+    if(!addServers()){
         return ;
     }
     running = true ;
@@ -132,6 +133,7 @@ bool Core::addServer(int port){
 }
 
 bool Core::addServers(){
+
     for(std::set<std::string>::iterator it = pairs.begin() ; it != pairs.end() ; it++ ){
 
         Socket* server = new Socket();
