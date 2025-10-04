@@ -7,26 +7,39 @@
 void addPair(std::string val,  std::set <std::string> &pairs)
 {
     std::string defaultInter("0.0.0.0"),port, inter, newVal;
-    std::set <std::string> :: iterator it;
-    int pos;
+    std::set <std::string> :: iterator it, toErase;
+    int pos, skip;
 
     newVal = val;
+    skip = 0;
     it = pairs.begin();
-    pos = val.find(":");
+    pos = newVal.find(":");
     if (pos == std::string::npos)
         newVal = (defaultInter + ":"+ val);
-    
+    pos = newVal.find(":");
     port = newVal.substr(pos+1, newVal.length());
     inter =  newVal.substr(0 , pos);
-    if (inter.compare("0.0.0.0") == 0)
+    if (inter.compare(defaultInter) == 0)
     {
-        for(it = pairs.begin(); it != pairs.end(); it++)
+        while (it!= pairs.end())
         {
             if (it->find(port) != std::string::npos)
-                pairs.erase(it);
+            {
+                toErase = it++;
+                pairs.erase(toErase);
+            }
+            else
+                it++;
         }
     }
-    pairs.insert(newVal);
+    else
+    {
+        it = pairs.find( defaultInter +":"+ port);
+        if (it != pairs.end())
+            skip = 1;
+    }
+    if (!skip)
+        pairs.insert(newVal);
 }
 
 void fillServerConf(BaseNode *root, Core &obj)
