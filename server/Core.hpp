@@ -26,7 +26,6 @@ class Core {
         void handleNewConnection(int server_fd);
         void handleClientEvent(int client_fd, short events);
         void processClientRequest(Client *client);
-        void setPairs(std::set<std::string>&);
         
     public:
         Core();
@@ -37,6 +36,7 @@ class Core {
         bool addServer(int port);
         void run();
         void stop();
+        void setPairs(std::set<std::string>&);
 };
 
 #endif

@@ -132,15 +132,15 @@ bool Core::addServer(int port){
 }
 
 bool Core::addServers(){
-    for(std::set<std::string>::iterator it = pairs.begin() ; it != pairs ; it++ ){
+    for(std::set<std::string>::iterator it = pairs.begin() ; it != pairs.end() ; it++ ){
 
         Socket* server = new Socket();
         
-        if (!server->create() || !server->bind(port) ||
+        if (!server->create() || !server->bind(*it) ||
             !server->listen(5) )
             // || !server->setNonBlocking())
         {
-            std::cerr << "Failed to create server on port " << port << std::endl;
+            std::cerr << "Failed to create server on port " << *it << std::endl;
             delete server;
             return false;
         }
@@ -148,7 +148,7 @@ bool Core::addServers(){
         // Add server socket to event loop
         event_loop.addSocket(server->getFd(), POLLIN);
 
-        std::cout << "Server listening on port " << port << std::endl;
+        std::cout << "Server listening on port " << *it << std::endl;
         servers.push_back(server);
     }
     return true;
