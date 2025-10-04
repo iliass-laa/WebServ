@@ -5,6 +5,8 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <string>
+#include <iostream>
+#include <vector>
 
 class Socket
 {
@@ -15,6 +17,8 @@ class Socket
     private:
         int sockFd;
         struct sockaddr_in address;
+        bool parseIPv4(const std::string& ip, uint32_t& result);
+
 
     public:
         Socket(); 

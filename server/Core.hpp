@@ -7,7 +7,7 @@
 #include<set>
 #include<iostream>
 #include<string>
-
+#include"../parsing/headers/AST.hpp"
 
 
 
@@ -34,7 +34,7 @@ class Core {
         Core& operator=(const Core& other);
         bool addServers();
         bool addServer(int port);
-        void run();
+        void run(BaseNode*);
         void stop();
         void setPairs(std::set<std::string>&);
 };
