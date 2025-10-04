@@ -11,10 +11,7 @@ int main(int ac, char **av)
     {
         root = parseConfigFile(confPath.c_str());
         Core magicSystem;
-        magicSystem.run(root);
-
-
-        
+        magicSystem.run(root);   
     }
     catch(const std::exception& e)
     {

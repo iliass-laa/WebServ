@@ -3,7 +3,6 @@
 #include <set>
 
 
-
 void addPair(std::string val,  std::set <std::string> &pairs)
 {
     std::string defaultInter("0.0.0.0"),port, inter, newVal;
