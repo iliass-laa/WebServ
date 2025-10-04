@@ -4,6 +4,8 @@
 #include <sstream>
 #include <sys/stat.h>
 #include <dirent.h>
+#include "../parsing/headers/webserver.hpp"
+
 
 struct HttpRequest {
     std::string method;
@@ -21,6 +23,6 @@ enum ParseStatus {
     ERROR
 };
 
-int		parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req);
-void	HandleGetResponse(const struct HttpRequest &Req, std::vector<char> &responseBuffer);
+int		parseRequest(BaseNode* ConfigNode, std::vector<char> requestBuffer, struct HttpRequest &Req);
+void	HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer);
 std::vector<char> buildErrorResponse(int status);
