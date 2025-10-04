@@ -1,5 +1,4 @@
 #include "request.hpp"
-#include "../parsing/headers/webserver.hpp"
 
 class DirectoryListing {
     private :
@@ -8,6 +7,7 @@ class DirectoryListing {
         bool    hasIndexFile;
         bool   autoIndex;
         bool   _default;
+        bool    uploadSupport;
     public :
     DirectoryListing();
     ~DirectoryListing();

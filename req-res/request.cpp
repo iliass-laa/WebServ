@@ -41,7 +41,7 @@ void printRequest(const struct HttpRequest &Req) {
 }
 
 
-int handleRequest(std::vector<char> requestBuffer, std::vector<char> &responseBuffer) {
+int handleRequest(BaseNode* ConfigNode, std::vector<char> requestBuffer, std::vector<char> &responseBuffer) {
     struct HttpRequest Req;
     
     int status = parseRequest(requestBuffer, Req);
@@ -51,9 +51,9 @@ int handleRequest(std::vector<char> requestBuffer, std::vector<char> &responseBu
         responseBuffer = buildErrorResponse(status);
     printRequest(Req);
     if (Req.method == "GET")
-        HandleGetResponse(Req, responseBuffer);
+        HandleGetResponse(BaseNode* ConfigNode, Req, responseBuffer);
     // else if (Req.method == "POST") {
-    //     HandlePostResponse(Req, responseBuffer);
+    //     HandlePostResponse(BaseNode* ConfigNode, Req, responseBuffer);
     // } else
     //     HandleDeleteResponse(Req, responseBuffer);
     return COMPLETE;
