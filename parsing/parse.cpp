@@ -6,13 +6,13 @@ int main(int ac, char **av)
     BaseNode *root = NULL;
     if (ac == 2){   
         try {
-            root =    root = parseConfigFile(av[1]);
+            root = parseConfigFile(av[1]);
             freeTree(root);
         }  
         catch (std::exception &e)
         {
             std::cerr << "Caught an Error in the main\n";
-            st1d::cerr << e.what() << std::endl;
+            std::cerr << e.what() << std::endl;
         }
     }
     else    
