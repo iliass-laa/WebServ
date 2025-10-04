@@ -1,5 +1,29 @@
 #include"Socket.hpp"
 
+static bool parseIPv4(const std::string& ip, uint32_t& result) {
+    std::istringstream iss(ip);
+    std::string octet;
+    uint32_t parts[4];
+    int count = 0;
+    
+    while (std::getline(iss, octet, '.') && count < 4) {
+        int val = std::stoi(octet);
+        if (val < 0 || val > 255) return false;
+        parts[count++] = val;
+    }
+    
+    if (count != 4) return false;
+    
+    result = (parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8) | parts[3];
+    return true;
+}
+
+// Usage:
+uint32_t ip_addr;
+if (parseIPv4(interface, ip_addr)) {
+    address.sin_addr.s_addr = htonl(ip_addr);
+}
+
 Socket::Socket(): sockFd(-1){}; 
 
 Socket::~Socket(){};
@@ -16,11 +40,15 @@ bool Socket::create()
     return sockFd != -1;
 }
 
-bool Socket::bind(int port)
+bool Socket::bind(std::string pair)
 {
+    
+    size_t colonPos = pair.find(':');
+    std::string interface = pair.substr(0, colonPos);
+    std::string port = pair.substr(colonPos + 1);
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY; // accept from any ip (0.0.0.0)
-    address.sin_port = htons(port);
+    address.sin_port = htons(atoi(port.c_str()));
 
     /*
             set all the info assigned to address struct 

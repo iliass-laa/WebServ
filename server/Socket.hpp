@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <netinet/in.h>
+#include <string>
 
 class Socket
 {
@@ -19,7 +20,7 @@ class Socket
         Socket(); 
         ~Socket();
         bool create();
-        bool bind(int port);
+        bool bind(std::string);
         bool setNonBlocking();
         bool listen(int backlog);
         int getFd() const ;
