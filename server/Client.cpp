@@ -4,6 +4,9 @@ Client::Client(int fd):client_fd(fd), connected(true), resOffset(0) {
     // Constructor implementation
 }
 
+
+
+
 Client::~Client() {
     // Destructor implementation
 }
