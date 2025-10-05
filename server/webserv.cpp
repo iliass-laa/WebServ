@@ -16,9 +16,9 @@
 // {
 //     std::cout << " WebServ A 3zzy " << std::endl ;
 //     Core mainServer;
-//     mainServer.run();
+//     mainServer.run(NULL);
 // }
-// /*
+/*
 
 //     loop 
 //         declare fd_set ( read_set , write_set )
