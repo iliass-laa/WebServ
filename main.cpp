@@ -10,9 +10,9 @@ int main(int ac, char *av[])
     try
     {
         root = parseConfigFile(confPath.c_str());
+        // printTree(root, 0);
         Core magicSystem;
         magicSystem.run(root);   
-        // (void)root;
     }
     catch(const std::exception& e)
     {
