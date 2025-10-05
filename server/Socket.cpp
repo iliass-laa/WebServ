@@ -24,11 +24,17 @@ bool Socket::bind(std::string pair)
     size_t colonPos = pair.find(':');
     std::string interface = pair.substr(0, colonPos);
     std::string port = pair.substr(colonPos + 1);
-    address.sin_family = AF_INET;
     uint32_t inter ;
     parseIPv4(interface, inter);
-    address.sin_addr.s_addr = inter; // accept from any ip (0.0.0.0)
-    address.sin_port = htons(atoi(port.c_str()));
+    std::cout << atoi(port.c_str()) << std::endl;
+    address.sin_family = AF_INET;
+    address.sin_port = htons((uint16_t)atoi(port.c_str()));
+    if(!interface.compare("0.0.0.0")){
+        std::cout << "it is 0.0.0.0 " << std::endl;
+        address.sin_addr.s_addr = INADDR_ANY; // accept from any ip (0.0.0.0)
+    }
+    else
+        address.sin_addr.s_addr = inter; // accept from any ip (0.0.0.0)
 
     /*
             set all the info assigned to address struct 
@@ -57,13 +63,15 @@ bool Socket::setNonBlocking()
         get the file flags first 
         set it to be non-blocking
     */
-    int flags = fcntl(sockFd, F_GETFL, 0);
+    int flags = fcntl(sockFd, F_GETFL, 0); 
     return fcntl(sockFd, F_SETFL, flags | O_NONBLOCK) == 0;
 }
 
 bool Socket::listen(int backlog)
 {
-    return ::listen(sockFd, backlog);
+    int status_listen = ::listen(sockFd, backlog);
+    std::cout << "listen return " << status_listen << "  qetal errno  " << errno << std::endl;
+    return status_listen ;
 }
 
 int Socket::getFd() const 

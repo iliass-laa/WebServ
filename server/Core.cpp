@@ -136,15 +136,19 @@ void Core::handleClientEvent(int client_fd, short events){
 bool Core::addServers(){
 
     
-    std::cout << pairs.size()  << std::endl;
+    std::cout << "start add server " << pairs.size()  << std::endl; 
+    printPairs(pairs);
     for(std::set<std::string>::iterator it = pairs.begin() ; it != pairs.end() ; it++ ){
 
         Socket* server = new Socket();
         
         std::cout << "addservers : inside loop" << std::endl;
-        if (!server->create() || !server->bind(*it) || !server->listen(5) || !server->setNonBlocking())
+        if (!server->create()
+        || !server->setNonBlocking()
+        || !server->bind(*it) 
+        || server->listen(5) )
         {
-            std::cerr << "Failed to create server on port " << *it << std::endl;
+            std::cerr << "00 Failed to create server on port " << *it << std::endl;
             delete server;
             return false;
         }
