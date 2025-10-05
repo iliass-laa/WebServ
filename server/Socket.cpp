@@ -82,7 +82,7 @@ bool Socket::parseIPv4(const std::string& ip, uint32_t& result){
     std::vector<std::string> numbers;
     std::string curr;
 
-    for(int i = 0 ; i < ip.length() ; i++){
+    for(size_t i = 0 ; i < ip.length() ; i++){
         if(ip[i] == '.' ){
             if(curr.empty())
                 return (std::cout << "error 0"<< std::endl ,false) ;
@@ -99,7 +99,7 @@ bool Socket::parseIPv4(const std::string& ip, uint32_t& result){
     uint32_t parts[4];
     for(int i = 0 ; i < 4 ; i++){
         int val = 0;
-        for(int j = 0 ; j < numbers[i].length() ; j++){
+        for(size_t j = 0 ; j < numbers[i].length() ; j++){
             char c = numbers[i][j];
             if(c < '0' || c > '9') return false;
             val = val * 10 + (c - 48);

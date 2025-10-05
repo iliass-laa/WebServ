@@ -34,7 +34,7 @@ class Core {
         Core(const Core& other);
         Core& operator=(const Core& other);
         bool addServers();
-        bool addServer(int port);
+        // bool addServer(int port);
         void run(BaseNode*);
         void stop();
         void setPairs(std::set<std::string>&);

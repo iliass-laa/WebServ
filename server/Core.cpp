@@ -1,5 +1,5 @@
 #include"Core.hpp"
-// #include"../"
+#include"../parsing/headers/webserver.hpp"
 
 Core::Core():running(false){}
 Core::~Core(){}
@@ -19,7 +19,7 @@ void Core::stop(){
 // run 
 void Core::run(BaseNode* root){
     // Fill pairs here 
-    fillServerConf(root, this);
+    fillServerConf(root, *this);
     if(!addServers()){
         return ;
     }
@@ -112,25 +112,25 @@ void Core::handleClientEvent(int client_fd, short events){
     
 }
 
-bool Core::addServer(int port){
-        Socket* server = new Socket();
+// bool Core::addServer(int port){
+//         // Socket* server = new Socket();
 
-        if (!server->create() || !server->bind(port) ||
-            !server->listen(5) )
-            // || !server->setNonBlocking())
-        {
-            std::cerr << "Failed to create server on port " << port << std::endl;
-            delete server;
-            return false;
-        }
+//         // if (!server->create() || !server->bind(port) ||
+//         //     !server->listen(5) )
+//         //     // || !server->setNonBlocking())
+//         // {
+//         //     std::cerr << "Failed to create server on port " << port << std::endl;
+//         //     delete server;
+//         //     return false;
+//         // }
 
-        // Add server socket to event loop
-        event_loop.addSocket(server->getFd(), POLLIN);
+//         // // Add server socket to event loop
+//         // event_loop.addSocket(server->getFd(), POLLIN);
 
-        std::cout << "Server listening on port " << port << std::endl;
-        servers.push_back(server);
-        return true;
-}
+//         // std::cout << "Server listening on port " << port << std::endl;
+//         // servers.push_back(server);
+//         return (ptrue);
+// }
 
 bool Core::addServers(){
 

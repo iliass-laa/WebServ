@@ -6,6 +6,7 @@
 #include <netinet/in.h>
 #include <string>
 #include <iostream>
+#include <cstdlib>
 #include <vector>
 
 class Socket
