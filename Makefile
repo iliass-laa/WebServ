@@ -1,9 +1,15 @@
 
 CC = c++
-CPPFLAGS = -Wall -Wextra -Werror -std=c++11 -I. -Iheaders -Iincludes -Iparsing -Iparsing/configParse -Iparsing/configTools -Ireq-res -Iserver
+CPPFLAGS = -Wall -Wextra -Werror -std=c++98
 
 # Automatically find all .cpp files in the repository (exclude .git and root/webserv placeholders)
-SRCS := $(shell find . -name '*.cpp' -not -path './.git/*' -not -path './webserv/*' | sort)
+SERVER = $(shell find ./server -name '*.cpp' | sort)
+PARSE = $(shell find ./parsing -name '*.cpp' | sort)
+REQERSP = $(shell find ./req-res -name '*.cpp' | sort)
+
+SRCS := $(PARSE) $(SERVER) main.cpp
+# SRCS := $(SERVER) main.cpp
+# SRCS := $(PARSE) main.cpp
 OBJ := $(SRCS:.cpp=.o)
 
 NAME = webserv

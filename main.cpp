@@ -1,7 +1,7 @@
 #include "parsing/headers/webserver.hpp"
 #include "server/Core.hpp"
 
-int main(int ac, char **av)
+int main(int ac, char *av[])
 {
     std::string confPath("configfile.conf");
     BaseNode *root;
@@ -17,4 +17,5 @@ int main(int ac, char **av)
     {
         std::cerr << e.what() << '\n';
     }
-    }
+    return 0;
+}

@@ -1,5 +1,5 @@
-#ifndef WEBSERV_HPP
-#define WEBSERV_HPP
+#ifndef WEBSERVER_HPP
+#define WEBSERVER_HPP
 
 
 #include "includes.hpp"
@@ -8,6 +8,7 @@
 #include "classes.hpp"
 #include "AST.hpp"
 #include "colors.hpp"
+#include "../../server/Core.hpp"
 
 
 
@@ -91,5 +92,7 @@ void getReqInfos(t_request & req,BaseNode *root);
 char *ft_strcopy(const char *s, int size);
 void handleCGIError(t_request &req, int client_fd);
 // void fillReqStruct(BaseNode*root, DirectoryListing &obj, std::string uri, std::string host);
+
+void fillServerConf(BaseNode *root, Core &obj);
 
 #endif
