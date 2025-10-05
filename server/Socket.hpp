@@ -7,6 +7,7 @@
 #include <string>
 #include <iostream>
 #include <cstdlib>
+#include <cerrno>
 #include <vector>
 
 class Socket

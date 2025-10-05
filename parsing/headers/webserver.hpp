@@ -94,5 +94,6 @@ void handleCGIError(t_request &req, int client_fd);
 // void fillReqStruct(BaseNode*root, DirectoryListing &obj, std::string uri, std::string host);
 
 void fillServerConf(BaseNode *root, Core &obj);
+void printPairs(std::set<std::string > &pairs);
 
 #endif
