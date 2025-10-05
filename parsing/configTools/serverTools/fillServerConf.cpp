@@ -7,7 +7,8 @@ void addPair(std::string val,  std::set <std::string> &pairs)
 {
     std::string defaultInter("0.0.0.0"),port, inter, newVal;
     std::set <std::string> :: iterator it, toErase;
-    int pos, skip;
+    size_t pos;
+    int skip;
 
     newVal = val;
     skip = 0;
