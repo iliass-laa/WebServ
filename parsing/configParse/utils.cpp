@@ -69,12 +69,16 @@ ContextNode *findContextChild(ContextNode *parent, std::string childName)
     ContextNode *child;
     if (parent == NULL)
         return NULL;
+    // std::cout << " >>>httpNode->nbrChilds:" << parent->nbrChildsC+parent->nbrChildsD << "\n";
+    // std::cout << " >>>httpNode->nbrChilds:" << parent->nbrChilds << "\n";
+    // std::cout << " >>>httpNode->Childs1Type:" << parent->Childs[0]->typeNode << "\n";
     for(int i=0 ; i< parent->nbrChildsC+parent->nbrChildsD;i++)
     {
         if (parent->Childs[i]->typeNode == isContext)
         {
             child = dynamic_cast<ContextNode *>(parent->Childs[i]);
-            if (child->val.at(0).compare(childName) == 0)
+            // std::cout << child->val.back() + " ,"+ childName<<  "\n";
+            if (child->val.back().compare(childName) == 0)
                 return child;
         }
     }

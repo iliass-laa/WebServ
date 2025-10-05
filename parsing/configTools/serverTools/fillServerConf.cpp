@@ -49,7 +49,8 @@ void fillServerConf(BaseNode *root, Core &obj)
     ContextNode *serverNode, *httpNode;
     DirectiveNode *dNode;
 
-    httpNode = findContextChild( dynamic_cast<ContextNode *>(root),"http"); 
+    // httpNode = findContextChild( dynamic_cast<ContextNode *>(root),"http"); 
+    httpNode = findHttpContext( dynamic_cast<ContextNode *>(root)); 
     for (int i = 0 ; i < httpNode->nbrChilds; i++)
     {
         if (httpNode->Childs[i]->typeNode == isContext)
@@ -71,4 +72,5 @@ void fillServerConf(BaseNode *root, Core &obj)
         }
     }
     obj.setPairs(pairs);
+    // (void)obj;
 }

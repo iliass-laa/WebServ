@@ -14,7 +14,7 @@ OBJ := $(SRCS:.cpp=.o)
 
 NAME = webserv
 
-all: $(NAME)
+all: $(NAME) Makefile
 
 $(NAME): $(OBJ)
 	$(CC) $(CPPFLAGS) -o $@ $^
