@@ -71,6 +71,7 @@ void fillServerConf(BaseNode *root, Core &obj)
             pairs.insert(serverPairs.begin(), serverPairs.end());   
         }
     }
+    std::cout << "parse pairs size " << pairs.size() << std::endl;
     obj.setPairs(pairs);
     // (void)obj;
 }

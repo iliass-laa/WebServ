@@ -19,6 +19,7 @@ void Core::stop(){
 // run 
 void Core::run(BaseNode* root){
     // Fill pairs here 
+    // (void)root;
     fillServerConf(root, *this);
     if(!addServers()){
         return ;
@@ -134,13 +135,14 @@ void Core::handleClientEvent(int client_fd, short events){
 
 bool Core::addServers(){
 
+    
+    std::cout << pairs.size()  << std::endl;
     for(std::set<std::string>::iterator it = pairs.begin() ; it != pairs.end() ; it++ ){
 
         Socket* server = new Socket();
         
-        if (!server->create() || !server->bind(*it) ||
-            !server->listen(5) )
-            // || !server->setNonBlocking())
+        std::cout << "addservers : inside loop" << std::endl;
+        if (!server->create() || !server->bind(*it) || !server->listen(5) || !server->setNonBlocking())
         {
             std::cerr << "Failed to create server on port " << *it << std::endl;
             delete server;
