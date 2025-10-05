@@ -49,7 +49,7 @@ void    printfContext(ContextNode *node, int level)
     for(size_t i = 0; i < node->Childs.size();i++)
     {
         if (node->Childs[i]->typeNode == isDirective)
-            printDirective(dynamic_cast<DirectiveNode*>(node->Childs[i]), level);
+            printDirective(dynamic_cast<DirectiveNode*>(node->Childs[i]),3 + level);
         else
             printfContext(dynamic_cast<ContextNode*>(node->Childs[i]), 3 + level);
     }
@@ -58,7 +58,9 @@ void    printfContext(ContextNode *node, int level)
 
 void printTree(BaseNode * root, int Level)
 {
+    std::cout << "Printing Tree\n";
     printfContext(dynamic_cast<ContextNode*>(root), Level);
+    std::cout << "Done Printing Tree\n";
 }
 
 

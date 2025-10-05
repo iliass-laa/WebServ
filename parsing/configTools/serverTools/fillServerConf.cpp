@@ -3,6 +3,17 @@
 #include <set>
 
 
+void printPairs(std::set<std::string > &pairs)
+{
+    std::set<std::string > :: iterator it = pairs.begin();
+    std::cout << "printing Pairs\n";
+    while(it != pairs.end())
+    {
+        std::cout << *it<< "\n";
+        it++;
+    }
+}
+
 void addPair(std::string val,  std::set <std::string> &pairs)
 {
     std::string defaultInter("0.0.0.0"),port, inter, newVal;
@@ -49,28 +60,24 @@ void fillServerConf(BaseNode *root, Core &obj)
     ContextNode *serverNode, *httpNode;
     DirectiveNode *dNode;
 
-    // httpNode = findContextChild( dynamic_cast<ContextNode *>(root),"http"); 
     httpNode = findHttpContext( dynamic_cast<ContextNode *>(root)); 
     for (int i = 0 ; i < httpNode->nbrChilds; i++)
     {
         if (httpNode->Childs[i]->typeNode == isContext)
         {
-            serverNode =  dynamic_cast<ContextNode *>(httpNode->Childs[i]);
 
+            serverNode =  dynamic_cast<ContextNode *>(httpNode->Childs[i]);
             for(int j = 0; j < serverNode->nbrChilds; j++)
             {
-                if (  httpNode->Childs[i]->typeNode == isDirective)
+                if ( serverNode->Childs[j]->typeNode == isDirective)
                 {
-                    dNode =  dynamic_cast<DirectiveNode *>(serverNode->Childs[i]);
+                    dNode =  dynamic_cast<DirectiveNode *>(serverNode->Childs[j]);
                     if (dNode->key.compare("listen") == 0)
-                    {
                         addPair(dNode->value.back(), serverPairs);
-                    }
                 }
             }
             pairs.insert(serverPairs.begin(), serverPairs.end());   
         }
     }
     obj.setPairs(pairs);
-    // (void)obj;
 }
