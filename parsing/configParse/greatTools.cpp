@@ -22,7 +22,7 @@ std::string getServerName(ContextNode *server)
 int getServerPorts(ContextNode *server, std::vector<int> &ports)
 {
     int port;
-    std::vector<int> ports;
+    // std::vector<int> ports;
     DirectiveNode * tmp;
     if (server->type_Context != ServerContext)  
         return 1;

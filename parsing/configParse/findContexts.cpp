@@ -36,7 +36,7 @@ ContextNode *findStaticLocation(BaseNode* root, t_request &req, std::string loca
 
 bool checkBestMatch(std::string uri, std::string locPath, int &nbr)
 {
-    if (uri.find(locPath) == 0 && locPath.length() > nbr)
+    if (uri.find(locPath) == 0 && static_cast<int>(locPath.length()) > nbr)
     {
         nbr = locPath.length();
         return true;
@@ -122,7 +122,7 @@ ContextNode *findLocationContext(ContextNode* server, std::string path)
     }
     if (path.compare("/") == 0)
         def = 1; 
-    int max = server->nbrChildsC + server->nbrChildsD;
+    // int max = server->nbrChildsC + server->nbrChildsD;
     // std::cout << GREEN <<"\n>>>>>MAX :"<< max <<"<<\n" <<DEF; 
     // std::cout << GREEN <<">>>>>MAX :"<< server->nbrChildsC + server->nbrChildsD <<"<<\n" <<DEF; 
     // for(int i = 0;  i < max ; i++)
