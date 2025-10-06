@@ -54,6 +54,11 @@ int checkPath(const std::string &path)
     return pathStat.st_mode;
 }
 
+bool getUploadSupport () const
+{
+    return uploadSupport;
+}
+
 std::string getContentType(const std::string &path)
 {
     size_t dotPosition = path.find_last_of('.');
@@ -205,4 +210,36 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
         responseBuffer = buildErrorResponse(404);
         return;
     }
+}
+
+void handlePostRequest(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)
+{
+    DirectoryListing locationConfig;
+    std::vector<std::string> parts;
+
+    fillReqStruct(ConfigNode, locationConfig, Req.uri, Req.headers.at("Host"));
+    if (!locationConfig.getUploadSupport())
+    {
+        responseBuffer = buildErrorResponse(403);
+        return;
+    }
+    if (locationConfig.getRoot() != "/")
+        std::string uploadPath = locationConfig.getRoot() + Req.uri;
+    size_t boundaryPos = Req.headers.at("Content-Type").find("Boundary=");
+    if (boundaryPos != std::string::npos)
+    {
+        responseBuffer = buildErrorResponse(400);
+        return;
+    }
+    Req.boundary = Req.headers.at("Content-Type").substr(pos + 9);
+    while (true)
+    {
+        size_t next = Req.body.find(Req.boundary, boundaryPos + 9);
+        if (next == std::string::npos)
+            break;
+        parts.push_back(std::string(Req.body.begin() + boundaryPos + 9, Req.body.begin() + next));
+        boundaryPos = next;
+    }
+    
+
 }
