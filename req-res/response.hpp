@@ -1,3 +1,4 @@
+#pragma once
 #include "request.hpp"
 
 class DirectoryListing {
@@ -19,4 +20,5 @@ class DirectoryListing {
     bool    getHasIndexFile() const;
     std::vector<std::string>    getIndexFile() const;
     bool   getDefault() const;
+    bool   getUploadSupport() const;
 };

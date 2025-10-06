@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <map>
 #include <vector>
@@ -13,6 +14,7 @@ struct HttpRequest {
     std::string version;
     std::map<std::string, std::string> headers;
     std::vector<char> body;
+    std::string boundary;
 };
 
 enum ParseStatus {
