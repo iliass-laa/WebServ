@@ -241,7 +241,8 @@ void buildProcessResponse(std::vector<char> &responseBuffer)
     responseStream << "Content-Length: 32\r\n";
     responseStream << "\r\n";
     responseStream << "Request processed succesfully.\r\n";
-    (void)responseBuffer;
+    std::string responseHeaders = responseStream.str();
+    responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
 }
 
 void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)
@@ -267,22 +268,22 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
         responseBuffer = buildErrorResponse(400);
         return;
     }
-    Req.boundary = Req.headers.at("Content-Type").substr(boundaryPos + 9);
+    std::string boundary = Req.headers.at("Content-Type").substr(boundaryPos + 9);
     std::string body(Req.body.begin(), Req.body.end());
-    size_t start = body.find(Req.boundary);
+    size_t start = body.find(boundary);
     if (start == std::string::npos)
     {
         responseBuffer = buildErrorResponse(400);
         return;
     }
-    start += Req.boundary.size() + 2;
+    start += boundary.size() + 2;
     while (true)
     {
-        size_t next = body.find(Req.boundary, start);
+        size_t next = body.find(boundary, start);
         if (next == std::string::npos)
             break;
         parts.push_back(body.substr(start, next - start));
-        start = next + Req.boundary.size() + 2;
+        start = next + boundary.size() + 2;
     }
     if (parts.empty())
     {
