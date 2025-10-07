@@ -9,6 +9,7 @@ class DirectoryListing {
         bool   autoIndex;
         bool   _default;
         bool    uploadSupport;
+        bool    deletePerm;
     public :
     DirectoryListing();
     ~DirectoryListing();
@@ -23,6 +24,8 @@ class DirectoryListing {
     void   setDefault(bool value);
     bool   getUploadSupport() const;
     void   setUploadSupport(bool value);
+    bool   getDeletePermission() const;
+    void   setDeletePermission(bool value);
 };
 
 
