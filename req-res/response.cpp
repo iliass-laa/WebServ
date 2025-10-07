@@ -1,6 +1,6 @@
 #include "response.hpp"
 
-DirectoryListing::DirectoryListing() : root(nullptr), indexFile(nullptr), hasIndexFile(false), autoIndex(false), locationFound(false) {}
+DirectoryListing::DirectoryListing() : hasIndexFile(false), autoIndex(false), _default(false), uploadSupport(false) {}
 
 DirectoryListing::~DirectoryListing() {}
 
@@ -11,7 +11,7 @@ void    DirectoryListing::setRoot(const std::string &path)
 
 bool    DirectoryListing::getDefault() const
 {
-    return locationFound;
+    return _default;
 }
 
 void    DirectoryListing::setAutoIndex(bool value)
@@ -46,6 +46,21 @@ const std::string &DirectoryListing::getRoot() const
     return root;
 }
 
+bool   DirectoryListing::getUploadSupport() const
+{
+    return uploadSupport;
+}
+
+void   DirectoryListing::setUploadSupport(bool value)
+{
+    uploadSupport = value;
+}
+
+void DirectoryListing::setDefault(bool value)
+{
+    _default = value;
+}              
+
 int checkPath(const std::string &path)
 {
     struct stat pathStat;
@@ -54,17 +69,13 @@ int checkPath(const std::string &path)
     return pathStat.st_mode;
 }
 
-bool getUploadSupport () const
-{
-    return uploadSupport;
-}
 
 std::string getContentType(const std::string &path)
 {
     size_t dotPosition = path.find_last_of('.');
-    if (dotPos == std::string::npos)
+    if (dotPosition == std::string::npos)
         return "application/octet-stream";
-    std::string extension = path.substr(dotPos + 1);
+    std::string extension = path.substr(dotPosition + 1);
     if (extension == "html" || extension == "htm")
         return "text/html";
     if (extension == "css")
@@ -84,7 +95,7 @@ std::string getContentType(const std::string &path)
 
 int buildFileResponse(std::string path, std::vector<char> &responseBuffer)
 {
-    std::ifstream file(path, std::ios::binary);
+    std::ifstream file(path.c_str(), std::ios::binary);
     if (!file)
         return 1;
     file.seekg(0, std::ios::end);
@@ -212,8 +223,31 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
     }
 }
 
-void handlePostRequest(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)
+void buildPostResponse(std::vector<char> &responseBuffer)
 {
+    std::ostringstream responseStream;
+    responseStream << "HTTP/1.1 201 Created\r\n";
+    responseStream << "Content-Length: 32\r\n";
+    responseStream << "\r\n";
+    responseStream << "Resource created successfully.\r\n";
+    std::string responseHeaders = responseStream.str();
+    responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
+}
+
+void buildProcessResponse(std::vector<char> &responseBuffer)
+{
+    std::ostringstream responseStream;
+    responseStream << "HTTP/1.1 200 OK\r\n";
+    responseStream << "Content-Length: 32\r\n";
+    responseStream << "\r\n";
+    responseStream << "Request processed succesfully.\r\n";
+    std::string responseHeaders = responseStream.str();
+    responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
+}
+
+void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)
+{
+    bool    writeSuccess = false;
     DirectoryListing locationConfig;
     std::vector<std::string> parts;
 
@@ -223,23 +257,77 @@ void handlePostRequest(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
         responseBuffer = buildErrorResponse(403);
         return;
     }
+    std::string uploadPath;
     if (locationConfig.getRoot() != "/")
-        std::string uploadPath = locationConfig.getRoot() + Req.uri;
-    size_t boundaryPos = Req.headers.at("Content-Type").find("Boundary=");
-    if (boundaryPos != std::string::npos)
+        uploadPath = locationConfig.getRoot() + Req.uri;
+    else
+        uploadPath = Req.uri;
+    size_t boundaryPos = Req.headers.at("Content-Type").find("boundary=");
+    if (boundaryPos == std::string::npos)
     {
         responseBuffer = buildErrorResponse(400);
         return;
     }
-    Req.boundary = Req.headers.at("Content-Type").substr(pos + 9);
+    std::string boundary = Req.headers.at("Content-Type").substr(boundaryPos + 9);
+    std::string body(Req.body.begin(), Req.body.end());
+    size_t start = body.find(boundary);
+    if (start == std::string::npos)
+    {
+        responseBuffer = buildErrorResponse(400);
+        return;
+    }
+    start += boundary.size() + 2;
     while (true)
     {
-        size_t next = Req.body.find(Req.boundary, boundaryPos + 9);
+        size_t next = body.find(boundary, start);
         if (next == std::string::npos)
             break;
-        parts.push_back(std::string(Req.body.begin() + boundaryPos + 9, Req.body.begin() + next));
-        boundaryPos = next;
+        parts.push_back(body.substr(start, next - start));
+        start = next + boundary.size() + 2;
     }
-    
+    if (parts.empty())
+    {
+        responseBuffer = buildErrorResponse(400);
+        return;
+    }
+    for (size_t i = 0; i < parts.size(); i++)
+    {
+        size_t headerEnd = parts[i].find("\r\n\r\n");
+        if (headerEnd == std::string::npos)
+            continue;
 
+        std::string headersPart = parts[i].substr(0, headerEnd);
+        std::string bodyPart = parts[i].substr(headerEnd + 4);
+        if (bodyPart.size() >= 2 && bodyPart.substr(bodyPart.size() - 2) == "\r\n")
+            bodyPart.resize(bodyPart.size() - 2);
+        std::istringstream headerStream(headersPart);
+        std::string headerLine;
+        std::string fileName;
+        while (std::getline(headerStream, headerLine))
+        {
+            if (headerLine.find("Content-Disposition:") != std::string::npos)
+            {
+                size_t namePos = headerLine.find("filename=\"");
+                if (namePos != std::string::npos)
+                {
+                    size_t nameEnd = headerLine.find("\"", namePos + 10);
+                    if (nameEnd != std::string::npos)
+                        fileName = headerLine.substr(namePos + 10, nameEnd - (namePos + 10));
+                }
+            }
+        }
+        if (fileName.empty())
+            continue;
+        std::string fullPath = uploadPath + '/' + fileName;
+        std::ofstream outFile(fullPath.c_str(), std::ios::binary);
+        if (!outFile)
+            continue;
+        outFile.write(bodyPart.c_str(), bodyPart.size());
+        writeSuccess = true;
+        outFile.close();
+    }
+    if (writeSuccess)
+        buildPostResponse(responseBuffer);
+    else
+        buildProcessResponse(responseBuffer);
 }
