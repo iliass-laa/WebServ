@@ -21,6 +21,16 @@ void EventLoop::addSocket(int fd, short events){
     fd_to_index[fd] = poll_fds.size() -1;
 }
 
+void EventLoop::editSocket(int fd, short events){
+    std::vector<pollfd>::iterator client ;
+    for(; client != poll_fds.end(); client++){
+        if(client->fd == fd)
+            break;   
+    }
+    client->events =  events; 
+}
+
+
 void EventLoop::removeSocket(int fd){
     std::map<int, int>::iterator it = fd_to_index.find(fd);
     int index = it->second ;

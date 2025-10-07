@@ -53,7 +53,7 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> requestBuffer, std::ve
     if (Req.method == "GET")
         HandleGetResponse(BaseNode* ConfigNode, Req, responseBuffer);
     else if (Req.method == "POST") {
-        HandlePostResponse(BaseNode* ConfigNode, Req, responseBuffer);
+        // HandlePostResponse(BaseNode* ConfigNode, Req, responseBuffer);
     }
     else
     //     HandleDeleteResponse(Req, responseBuffer);

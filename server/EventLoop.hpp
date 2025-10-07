@@ -15,6 +15,7 @@ class EventLoop {
         EventLoop& operator=(const EventLoop& );
 
         void addSocket(int fd, short events);
+        void editSocket(int fd, short events);
         void removeSocket(int fd);
         void updateSocketEvents(int fd, short events);
         std::vector<std::pair<int, short> > waitForEvents(int timeout);
