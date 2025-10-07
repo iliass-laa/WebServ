@@ -7,7 +7,7 @@ SERVER = $(shell find ./server -name '*.cpp' | sort)
 PARSE = $(shell find ./parsing -name '*.cpp' | sort)
 REQERSP = $(shell find ./req-res -name '*.cpp' | sort)
 
-SRCS := $(PARSE) $(SERVER) main.cpp
+SRCS := $(PARSE) $(SERVER) $(REQERSP) main.cpp
 # SRCS := $(SERVER) main.cpp
 # SRCS := $(PARSE) main.cpp
 OBJ := $(SRCS:.cpp=.o)

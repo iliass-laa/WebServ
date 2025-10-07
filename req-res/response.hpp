@@ -24,3 +24,6 @@ class DirectoryListing {
     bool   getUploadSupport() const;
     void   setUploadSupport(bool value);
 };
+
+
+void fillReqStruct(BaseNode*root, DirectoryListing &obj, std::string uri, std::string host);
