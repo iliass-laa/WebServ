@@ -146,7 +146,8 @@ bool Core::addServers(){
         if (!server->create()
         || !server->setNonBlocking()
         || !server->bind(*it) 
-        || server->listen(5) )
+        || server->listen(5) 
+        )
         {
             std::cerr << "00 Failed to create server on port " << *it << std::endl;
             delete server;
