@@ -6,8 +6,6 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include "../parsing/headers/webserver.hpp"
-#include "response.hpp"
-
 
 struct HttpRequest {
     std::string method;
@@ -29,3 +27,4 @@ enum ParseStatus {
 int		parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req);
 void	HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer);
 std::vector<char> buildErrorResponse(int status);
+void    HandlePostRequest(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer);
