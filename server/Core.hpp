@@ -10,7 +10,7 @@
 #include<string>
 // #include"../parsing/headers/AST.hpp"
 class BaseNode;
-// class Client;
+class Client;
 
 class Core {
     private:

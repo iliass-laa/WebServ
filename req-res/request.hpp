@@ -8,7 +8,6 @@
 #include "../parsing/headers/webserver.hpp"
 #include "../parsing/headers/AST.hpp"
 
-
 struct HttpRequest {
     std::string method;
     std::string uri;
@@ -26,7 +25,8 @@ enum ParseStatus {
     ERROR
 };
 
-int		parseRequest(BaseNode* ConfigNode, std::vector<char> requestBuffer, struct HttpRequest &Req);
+int		parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req);
 void	HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer);
 std::vector<char> buildErrorResponse(int status);
 int handleRequest(BaseNode* ConfigNode, std::vector<char> requestBuffer, std::vector<char> &responseBuffer) ;
+void    HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer);
