@@ -46,6 +46,21 @@ const std::string &DirectoryListing::getRoot() const
     return root;
 }
 
+bool   DirectoryListing::getUploadSupport() const
+{
+    return uploadSupport;
+}
+
+void   DirectoryListing::setUploadSupport(bool value)
+{
+    uploadSupport = value;
+}
+
+void DirectoryListing::setDefault(bool value)
+{
+    locationFound = value;
+}              
+
 int checkPath(const std::string &path)
 {
     struct stat pathStat;
@@ -54,10 +69,6 @@ int checkPath(const std::string &path)
     return pathStat.st_mode;
 }
 
-bool getUploadSupport () const
-{
-    return uploadSupport;
-}
 
 std::string getContentType(const std::string &path)
 {
