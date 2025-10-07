@@ -1,6 +1,6 @@
 #include "response.hpp"
 
-DirectoryListing::DirectoryListing() : root(nullptr), indexFile(nullptr), hasIndexFile(false), autoIndex(false), _default(false), uploadSupport(false) {}
+DirectoryListing::DirectoryListing() : hasIndexFile(false), autoIndex(false), _default(false), uploadSupport(false) {}
 
 DirectoryListing::~DirectoryListing() {}
 
@@ -11,7 +11,7 @@ void    DirectoryListing::setRoot(const std::string &path)
 
 bool    DirectoryListing::getDefault() const
 {
-    return locationFound;
+    return _default;
 }
 
 void    DirectoryListing::setAutoIndex(bool value)
@@ -73,9 +73,9 @@ int checkPath(const std::string &path)
 std::string getContentType(const std::string &path)
 {
     size_t dotPosition = path.find_last_of('.');
-    if (dotPos == std::string::npos)
+    if (dotPosition == std::string::npos)
         return "application/octet-stream";
-    std::string extension = path.substr(dotPos + 1);
+    std::string extension = path.substr(dotPosition + 1);
     if (extension == "html" || extension == "htm")
         return "text/html";
     if (extension == "css")
@@ -95,7 +95,7 @@ std::string getContentType(const std::string &path)
 
 int buildFileResponse(std::string path, std::vector<char> &responseBuffer)
 {
-    std::ifstream file(path, std::ios::binary);
+    std::ifstream file(path.c_str(), std::ios::binary);
     if (!file)
         return 1;
     file.seekg(0, std::ios::end);
@@ -241,11 +241,12 @@ void buildProcessResponse(std::vector<char> &responseBuffer)
     responseStream << "Content-Length: 32\r\n";
     responseStream << "\r\n";
     responseStream << "Request processed succesfully.\r\n";
+    (void)responseBuffer;
 }
 
 void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)
 {
-    Bool    writeSuccess = false;
+    bool    writeSuccess = false;
     DirectoryListing locationConfig;
     std::vector<std::string> parts;
 
@@ -317,7 +318,7 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
         if (fileName.empty())
             continue;
         std::string fullPath = uploadPath + '/' + fileName;
-        std::ofstream outFile(fullPath, std::ios::binary);
+        std::ofstream outFile(fullPath.c_str(), std::ios::binary);
         if (!outFile)
             continue;
         outFile.write(bodyPart.c_str(), bodyPart.size());
@@ -327,5 +328,5 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
     if (writeSuccess)
         buildPostResponse(responseBuffer);
     else
-        BuildProcessResponse(responseBuffer);
+        buildProcessResponse(responseBuffer);
 }

@@ -1,4 +1,4 @@
-#include "response.hpp"
+#include "request.hpp"
 
 std::vector<char> buildErrorResponse(int status) {
     int code;
@@ -27,18 +27,18 @@ std::vector<char> buildErrorResponse(int status) {
     return std::vector<char>(response.begin(), response.end());
 }
 
-void printRequest(const struct HttpRequest &Req) {
-    std::cout << "Method: " << Req.method << "\n";
-    std::cout << "URI: " << Req.uri << "\n";
-    std::cout << "Version: " << Req.version << "\n";
-    std::cout << "Headers:\n";
-    for (const auto &header : Req.headers) {
-        std::cout << header.first << ": " << header.second << "\n";
-    }
-    std::cout << "Body (" << Req.body.size() << " bytes):\n";
-    std::cout.write(Req.body.data(), Req.body.size());
-    std::cout << "\n";
-}
+// void printRequest(const struct HttpRequest &Req) {
+//     std::cout << "Method: " << Req.method << "\n";
+//     std::cout << "URI: " << Req.uri << "\n";
+//     std::cout << "Version: " << Req.version << "\n";
+//     std::cout << "Headers:\n";
+//     for (const auto &header : Req.headers) {
+//         std::cout << header.first << ": " << header.second << "\n";
+//     }
+//     std::cout << "Body (" << Req.body.size() << " bytes):\n";
+//     std::cout.write(Req.body.data(), Req.body.size());
+//     std::cout << "\n";
+// }
 
 
 int handleRequest(BaseNode* ConfigNode, std::vector<char> requestBuffer, std::vector<char> &responseBuffer) {
@@ -54,7 +54,7 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> requestBuffer, std::ve
         HandleGetResponse(ConfigNode, Req, responseBuffer);
     else if (Req.method == "POST")
         HandlePostResponse(ConfigNode, Req, responseBuffer);
-    else
+    // else
     //     HandleDeleteResponse(Req, responseBuffer);
     return COMPLETE;
     
