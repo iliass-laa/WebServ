@@ -58,7 +58,7 @@ void   DirectoryListing::setUploadSupport(bool value)
 
 void DirectoryListing::setDefault(bool value)
 {
-    locationFound = value;
+    _default = value;
 }              
 
 int checkPath(const std::string &path)
