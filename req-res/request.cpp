@@ -9,7 +9,7 @@ std::vector<char> buildErrorResponse(int status) {
         case ERROR:             code = 400; reason = "Bad Request"; break;
         case 404:               code = 404; reason = "Not Found"; break;
         case 403:               code = 403; reason = "Forbidden"; break;
-        case 409;               code = 409; reason = "Conflict"; break;
+        case 409:               code = 409; reason = "Conflict"; break;
         default:                code = 400; reason = "Bad Request"; break;
     }
 
