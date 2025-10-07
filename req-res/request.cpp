@@ -49,7 +49,7 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> requestBuffer, std::ve
         return INCOMPLETE;
     else if (status == ERROR_BAD_METHOD || status == ERROR_BAD_VERSION || status == ERROR)
         responseBuffer = buildErrorResponse(status);
-    printRequest(Req);
+    // printRequest(Req);
     if (Req.method == "GET")
         HandleGetResponse(BaseNode* ConfigNode, Req, responseBuffer);
     else if (Req.method == "POST")
@@ -142,31 +142,4 @@ int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
     }
     Req.body = bodyPart;
     return COMPLETE;
-}
-
-
-int main() {
-    // Example HTTP request (GET with headers)
-    const char* rawRequest =
-        "GET /index.html HTTP/1.1\r\n"
-        "Host: localhost\r\n"
-        "User-Agent: TestClient/1.0\r\n"
-        "Accept: */*\r\n"
-        "\r\n";
-
-    // Fill vector<char> with request bytes
-    std::vector<char> requestBuffer(rawRequest, rawRequest + strlen(rawRequest));
-
-    // Prepare response vector (not used for GET in this example)
-    std::vector<char> responseBuffer;
-
-    int status = handleRequest(requestBuffer, responseBuffer);
-    if (status == INCOMPLETE) {
-        std::cout << "Request is incomplete, waiting for more data...\n";
-    } else
-    if (!responseBuffer.empty()) {
-            std::cout << "Error response:\n";
-            std::cout.write(&responseBuffer[0], responseBuffer.size());
-    }
-    return 0;
 }
