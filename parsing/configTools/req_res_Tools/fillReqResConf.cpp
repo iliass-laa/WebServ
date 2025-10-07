@@ -2,9 +2,6 @@
 #include "../../../req-res/response.hpp"
 
 
-// sa7bi driss check this Header , needs Guards  "../../../req-res/response.hpp"
-
-
 void fillReqStruct(BaseNode*root, DirectoryListing &obj, std::string uri, std::string host)
 {
     ContextNode *cNode;
@@ -35,6 +32,8 @@ void fillReqStruct(BaseNode*root, DirectoryListing &obj, std::string uri, std::s
     cNode = findLocationContext(cNode, uri);
     if (cNode)
     {
+        if (uri.find("/upload/") == 0)
+            obj.setUploadSupport(true);
         for(int i = 0; i < cNode->nbrChilds; i++)
         {
             if (cNode->Childs[i]->typeNode == isDirective)
