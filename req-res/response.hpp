@@ -20,5 +20,7 @@ class DirectoryListing {
     bool    getHasIndexFile() const;
     std::vector<std::string>    getIndexFile() const;
     bool   getDefault() const;
+    void   setDefault(bool value);
     bool   getUploadSupport() const;
+    void   setUploadSupport(bool value);
 };
