@@ -4,17 +4,21 @@
 #include<iostream>
 #include<vector>
 #include <sys/socket.h>
+#include "../req-res/request.hpp"
 #define BUFFER 4096
 
+class BaseNode;
 class Client {
 private:
+    BaseNode* root;
     int client_fd;
     bool connected;
     std::vector<char> reqBuff; // for request
     std::string resBuff; // for response
+    std::vector<char> respoBuff; // for response
     ssize_t resOffset;
 public:
-    Client(int);
+    Client(int, BaseNode*);
     ~Client();
     Client(const Client& other);
     Client& operator=(const Client& other);

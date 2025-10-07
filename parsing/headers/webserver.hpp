@@ -9,7 +9,7 @@
 #include "AST.hpp"
 #include "colors.hpp"
 #include "../../server/Core.hpp"
-
+#include<set>
 
 
 void testSocket(char *path, BaseNode *root);
@@ -93,6 +93,6 @@ char *ft_strcopy(const char *s, int size);
 void handleCGIError(t_request &req, int client_fd);
 
 void fillServerConf(BaseNode *root, Core &obj);
-void printPairs(std::set<std::string > &pairs);
+// void printPairs(std::set<std::string > &pairs);
 
 #endif

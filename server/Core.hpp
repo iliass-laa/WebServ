@@ -5,12 +5,12 @@
 #include"EventLoop.hpp"
 #include<vector>
 #include<set>
+#include<map>
 #include<iostream>
 #include<string>
-#include"../parsing/headers/AST.hpp"
-
-
-
+// #include"../parsing/headers/AST.hpp"
+class BaseNode;
+class Client;
 
 class Core {
     private:
@@ -18,8 +18,7 @@ class Core {
         std::map<int, Client*> clients;
         EventLoop event_loop;
         bool running;
-        // Config obj;
-        // std::list<pair<std::> >
+        BaseNode* root;
         std::set<std::string> pairs;
 
         void handleSocketEvent(int fd, short events);
@@ -27,15 +26,17 @@ class Core {
         void handleNewConnection(int server_fd);
         void handleClientEvent(int client_fd, short events);
         void processClientRequest(Client *client);
+        // void editSocket();
         
     public:
         Core();
+        Core(BaseNode* );
         ~Core();
         Core(const Core& other);
         Core& operator=(const Core& other);
         bool addServers();
         // bool addServer(int port);
-        void run(BaseNode*);
+        void run();
         void stop();
         void setPairs(std::set<std::string>&);
 };
