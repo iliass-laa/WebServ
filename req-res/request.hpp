@@ -28,3 +28,4 @@ int		parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req);
 void	HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer);
 std::vector<char> buildErrorResponse(int status);
 void    HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer);
+void HandleDeleteResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer);

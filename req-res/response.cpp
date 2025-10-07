@@ -59,7 +59,17 @@ void   DirectoryListing::setUploadSupport(bool value)
 void DirectoryListing::setDefault(bool value)
 {
     _default = value;
-}              
+}
+
+void DirectoryListing::setDeletePermission(bool value)
+{
+    deletePerm = value;
+}
+
+bool   DirectoryListing::getDeletePermission() const
+{
+    return deletePerm;
+}
 
 int checkPath(const std::string &path)
 {
@@ -182,8 +192,17 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
             break;
         longestMatchingPrefix = Req.uri.substr(0, pos);
     }
-    std::string fileSystemPath = locationConfig.getRoot() + Req.uri;
-    if (S_ISDIR(checkPath(fileSystemPath)))
+    std::string fileSystemPath = locationConfig.getRoot();
+    if (fileSystemPath.back() != '/')
+        fileSystemPath += '/';
+    fileSystemPath += Req.uri.substr(1);
+    int pathType = checkPath(fileSystemPath);
+    if (pathType == -1)
+    {
+        responseBuffer = buildErrorResponse(404);
+        return;
+    }
+    if (S_ISDIR(pathType))
     {
         if ((!fileSystemPath.empty() && fileSystemPath[fileSystemPath.size() - 1] != '/'))
         {
@@ -196,7 +215,8 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
             for (size_t i = 0; i < indexFiles.size(); i++)
             {
                 std::string indexPath = fileSystemPath + '/' + indexFiles[i];
-                if (S_ISREG(checkPath(indexPath)))
+                pathType = checkPath(indexPath);
+                if (S_ISREG(pathType))
                 {
                     if (!buildFileResponse(indexPath, responseBuffer))
                         return;
@@ -211,7 +231,7 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
         responseBuffer = buildErrorResponse(403);
             return;
     }
-    else if (S_ISREG(checkPath(fileSystemPath)))
+    else if (S_ISREG(pathType))
     {
         if (!buildFileResponse(fileSystemPath, responseBuffer))
             return;
@@ -330,4 +350,72 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
         buildPostResponse(responseBuffer);
     else
         buildProcessResponse(responseBuffer);
+}
+
+void buildDelResponse(std::vector<char> &responseBuffer)
+{
+    std::ostringstream responseStream;
+    responseStream << "HTTP/1.1 200 OK\r\n";
+    responseStream << "Content-Length: 19\r\n";
+    responseStream << "\r\n";
+    responseStream << "Resource deleted.\r\n";
+    std::string responseHeaders = responseStream.str();
+    responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
+}
+
+void HandleDeleteResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)
+{
+    DirectoryListing locationConfig;
+    std::string longestMatchingPrefix = Req.uri;
+
+    while (true)
+    {
+        fillReqStruct(ConfigNode, locationConfig, longestMatchingPrefix, Req.headers.at("Host"));
+        if (!locationConfig.getDefault())
+            break;
+        size_t pos = Req.uri.find_last_of('/');
+        if (pos == std::string::npos || pos == 0)
+            break;
+        longestMatchingPrefix = Req.uri.substr(0, pos);
+    }
+    if (!locationConfig.getDeletePermission())
+    {
+        responseBuffer = buildErrorResponse(403);
+        return;
+    }
+    std::string fileSystemPath = locationConfig.getRoot();
+    if (fileSystemPath.back() != '/')
+        fileSystemPath += '/';
+    fileSystemPath += Req.uri.substr(1);
+    int pathType = checkPath(fileSystemPath);
+    if (pathType == -1)
+    {
+        responseBuffer = buildErrorResponse(404);
+        return;
+    }
+    if (S_ISREG(pathType))
+    {
+        if (remove(fileSystemPath.c_str()) != 0)
+        {
+            responseBuffer = buildErrorResponse(500);
+            return;
+        }
+        buildDelResponse(responseBuffer);
+            return;
+    }
+    else if (S_ISDIR(pathType))
+    {
+       if (rmdir(fileSystemPath.c_str()) != 0)
+       {
+           responseBuffer = buildErrorResponse(409);
+           return;
+       }
+       buildDelResponse(responseBuffer);
+       return;
+    }
+    else
+    {
+        responseBuffer = buildErrorResponse(404);
+        return;
+    }
 }
