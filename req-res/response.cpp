@@ -1,6 +1,6 @@
 #include "response.hpp"
 
-DirectoryListing::DirectoryListing() : root(nullptr), indexFile(nullptr), hasIndexFile(false), autoIndex(false), locationFound(false) {}
+DirectoryListing::DirectoryListing() : root(nullptr), indexFile(nullptr), hasIndexFile(false), autoIndex(false), _default(false), uploadSupport(false) {}
 
 DirectoryListing::~DirectoryListing() {}
 
