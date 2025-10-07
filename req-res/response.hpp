@@ -24,5 +24,3 @@ class DirectoryListing {
     bool   getUploadSupport() const;
     void   setUploadSupport(bool value);
 };
-
-void handlePostRequest(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)

@@ -243,7 +243,7 @@ void buildProcessResponse(std::vector<char> &responseBuffer)
     responseStream << "Request processed succesfully.\r\n";
 }
 
-void handlePostRequest(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)
+void HandlePostRequest(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)
 {
     Bool    writeSuccess = false;
     DirectoryListing locationConfig;
