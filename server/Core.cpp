@@ -1,7 +1,10 @@
 #include"Core.hpp"
 #include"../parsing/headers/webserver.hpp"
 
-Core::Core():running(false){}
+Core::Core():running(false),root(NULL){}
+
+Core::Core(BaseNode* obj):running(false), root(obj){}
+ 
 Core::~Core(){}
 Core::Core(const Core& obj){
     (void)obj;
@@ -17,9 +20,7 @@ void Core::stop(){
 } 
 
 // run 
-void Core::run(BaseNode* root){
-    // Fill pairs here 
-    // (void)root;
+void Core::run(){
     fillServerConf(root, *this);
     if(!addServers()){
         return ;
@@ -79,7 +80,7 @@ void Core::handleNewConnection(int server_fd){
     // accept new connection 
     int new_client = server->accept();
     if(new_client != -1){
-        Client* cl = new Client(new_client);
+        Client* cl = new Client(new_client, root);
         event_loop.addSocket(new_client, POLLIN);
         clients[new_client] = cl;
         std::cout << "new client connected !!" << std::endl ;
@@ -95,8 +96,8 @@ void Core::handleClientEvent(int client_fd, short events){
     Client* client = it->second;
 
     if(events & POLLIN ){
-        if(client)
-        client->readData();
+        if(client->readData() == COMPLETE)
+            event_loop.editSocket(client->getFd() ,POLL_OUT );
     }
 
     // send response
@@ -113,36 +114,9 @@ void Core::handleClientEvent(int client_fd, short events){
     
 }
 
-// bool Core::addServer(int port){
-//         // Socket* server = new Socket();
-
-//         // if (!server->create() || !server->bind(port) ||
-//         //     !server->listen(5) )
-//         //     // || !server->setNonBlocking())
-//         // {
-//         //     std::cerr << "Failed to create server on port " << port << std::endl;
-//         //     delete server;
-//         //     return false;
-//         // }
-
-//         // // Add server socket to event loop
-//         // event_loop.addSocket(server->getFd(), POLLIN);
-
-//         // std::cout << "Server listening on port " << port << std::endl;
-//         // servers.push_back(server);
-//         return (ptrue);
-// }
-
-bool Core::addServers(){
-
-    
-    std::cout << "start add server " << pairs.size()  << std::endl; 
-    printPairs(pairs);
+bool Core::addServers(){    
     for(std::set<std::string>::iterator it = pairs.begin() ; it != pairs.end() ; it++ ){
-
         Socket* server = new Socket();
-        
-        std::cout << "addservers : inside loop" << std::endl;
         if (!server->create()
         || !server->setNonBlocking()
         || !server->bind(*it) 
@@ -157,12 +131,20 @@ bool Core::addServers(){
         // Add server socket to event loop
         event_loop.addSocket(server->getFd(), POLLIN);
 
-        std::cout << "Server listening on port " << *it << std::endl;
+        std::cout << "Server listening on ip:port " << *it << std::endl;
         servers.push_back(server);
     }
     return true;
 }
 
+void Core::setPairs(std::set<std::string>& param){
+    pairs.insert(param.begin(), param.end());
+}
+
+
+// void Core::editSocket(client){
+
+// }
 /*  
     algo
 
@@ -178,8 +160,4 @@ bool Core::addServers(){
                     HandelCLientEvent
 */
 
-
-void Core::setPairs(std::set<std::string>& param){
-    pairs.insert(param.begin(), param.end());
-}
 
