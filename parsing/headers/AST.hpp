@@ -13,7 +13,7 @@
 
 #include <list>
 
-
+class Core;
 enum NodeType{
     isDirective,
     isContext
