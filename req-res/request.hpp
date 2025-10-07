@@ -27,4 +27,4 @@ enum ParseStatus {
 int		parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req);
 void	HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer);
 std::vector<char> buildErrorResponse(int status);
-void    HandlePostRequest(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer);
+void    HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer);
