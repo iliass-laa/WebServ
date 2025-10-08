@@ -56,6 +56,7 @@ std::vector<std::pair<int, short> > EventLoop::waitForEvents(int timeout){
     // and the number of fds to monitor obligatoire
     // last param for time out 
     int ready = poll(&poll_fds[0], poll_fds.size(), timeout);  
+    std::cout << "poll() ==>" << std::endl;
     // ready = the number of structures which have nonzero revents > 0 in success
     if(ready > 0)
     {
