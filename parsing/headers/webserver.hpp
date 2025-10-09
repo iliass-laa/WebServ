@@ -94,5 +94,8 @@ void handleCGIError(t_request &req, int client_fd);
 
 void fillServerConf(BaseNode *root, Core &obj);
 // void printPairs(std::set<std::string > &pairs);
+int  getPortFromDirective(std::string str);
+std::string  getInterFromDirective(std::string str);
+bool serverNameisInterface(std::string serverName, std::vector<std::string> interfaces);
 
 #endif
