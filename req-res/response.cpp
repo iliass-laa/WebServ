@@ -193,11 +193,10 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
             break;
         longestMatchingPrefix = Req.uri.substr(0, pos);
     }
-    // std::string fileSystemPath = locationConfig.getRoot();
-    // if (fileSystemPath.back() != '/')
-    //     fileSystemPath += '/';
-    // fileSystemPath += Req.uri.substr(1);
-    std::string fileSystemPath = locationConfig.getRoot() + Req.uri;
+    std::string fileSystemPath = locationConfig.getRoot();
+    if (fileSystemPath.length() != 0 && fileSystemPath[fileSystemPath.length() - 1] != '/')
+        fileSystemPath += '/';
+    fileSystemPath += Req.uri.substr(1);
     int pathType = checkPath(fileSystemPath);
     if (pathType == -1)
     {
@@ -385,10 +384,10 @@ void HandleDeleteResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, s
         responseBuffer = buildErrorResponse(403);
         return;
     }
-    std::string fileSystemPath = locationConfig.getRoot() + Req.uri;
-    // if (fileSystemPath.back() != '/')
-    //     fileSystemPath += '/';
-    // fileSystemPath += Req.uri.substr(1);
+    std::string fileSystemPath = locationConfig.getRoot();
+    if (fileSystemPath.length() != 0 && fileSystemPath[fileSystemPath.length() - 1] != '/')
+        fileSystemPath += '/';
+    fileSystemPath += Req.uri.substr(1);
     int pathType = checkPath(fileSystemPath);
     if (pathType == -1)
     {
