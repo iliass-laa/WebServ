@@ -96,13 +96,24 @@ void Core::handleClientEvent(int client_fd, short events){
     Client* client = it->second;
 
     if(events & POLLIN ){
-        if(client->readData() == COMPLETE)
-            event_loop.updateSocketEvents(client->getFd() ,POLL_OUT );
+        if(client->readData() == COMPLETE){
+            event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
+            // std::vector<char>& respo = client->getRespoBuffer();
+
+            // std::cout << "[Respo][Complete request][start print]" << std::endl;
+            // for (std::vector<char>::iterator it = respo.begin();
+            // it != respo.end();
+            // it++)
+            // std::cout << *it;
+            // std::cout << "[Respo][Complete request][end print]" << std::endl;
+        }
     }
 
     // send response
-    if(events & POLLOUT)
+    if(events & POLLOUT){
+        std::cout << "enter responce svp !!!!! "<< std::endl;
         client->writeData();
+    }
 
     // disconnect the client 
     if ( !(client->isConnected()) || (events & (POLLERR | POLLHUP))){

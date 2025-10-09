@@ -17,6 +17,7 @@ private:
     std::string resBuff; // for response
     std::vector<char> respoBuff; // for response
     ssize_t resOffset;
+    
 public:
     Client(int, BaseNode*);
     ~Client();
@@ -30,5 +31,7 @@ public:
     bool hasDataToRead() const ;
     bool hasDataToWrite() const ;
     std::string getReadBuffer();  
+    std::vector<char>& getRespoBuffer();  
+    std::string getResBuffer();
 };
 #endif // CLIENT_HPP
