@@ -7,7 +7,7 @@ class DirectoryListing {
         std::vector<std::string> indexFile;
         bool    hasIndexFile;
         bool   autoIndex;
-        bool   _default;
+        bool   _default; //is it correspond to when it's location / { ... } ??
         bool    uploadSupport;
         bool    deletePerm;
     public :

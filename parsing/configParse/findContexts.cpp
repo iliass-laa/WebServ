@@ -10,6 +10,33 @@ int findInV(std::vector<std::string>v, std::string s)
     return 1;
 }
 
+
+std::vector <std::string> getInterFace(ContextNode *server, int port)
+{
+    std::string inter;
+    std::vector <std::string> res;
+    int p;
+    DirectiveNode *d;
+    for(int i = 0; i< server->nbrChilds; i ++)
+    {
+        if (server->Childs[i]->typeNode == isDirective)
+        {
+            d = dynamic_cast<DirectiveNode *>(server->Childs[i]);
+            if (d->key.compare("listen") == 0)
+            {
+                p = getPortFromDirective(d->value.back());
+                if (p == port)
+                {
+                    inter =  getInterFromDirective(d->value.back());
+                    res.push_back(inter);
+                }
+            }
+        }
+    }
+
+    return res;
+}
+
 ContextNode *findStaticLocation(BaseNode* root, t_request &req, std::string locationPath)
 {
     ContextNode * tmp, *tmp2;
@@ -71,10 +98,13 @@ ContextNode *findHttpContext(BaseNode* root)
 
 ContextNode *findServerContext(ContextNode* http, std::string serverName , int port)
 {
+    // std::cout <<GREEN<< "serveName :" +serverName + "\nPort :"<<port<< DEF<<std::endl;
     ContextNode *tmp, *res;
     std::vector <int> ports;
     res = NULL;
-    for (int i = 0 ; i < http->nbrChildsC + http->nbrChildsD ; i++)
+    if (!http)
+        return NULL;
+    for (int i = 0 ; i < http->nbrChilds ; i++)
     {
         if (http->Childs[i]->typeNode == isContext)
         {   
@@ -83,19 +113,24 @@ ContextNode *findServerContext(ContextNode* http, std::string serverName , int p
             {
                 if (!getServerPorts(tmp, ports)) 
                 {
+                    // std::cout <<"Here >>>>>> \n"<<"Ports>>"<< ports.size() << "\n" ;
                     if (!findPort(port, ports))
                     {
+                        // std::cout <<"port Front ::"<<ports.front()<<"\nPort back ::"<< ports.back() << "\n" ;
+
                         if (!res)
                             res = tmp;
-                        if (serverName.compare(getServerName(tmp)) == 0)
+                        if (!serverName.compare(getServerName(tmp)) || serverNameisInterface(serverName,getInterFace(tmp, port)))
                             return tmp;
+                        // std::cout <<"Server Name in Conf>>>>>>>" +getServerName(res)+ "<<<<<\n";
+                        // std::cout << " Server Name Arg>>>>>>>" +serverName+ "<<<<<\n";
                     }
                 }
-                else
-                    throw (ConfigFileError("Server not Found!"));
             }
         }
     }
+    if (res)
+        std::cout << "LLAAASST\n";
     return res;
 }
 

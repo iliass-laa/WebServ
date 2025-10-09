@@ -1,6 +1,39 @@
 #include "../headers/webserver.hpp"
 
+bool serverNameisInterface(std::string serverName, std::vector<std::string> interfaces)
+{
+    std::vector <std::string> ::iterator it = interfaces.begin();
+    while (it != interfaces.end())
+    {
+        if (it->compare(serverName)==0)
+            return true;
+        it++;
+    }
+    return false;
+}
 
+int  getPortFromDirective(std::string str)
+{
+    size_t pos;
+    int port;
+
+    pos = str.find(":");
+    if (pos != std::string::npos)
+        str= str.substr(pos + 1, str.length());
+    port = std::atoi(str.c_str());
+    return port;
+}
+
+std::string  getInterFromDirective(std::string str)
+{
+    size_t pos;
+    std::string inter("0.0.0.0");
+
+    pos = str.find(":");
+    if (pos != std::string::npos)
+        inter = str.substr(0, pos);
+    return inter;
+}
 
 std::string getServerName(ContextNode *server)
 {
@@ -16,29 +49,29 @@ std::string getServerName(ContextNode *server)
                 return tmp->value.back();
         }
     }
-    return std::string ("NOT Founded");
+    return std::string ("NOT Found");
 }
 
 int getServerPorts(ContextNode *server, std::vector<int> &ports)
 {
     int port;
-    // std::vector<int> ports;
     DirectiveNode * tmp;
     if (server->type_Context != ServerContext)  
         return 1;
-    for(int i = 0;i < server->nbrChildsC + server->nbrChildsD; i++)
+    for(int i = 0;i < server->nbrChilds; i++)
     {
         if (server->Childs[i]->typeNode == isDirective)
         {
             tmp = dynamic_cast<DirectiveNode *>(server->Childs[i]);
             if (tmp->key.compare("listen") == 0)
             {
-                port = std::atoi((tmp->value.back()).c_str());
+                port = getPortFromDirective(tmp->value.back());
                 ports.push_back(port);
+                // std::cout<<BLUE << "here, port::"<<port<<"\n"<<DEF;
             }
         }
     }
-    if (ports.size() ==0)
+    if (ports.size() == 0)
         return 1;
     return 0;   
 }
@@ -144,6 +177,8 @@ std::string getRootPath(BaseNode *root, t_request req, ContextNode **location)
     tmp = findServerContext(tmp, req.headers.hostname, req.headers.port);
     if (!tmp)
         return ("No Server Context Found\n");
+    else
+        return ("ALRIGHT \n");
     rootPathServer = getRootPath(tmp);
     //std::cout << "ROOT PATH SERVER :" << rootPathServer << "<<\n";
     tmp = findLocationContext(tmp, req.headers.path);
