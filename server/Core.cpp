@@ -27,7 +27,7 @@ void Core::run(){
     }
     running = true ;
     while (running){
-        std::vector<std::pair<int,short> > readyEvents = event_loop.waitForEvents(0); 
+        std::vector<std::pair<int,short> > readyEvents = event_loop.waitForEvents(-1); 
         // time out here is 0 => non-blocking poll()
         for(std::vector<std::pair<int,short> >::iterator it = readyEvents.begin() ; 
         it != readyEvents.end() ;
@@ -123,7 +123,7 @@ bool Core::addServers(){
         || server->listen(5) 
         )
         {
-            std::cerr << "00 Failed to create server on port " << *it << std::endl;
+            std::cerr << "[server][addServers] Failed to create server on port " << *it << std::endl;
             delete server;
             return false;
         }
@@ -131,7 +131,7 @@ bool Core::addServers(){
         // Add server socket to event loop
         event_loop.addSocket(server->getFd(), POLLIN);
 
-        std::cout << "Server listening on ip:port " << *it << std::endl;
+        std::cout << "[server][addServers] Server listening on ip:port " << *it << std::endl;
         servers.push_back(server);
     }
     return true;

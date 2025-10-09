@@ -54,7 +54,7 @@ bool Client::readData(){
         std::cout << buffer << std::endl;
         std::vector<char> readed(buffer, buffer + bytes);
         reqBuff.insert(reqBuff.end(), readed.begin(), readed.end());
-        std::cout << "req " << this->client_fd << std::endl;
+        std::cout << "[client][readData] " << this->client_fd << std::endl;
         std::cout << buffer << std::endl;
         return handleRequest(root,reqBuff,respoBuff);
         // return true;

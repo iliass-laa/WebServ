@@ -27,7 +27,6 @@ bool Socket::bind(std::string pair)
     std::string port = pair.substr(colonPos + 1);
     uint32_t inter;
     parseIPv4(interface, inter);
-    std::cout << atoi(port.c_str()) << std::endl;
     address.sin_family = AF_INET;
     address.sin_port = htons((uint16_t)atoi(port.c_str()));
     address.sin_addr.s_addr = inter;
@@ -66,10 +65,8 @@ bool Socket::setNonBlocking()
 }
 
 bool Socket::listen(int backlog)
-{
-    int status_listen = ::listen(sockFd, backlog);
-    std::cout << "listen return " << status_listen << "  qetal errno  " << errno << std::endl;
-    return status_listen;
+{ 
+    return ::listen(sockFd, backlog);
 }
 
 int Socket::getFd() const
@@ -120,7 +117,6 @@ bool Socket::parseIPv4(const std::string &ip, uint32_t &result)
         parts[i] = val;
     }
     result = ((parts[3] << 24) | (parts[2] << 16) | (parts[1] << 8) | parts[0]);
-    std::cout << "after parse ip " << result << std::endl;
     return true;
 }
 
