@@ -66,7 +66,8 @@ bool Client::readData(){
 }
 
 bool Client::writeData(){ // to vector<char> of write_data
-    
+    resBuff.clear();
+    resBuff = getResBuffer();
     if(!resBuff.size() || !connected)
         return false;
     resOffset = send(client_fd, resBuff.c_str(), BUFFER,0);
@@ -85,3 +86,10 @@ std::string Client::getReadBuffer(){
     return std::string(reqBuff.begin(), reqBuff.end());
 }
 
+std::vector<char>& Client::getRespoBuffer(){
+    return respoBuff;
+}  
+
+std::string Client::getResBuffer(){
+    return std::string(respoBuff.begin(), respoBuff.end());
+}  
