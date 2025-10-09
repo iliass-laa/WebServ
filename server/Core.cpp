@@ -97,7 +97,7 @@ void Core::handleClientEvent(int client_fd, short events){
 
     if(events & POLLIN ){
         if(client->readData() == COMPLETE)
-            event_loop.editSocket(client->getFd() ,POLL_OUT );
+            event_loop.updateSocketEvents(client->getFd() ,POLL_OUT );
     }
 
     // send response
