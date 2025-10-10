@@ -76,7 +76,11 @@ bool Client::writeData(){ // to vector<char> of write_data
     }
     if(!resBuff.size() || !connected)
         return false;
-    resOffset = send(client_fd, resBuff.c_str(), BUFFER,0);
+    // std::cout << fstat()<< std::endl;
+    resOffset = BUFFER;
+    if(responseSize > 0 && responseSize < BUFFER)
+        resOffset =  responseSize;
+    resOffset = send(client_fd, resBuff.c_str(), resOffset,0);
     if (resOffset > 0 )
         responseSize -= resOffset;
     if(!responseSize )
