@@ -20,6 +20,7 @@ class EventLoop {
         void removeSocket(int fd);
         void updateSocketEvents(int fd, short events);
         std::vector<std::pair<int, short> > waitForEvents(int timeout);
+        int getSocketEvent(int) ;
 
 };
 

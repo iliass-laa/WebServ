@@ -71,3 +71,10 @@ std::vector<std::pair<int, short> > EventLoop::waitForEvents(int timeout){
 
     return ready_fds;
 }
+
+int EventLoop::getSocketEvent(int fd) {
+    std::map<int, int>::iterator it = fd_to_index.find(fd);
+    if(it != fd_to_index.end())
+        return poll_fds[it->second].events;
+    return -1;
+}

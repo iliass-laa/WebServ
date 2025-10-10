@@ -8,6 +8,13 @@
 #define BUFFER 4096
 
 class BaseNode;
+
+typedef enum clientState {
+    READING_REQUEST, // 0
+    WAITTING_FOR_REQUEST, // 2
+    SENDING_RESPONSE, // 1
+    WAITTING_FOR_RESPONSE, // 2
+} cState;
 class Client {
 private:
     BaseNode* root;
@@ -17,6 +24,8 @@ private:
     std::string resBuff; // for response
     std::vector<char> respoBuff; // for response
     ssize_t resOffset;
+    ssize_t responseSize;
+    int state;
     
 public:
     Client(int, BaseNode*);
@@ -33,5 +42,9 @@ public:
     std::string getReadBuffer();  
     std::vector<char>& getRespoBuffer();  
     std::string getResBuffer();
+    void setResponseSize(ssize_t );
+
+    void setClientState(int );
+    int getClientState() const;
 };
 #endif // CLIENT_HPP
