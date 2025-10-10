@@ -110,6 +110,9 @@ void Core::handleClientEvent(int client_fd, short events){
         // std::cout << " **** Sending Response ****"<< std::endl;
         if(client->getClientState() == WAITTING_FOR_RESPONSE || client->getClientState() == SENDING_RESPONSE )
             client->writeData();
+        if(client->getClientState() == WAITTING_FOR_REQUEST)
+            event_loop.updateSocketEvents(client->getFd() ,POLLIN );
+
     }
     
     // disconnect the client 
