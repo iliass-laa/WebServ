@@ -8,6 +8,7 @@ Client::Client(int fd,BaseNode* cnf)
     , resBuff()
     , respoBuff()
     , resOffset(0)
+    , responseSize(0)
     // Constructor implementation
 {}
 
@@ -65,14 +66,21 @@ bool Client::readData(){
     return false;
 }
 
+// return should be void no use 
 bool Client::writeData(){ // to vector<char> of write_data
-    resBuff.clear();
-    resBuff = getResBuffer();
+    if(getClientState() == WAITTING_FOR_RESPONSE){
+        state = SENDING_RESPONSE;
+        resBuff.clear();
+        resBuff = getResBuffer();
+        responseSize = respoBuff.size();
+    }
     if(!resBuff.size() || !connected)
         return false;
     resOffset = send(client_fd, resBuff.c_str(), BUFFER,0);
-    if (resOffset > 0)
-        return true;
+    if (resOffset > 0 )
+        responseSize -= resOffset;
+    if(!responseSize )
+        state = WAITTING_FOR_REQUEST;
     return false;
 }
 
@@ -93,3 +101,14 @@ std::vector<char>& Client::getRespoBuffer(){
 std::string Client::getResBuffer(){
     return std::string(respoBuff.begin(), respoBuff.end());
 }  
+
+
+void Client::setResponseSize(ssize_t size){
+    responseSize = size;
+}
+
+void Client::setClientState(int state){
+    this->state = state;
+}
+
+int Client::getClientState() const { return state;}

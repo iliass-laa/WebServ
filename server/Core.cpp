@@ -91,38 +91,34 @@ void Core::handleNewConnection(int server_fd){
 void Core::handleClientEvent(int client_fd, short events){
     // retrive client from map 
     std::map<int, Client*>::iterator it = clients.find(client_fd) ;
-    if(it == clients.end())
+    if(it == clients.end()){
+        std::cout << "no client found in core clients map<int, Client*>" << std::endl;
         return ;
+    }
     Client* client = it->second;
-
+    
     if(events & POLLIN ){
+        client->setClientState(READING_REQUEST);
         if(client->readData() == COMPLETE){
             event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
-            // std::vector<char>& respo = client->getRespoBuffer();
-
-            // std::cout << "[Respo][Complete request][start print]" << std::endl;
-            // for (std::vector<char>::iterator it = respo.begin();
-            // it != respo.end();
-            // it++)
-            // std::cout << *it;
-            // std::cout << "[Respo][Complete request][end print]" << std::endl;
+            client->setClientState(WAITTING_FOR_RESPONSE);
         }
     }
-
+    
     // send response
-    if(events & POLLOUT){
-        std::cout << "enter responce svp !!!!! "<< std::endl;
-        client->writeData();
+    if(events & POLLOUT ){
+        std::cout << " **** Sending Response ****"<< std::endl;
+        if(client->getClientState() == WAITTING_FOR_RESPONSE || client->getClientState() == SENDING_RESPONSE )
+            client->writeData();
     }
-
+    
     // disconnect the client 
     if ( !(client->isConnected()) || (events & (POLLERR | POLLHUP))){
+        std::cout << "client"<< client->getFd() <<  " reased from clients map<int, Client*>" << std::endl;
         event_loop.removeSocket(client_fd);
         delete client;
         clients.erase(it);
     }
-
-    
 }
 
 bool Core::addServers(){    
