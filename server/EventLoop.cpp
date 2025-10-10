@@ -21,16 +21,6 @@ void EventLoop::addSocket(int fd, short events){
     fd_to_index[fd] = poll_fds.size() -1;
 }
 
-// void EventLoop::editSocket(int fd, short events){
-//     std::vector<pollfd>::iterator client ;
-//     for(; client != poll_fds.end(); client++){
-//         if(client->fd == fd)
-//             break;   
-//     }
-//     client->events =  events; 
-// }
-
-
 void EventLoop::removeSocket(int fd){
     std::map<int, int>::iterator it = fd_to_index.find(fd);
     int index = it->second ;
@@ -56,7 +46,7 @@ std::vector<std::pair<int, short> > EventLoop::waitForEvents(int timeout){
     // and the number of fds to monitor obligatoire
     // last param for time out 
     int ready = poll(&poll_fds[0], poll_fds.size(), timeout);  
-    std::cout << "poll() ==>" << std::endl;
+    // std::cout << "poll() ==>" << std::endl;
     // ready = the number of structures which have nonzero revents > 0 in success
     if(ready > 0)
     {
