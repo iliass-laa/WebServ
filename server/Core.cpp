@@ -107,7 +107,7 @@ void Core::handleClientEvent(int client_fd, short events){
     
     // send response
     if(events & POLLOUT ){
-        std::cout << " **** Sending Response ****"<< std::endl;
+        // std::cout << " **** Sending Response ****"<< std::endl;
         if(client->getClientState() == WAITTING_FOR_RESPONSE || client->getClientState() == SENDING_RESPONSE )
             client->writeData();
     }
