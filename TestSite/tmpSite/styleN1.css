@@ -1,0 +1,13 @@
+html {
+    color: light dark; 
+    background-color: rgb(129, 138, 87);
+}
+body { 
+    width: 35em; margin: 0 auto;
+    font-family: Tahoma, Verdana, Arial, sans-serif;
+ }
+
+ button{
+    border-radius: 10%;
+    background-color:rgb(87, 150, 129);
+ }
