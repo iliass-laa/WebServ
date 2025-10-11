@@ -21,6 +21,7 @@ std::vector<char> buildErrorResponse(int status) {
     ss << "HTTP/1.1 " << code << " " << reason << "\r\n";
     ss << "Content-Type: text/html\r\n";
     ss << "Content-Length: " << bodyStr.size() << "\r\n";
+    ss << "Connection: close\r\n";
     ss << "\r\n";
     ss << bodyStr;
 
