@@ -26,6 +26,7 @@ private:
     ssize_t resOffset;
     ssize_t responseSize;
     int state;
+    bool keepAlive;
     
 public:
     Client(int, BaseNode*);
@@ -46,5 +47,9 @@ public:
 
     void setClientState(int );
     int getClientState() const;
+
+    void setKeepAlive(int );
+    int getKeepAlive() const;
+
 };
 #endif // CLIENT_HPP

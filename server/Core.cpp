@@ -29,12 +29,8 @@ void Core::run(){
     while (running){
         std::vector<std::pair<int,short> > readyEvents = event_loop.waitForEvents(-1); 
         // time out here is 0 => non-blocking poll()
-        for(std::vector<std::pair<int,short> >::iterator it = readyEvents.begin() ; 
-        it != readyEvents.end() ;
-        it++
-        ){
+        for(std::vector<std::pair<int,short> >::iterator it = readyEvents.begin() ; it != readyEvents.end() ;it++ )
             handleSocketEvent(it->first , it->second);
-        }
     }
 }   
 
@@ -44,7 +40,7 @@ void Core::handleSocketEvent(int fd, short events){
         handleNewConnection(fd);
     }
     else{
-        std::cout << "client " << fd << std::endl;
+        // std::cout << "client " << fd << std::endl;
         handleClientEvent(fd, events);
     }
 }
@@ -83,7 +79,7 @@ void Core::handleNewConnection(int server_fd){
         Client* cl = new Client(new_client, root);
         event_loop.addSocket(new_client, POLLIN);
         clients[new_client] = cl;
-        std::cout << "new client connected !!" << std::endl ;
+        std::cout << "new client connected " << new_client << " !!" << std::endl ;
     }
     return ;
 }
@@ -99,7 +95,8 @@ void Core::handleClientEvent(int client_fd, short events){
     
     if(events & POLLIN ){
         client->setClientState(READING_REQUEST);
-        if(client->readData() == COMPLETE){
+        int readDataState = client->readData(); 
+        if( readDataState == COMPLETE){
             event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
             client->setClientState(WAITTING_FOR_RESPONSE);
         }
