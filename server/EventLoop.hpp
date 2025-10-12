@@ -2,6 +2,7 @@
 #define EVENTLOOP_HPP
 #include<vector>
 #include<map>
+#include <unistd.h>
 #include<iostream>
 #include<poll.h>
 
