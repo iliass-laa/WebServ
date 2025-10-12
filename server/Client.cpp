@@ -9,6 +9,7 @@ Client::Client(int fd,BaseNode* cnf)
     , respoBuff()
     , resOffset(0)
     , responseSize(0)
+    , keepAlive(true)
     // Constructor implementation
 {}
 
@@ -52,15 +53,18 @@ bool Client::readData(){
 
     ssize_t bytes = recv(client_fd, buffer, sizeof(buffer), 0); // 
     if (bytes > 0){
-        std::cout << buffer << std::endl;
+        // std::cout << buffer << std::endl;
         std::vector<char> readed(buffer, buffer + bytes);
         reqBuff.insert(reqBuff.end(), readed.begin(), readed.end());
         std::cout << "[client][readData] " << this->client_fd << std::endl;
-        std::cout << buffer << std::endl;
-        return handleRequest(root,reqBuff,respoBuff);
+        // std::cout << buffer << std::endl;
+        int checkReq = handleRequest(root,reqBuff,respoBuff);
+        if(COMPLETE == checkReq)
+            setKeepAlive(false);
+        return checkReq; // keep alive 
         // return true;
     }
-    else if (bytes == 0){
+    else if (keepAlive == false){
         connected = false; // Client disconnected
     }
     return false;
@@ -116,3 +120,6 @@ void Client::setClientState(int state){
 }
 
 int Client::getClientState() const { return state;}
+
+void Client::setKeepAlive(int val){keepAlive = val;}
+int Client::getKeepAlive() const{return keepAlive;}
