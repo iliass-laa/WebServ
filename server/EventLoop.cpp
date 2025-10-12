@@ -31,6 +31,7 @@ void EventLoop::removeSocket(int fd){
     }
     poll_fds.pop_back();
     fd_to_index.erase(fd);
+    close(fd);
 }
 
 void EventLoop::updateSocketEvents(int fd, short events)
