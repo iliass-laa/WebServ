@@ -20,6 +20,7 @@ struct HttpRequest {
 enum ParseStatus {
     INCOMPLETE,
     COMPLETE,
+    COMPLETEDEF,
     ERROR_BAD_METHOD,
     ERROR_BAD_VERSION,
     ERROR
