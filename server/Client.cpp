@@ -51,20 +51,28 @@ bool Client::hasDataToWrite() const
 bool Client::readData(){
     char buffer[BUFFER];
 
-    ssize_t bytes = recv(client_fd, buffer, sizeof(buffer), 0); // 
+    ssize_t bytes = recv(client_fd, buffer, sizeof(buffer), 0); //
+
     if (bytes > 0){
-        // std::cout << buffer << std::endl;
+        buffer[bytes] = '\0';
         std::vector<char> readed(buffer, buffer + bytes);
-        reqBuff.insert(reqBuff.end(), readed.begin(), readed.end());
+        reqBuff.clear();
+        reqBuff.insert(reqBuff.begin(), readed.begin(), readed.end());
+
         std::cout << "[client][readData] " << this->client_fd << std::endl;
-        // std::cout << buffer << std::endl;
-        int checkReq = handleRequest(root,reqBuff,respoBuff);
-        if(COMPLETE == checkReq)
-            setKeepAlive(false);
+        // std::cout << ">>>>>>>>>\t\t "<< buffer << "<<<<<<<\n";
+
+        std::cout << ">>>>>>>>>\t\t "<< GREEN ;
+        for (std::vector<char>::iterator it = reqBuff.begin(); it != reqBuff.end() ; it++ ){
+            std::cout   << *it ;
+        }
+        std::cout << DEF <<"<<<<<<<<<"<< std::endl;
+        int checkReq = handleRequest(root,reqBuff,respoBuff); // keep-alive == COMPLETEDEF
+        if(COMPLETE == checkReq )
+            connected = false; // Client disconnected
         return checkReq; // keep alive 
-        // return true;
     }
-    else if (keepAlive == false){
+    else if (bytes <= 0){
         connected = false; // Client disconnected
     }
     return false;
@@ -80,15 +88,17 @@ bool Client::writeData(){ // to vector<char> of write_data
     }
     if(!resBuff.size() || !connected)
         return false;
-    // std::cout << fstat()<< std::endl;
+    // std::cout << ">>>\t\t\t"<< PINK << resBuff << DEF<< std::endl;
     resOffset = BUFFER;
     if(responseSize > 0 && responseSize < BUFFER)
         resOffset =  responseSize;
     resOffset = send(client_fd, resBuff.c_str(), resOffset,0);
     if (resOffset > 0 )
         responseSize -= resOffset;
-    if(!responseSize )
+    if(responseSize <= 0){
+        std::cout << "[RECPONCE][SENDED] (" << respoBuff.size() << ")" << std::endl;
         state = WAITTING_FOR_REQUEST;
+    }
     return false;
 }
 
@@ -123,3 +133,13 @@ int Client::getClientState() const { return state;}
 
 void Client::setKeepAlive(int val){keepAlive = val;}
 int Client::getKeepAlive() const{return keepAlive;}
+
+void Client::clearVectReq(){
+    reqBuff.clear();
+}
+
+
+void Client::clearVectRes(){
+    resBuff.clear();
+}
+
