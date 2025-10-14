@@ -14,6 +14,8 @@ typedef enum clientState {
     WAITTING_FOR_REQUEST, // 2
     SENDING_RESPONSE, // 1
     WAITTING_FOR_RESPONSE, // 2
+    INACTIVE,
+    WAITTING,
 } cState;
 class Client {
 private:
@@ -50,6 +52,8 @@ public:
 
     void setKeepAlive(int );
     int getKeepAlive() const;
+    void clearVectReq();
+    void clearVectRes();
 
 };
 #endif // CLIENT_HPP
