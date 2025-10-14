@@ -1,6 +1,8 @@
 #include"Core.hpp"
 #include"../parsing/headers/webserver.hpp"
 
+
+// ORTHODOX FORM
 Core::Core():running(false),root(NULL){}
 
 Core::Core(BaseNode* obj):running(false), root(obj){}
@@ -14,12 +16,15 @@ Core& Core::operator=(const Core& obj){
     return *this;
 }
 
-// stop
+
+
+
+//********************STOP******************************************************************************
 void Core::stop(){
     running = false;
 } 
 
-// run 
+//********************RUN************************ *******************************************************
 void Core::run(){
     fillServerConf(root, *this);
     if(!addServers()){
@@ -34,9 +39,11 @@ void Core::run(){
     }
 }   
 
+
+//*****************HANDEL**SOCKET**EVENT******************************************************************
 void Core::handleSocketEvent(int fd, short events){
     if(isServerSocket(fd)){
-        std::cout << "server socket " << fd << std::endl;
+        std::cout << "[server socket] " << fd << std::endl;
         handleNewConnection(fd);
     }
     else{
@@ -45,6 +52,10 @@ void Core::handleSocketEvent(int fd, short events){
     }
 }
 
+
+
+
+//***********IS**SERVER**SOCKET***************************************************************************
 bool Core::isServerSocket(int fd){
     for(std::vector<Socket*>::iterator it = servers.begin();
     it != servers.end();
@@ -56,6 +67,8 @@ bool Core::isServerSocket(int fd){
     return false;
 }
 
+
+//****************HANDEL**NEW**CONNECION*******************************************************************
 void Core::handleNewConnection(int server_fd){
     // retrive server where event occured
     Socket* server = NULL;
@@ -79,50 +92,57 @@ void Core::handleNewConnection(int server_fd){
         Client* cl = new Client(new_client, root);
         event_loop.addSocket(new_client, POLLIN);
         clients[new_client] = cl;
-        std::cout << "new client connected " << new_client << " !!" << std::endl ;
+        std::cout << "\t\t[new client connected] [" << new_client << "] !!" << std::endl ;
     }
     return ;
 }
 
+
+
+//***************HANDEL**CLIENT**EVENT********************************************************************
 void Core::handleClientEvent(int client_fd, short events){
     // retrive client from map 
     std::map<int, Client*>::iterator it = clients.find(client_fd) ;
     if(it == clients.end()){
-        std::cout << "no client found in core clients map<int, Client*>" << std::endl;
+        std::cout << "[HandelClientEvent][No Client Found]" << std::endl;
         return ;
     }
     Client* client = it->second;
     
-    if(events & POLLIN ){
+    if( events & POLLIN ){
         client->setClientState(READING_REQUEST);
-        int readDataState = client->readData(); 
-        if( readDataState == COMPLETE){
+        int readDataState = WAITTING;
+        if(client->getClientState() == READING_REQUEST)
+            readDataState = client->readData(); 
+        if( readDataState == COMPLETE || readDataState == COMPLETEDEF){
             event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
             client->setClientState(WAITTING_FOR_RESPONSE);
+            client->clearVectReq();
         }
     }
     
     // send response
-    if(events & POLLOUT ){
+    else if(events & POLLOUT ){
         // std::cout << " **** Sending Response ****"<< std::endl;
         if(client->getClientState() == WAITTING_FOR_RESPONSE || client->getClientState() == SENDING_RESPONSE )
             client->writeData();
         if(client->getClientState() == WAITTING_FOR_REQUEST){
             event_loop.updateSocketEvents(client->getFd() ,POLLIN );
-            client->setKeepAlive(false);
         }
 
     }
     
     // disconnect the client 
-    if ( !(client->isConnected()) || (events & (POLLERR | POLLHUP))){
-        std::cout << "client"<< client->getFd() <<  " reased from clients map<int, Client*>" << std::endl;
+    // if ( !(client->isConnected()) || (events & (POLLERR | POLLHUP))){
+    if ( !(client->isConnected())){
+        std::cout << "client"<< client->getFd() <<  " lose tcp connection !!!" << std::endl;
         event_loop.removeSocket(client_fd);
         delete client;
         clients.erase(it);
     }
 }
 
+//*************ADD**SERVERS******************************************************************************
 bool Core::addServers(){    
     for(std::set<std::string>::iterator it = pairs.begin() ; it != pairs.end() ; it++ ){
         Socket* server = new Socket();
@@ -146,6 +166,8 @@ bool Core::addServers(){
     return true;
 }
 
+
+//****************SET**PAIRS********************************************************************************
 void Core::setPairs(std::set<std::string>& param){
     pairs.insert(param.begin(), param.end());
 }
