@@ -105,9 +105,7 @@ std::string getContentType(const std::string &path)
 
 int buildFileResponse(std::string path, std::vector<char> &responseBuffer, const struct HttpRequest Req)
 {
-    
     std::ifstream file(path.c_str(), std::ios::binary);
-    std::cout << "RESP PATH>>>>>>>>" << path.c_str() << "<<<<<<<<\n" ;
     if (!file)
         return 1;
     file.seekg(0, std::ios::end);
@@ -128,12 +126,6 @@ int buildFileResponse(std::string path, std::vector<char> &responseBuffer, const
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
     responseBuffer.insert(responseBuffer.end(), buffer.begin(), buffer.end());
-
-    // std::cout << "RESPONCE VECTOR>>>>>>>>>\t\t "<< PINK ;
-    //     for (std::vector<char>::iterator it = responseBuffer.begin(); it != responseBuffer.end() ; it++ ){
-    //         std::cout   << *it ;
-    //     }
-    //     std::cout << DEF <<"<<<<<<<<<"<< std::endl;
     return 0;
 }
 
