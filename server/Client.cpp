@@ -59,20 +59,20 @@ bool Client::readData(){
         reqBuff.clear();
         reqBuff.insert(reqBuff.begin(), readed.begin(), readed.end());
 
-        std::cout << "[client][readData] " << this->client_fd << std::endl;
-        // std::cout << ">>>>>>>>>\t\t "<< buffer << "<<<<<<<\n";
-
         std::cout << ">>>>>>>>>\t\t "<< GREEN ;
         for (std::vector<char>::iterator it = reqBuff.begin(); it != reqBuff.end() ; it++ ){
             std::cout   << *it ;
         }
         std::cout << DEF <<"<<<<<<<<<"<< std::endl;
+
         int checkReq = handleRequest(root,reqBuff,respoBuff); // keep-alive == COMPLETEDEF
-        if(COMPLETE == checkReq )
+        if(COMPLETE == checkReq ){
+            std::cout << BLUE <<" >>>>>>>>>>>>>>>>> is ever he was here who knows" << DEF<< std::endl;
             connected = false; // Client disconnected
+        }
         return checkReq; // keep alive 
     }
-    else if (bytes <= 0){
+    else if (bytes < 0){
         connected = false; // Client disconnected
     }
     return false;
@@ -96,8 +96,9 @@ bool Client::writeData(){ // to vector<char> of write_data
     if (resOffset > 0 )
         responseSize -= resOffset;
     if(responseSize <= 0){
-        std::cout << "[RECPONCE][SENDED] (" << respoBuff.size() << ")" << std::endl;
         state = WAITTING_FOR_REQUEST;
+        std::cout << PINK << resBuff << DEF<< std::endl;
+        respoBuff.clear();
     }
     return false;
 }
