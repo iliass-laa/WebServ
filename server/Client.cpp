@@ -92,7 +92,11 @@ bool Client::writeData(){ // to vector<char> of write_data
     resOffset = BUFFER;
     if(responseSize > 0 && responseSize < BUFFER)
         resOffset =  responseSize;
-    resOffset = send(client_fd, resBuff.c_str(), resOffset,0);
+    // memset()
+    std::cout <<PINK<< "\n\n>>" <<resBuff << DEF << "\n>>>>>Response DONE<<<<<\n>>>>>Response LENGTh :"<< resBuff.length()<<"<<<<<\n";
+    resOffset = send(client_fd, resBuff.c_str(), resBuff.length(),0);
+    //>> tillas was here : i have no idea why u send "resOffset" as len instead of  " resBuff.length()", sorry i commented ur line.
+    // resOffset = send(client_fd, resBuff.c_str(), resOffset,0);
     if (resOffset > 0 )
         responseSize -= resOffset;
     if(responseSize <= 0){
