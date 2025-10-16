@@ -50,10 +50,7 @@ void printResponse(const std::vector<char> &responseBuffer) {
 
 
 int handleRequest(BaseNode* ConfigNode, std::vector<char> requestBuffer, std::vector<char> &responseBuffer) {
-    struct HttpRequest Req;
-    
-    responseBuffer.clear();
-    std::cout << "Received Request (" << requestBuffer.size() << " bytes):\n";
+    struct HttpRequest Req;    
     int status = parseRequest(requestBuffer, Req);
     if (status == INCOMPLETE)
         return INCOMPLETE;
