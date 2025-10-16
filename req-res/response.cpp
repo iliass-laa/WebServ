@@ -327,7 +327,6 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
         rawboundary.erase(0, 1);
     std::string boundary = "--" + rawboundary;
     std::string endBoundary = boundary + "--";
-    std::cout << "End boundary ->>>>>>> " << endBoundary << std::endl;
     std::string body(Req.body.begin(), Req.body.end());
     size_t start = body.find(boundary);
     if (start == std::string::npos)
@@ -347,13 +346,11 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
         if (nextEnd != std::string::npos && (next == std::string::npos || nextEnd < next)) 
         {
             parts.push_back(body.substr(start, nextEnd - start));
-            std::cout << "Final part found: " << parts.back() << std::endl;
             break;
         }
         if (next == std::string::npos)
             break;
         parts.push_back(body.substr(start, next - start));
-        std::cout << "Part found: " << parts.back() << std::endl;
         start = next + boundary.size();
         if (body[start] == '\r')
             start++;
@@ -362,7 +359,6 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
     }
     if (parts.empty())
     {
-        std::cout << "ALOOOOOO"<< std::endl;
         responseBuffer = buildErrorResponse(400);
         return;
     }
@@ -371,7 +367,6 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
         size_t headerEnd = parts[i].find("\r\n\r\n");
         if (headerEnd == std::string::npos)
             continue;
-
         std::string headersPart = parts[i].substr(0, headerEnd);
         std::string bodyPart = parts[i].substr(headerEnd + 4);
         if (bodyPart.size() >= 2 && bodyPart.substr(bodyPart.size() - 2) == "\r\n")
