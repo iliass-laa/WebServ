@@ -69,6 +69,16 @@ int checkPath(const std::string &path)
     return pathStat.st_mode;
 }
 
+size_t DirectoryListing::getMaxBodySize() const
+{
+    return maxBodySize;
+}
+
+void   DirectoryListing::setMaxBodySize(size_t size)
+{
+    maxBodySize = size;
+}
+
 
 std::string getContentType(const std::string &path)
 {
