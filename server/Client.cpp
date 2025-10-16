@@ -101,7 +101,7 @@ bool Client::writeData(){ // to vector<char> of write_data
         responseSize -= resOffset;
     if(responseSize <= 0){
         state = WAITTING_FOR_REQUEST;
-        std::cout << PINK << resBuff << DEF<< std::endl;
+        // std::cout << PINK << resBuff << DEF<< std::endl;
         respoBuff.clear();
     }
     return false;

@@ -316,7 +316,18 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
         responseBuffer = buildErrorResponse(400);
         return;
     }
-    std::string boundary = Req.headers.at("Content-Type").substr(boundaryPos + 9);
+    // std::string rawboundary = Req.headers.at("Content-Type").substr(boundaryPos + 9);
+    // std::string boundary = "--" + rawboundary;
+    // std::string endBoundary = boundary + "--";
+    // std::cout << "End boundary ->>>>>>> " << endBoundary << std::endl;
+    std::string rawboundary = Req.headers.at("Content-Type").substr(boundaryPos + 9);
+    while (!rawboundary.empty() && (rawboundary.back() == '\r' || rawboundary.back() == '\n' || rawboundary.back() == ' '))
+        rawboundary.erase(rawboundary.size() - 1);
+    while (!rawboundary.empty() && (rawboundary.front() == ' ' || rawboundary.front() == '\r' || rawboundary.front() == '\n'))
+        rawboundary.erase(0, 1);
+    std::string boundary = "--" + rawboundary;
+    std::string endBoundary = boundary + "--";
+    std::cout << "End boundary ->>>>>>> " << endBoundary << std::endl;
     std::string body(Req.body.begin(), Req.body.end());
     size_t start = body.find(boundary);
     if (start == std::string::npos)
@@ -324,17 +335,34 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
         responseBuffer = buildErrorResponse(400);
         return;
     }
-    start += boundary.size() + 2;
+    start += boundary.size();
+    if (body[start] == '\r')
+        start++;
+    if (body[start] == '\n')
+        start++;
     while (true)
     {
         size_t next = body.find(boundary, start);
+        size_t nextEnd = body.find(endBoundary, start);
+        if (nextEnd != std::string::npos && (next == std::string::npos || nextEnd < next)) 
+        {
+            parts.push_back(body.substr(start, nextEnd - start));
+            std::cout << "Final part found: " << parts.back() << std::endl;
+            break;
+        }
         if (next == std::string::npos)
             break;
         parts.push_back(body.substr(start, next - start));
-        start = next + boundary.size() + 2;
+        std::cout << "Part found: " << parts.back() << std::endl;
+        start = next + boundary.size();
+        if (body[start] == '\r')
+            start++;
+        if (body[start] == '\n')
+            start++;
     }
     if (parts.empty())
     {
+        std::cout << "ALOOOOOO"<< std::endl;
         responseBuffer = buildErrorResponse(400);
         return;
     }
@@ -369,7 +397,10 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
         std::string fullPath = uploadPath + '/' + fileName;
         std::ofstream outFile(fullPath.c_str(), std::ios::binary);
         if (!outFile)
-            continue;
+        {
+            responseBuffer = buildErrorResponse(500);
+            return;
+        }
         outFile.write(bodyPart.c_str(), bodyPart.size());
         writeSuccess = true;
         outFile.close();
