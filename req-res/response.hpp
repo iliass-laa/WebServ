@@ -9,6 +9,7 @@ class DirectoryListing {
         bool   autoIndex;
         bool   _default; //is it correspond to when it's location / { ... } // yes ??
         std::vector<std::string> allowedMethods;
+        size_t maxBodySize;
     public :
     DirectoryListing();
     ~DirectoryListing();
@@ -23,6 +24,8 @@ class DirectoryListing {
     void   setDefault(bool value);
     std::vector<std::string> getAllowedMethods() const;
     void   setAllowedMethods(const std::vector<std::string> &methods);
+    size_t getMaxBodySize() const;
+    void   setMaxBodySize(size_t size);
 };
 
 
