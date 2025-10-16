@@ -7,9 +7,8 @@ class DirectoryListing {
         std::vector<std::string> indexFile;
         bool    hasIndexFile;
         bool   autoIndex;
-        bool   _default; //is it correspond to when it's location / { ... } ??
-        bool    uploadSupport;
-        bool    deletePerm;
+        bool   _default; //is it correspond to when it's location / { ... } // yes ??
+        std::vector<std::string> allowedMethods;
     public :
     DirectoryListing();
     ~DirectoryListing();
@@ -22,10 +21,8 @@ class DirectoryListing {
     std::vector<std::string>    getIndexFile() const;
     bool   getDefault() const;
     void   setDefault(bool value);
-    bool   getUploadSupport() const;
-    void   setUploadSupport(bool value);
-    bool   getDeletePermission() const;
-    void   setDeletePermission(bool value);
+    std::vector<std::string> getAllowedMethods() const;
+    void   setAllowedMethods(const std::vector<std::string> &methods);
 };
 
 
