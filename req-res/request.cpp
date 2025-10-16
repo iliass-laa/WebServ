@@ -11,6 +11,7 @@ std::vector<char> buildErrorResponse(int status) {
         case 403:               code = 403; reason = "Forbidden"; break;
         case 409:               code = 409; reason = "Conflict"; break;
         case 405:               code = 405; reason = "Method Not Allowed"; break;
+        case 500:               code = 500; reason = "Internal Server Error"; break;
         default:                code = 400; reason = "Bad Request"; break;
     }
 
