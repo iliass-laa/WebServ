@@ -6,6 +6,7 @@ void fillReqStruct(BaseNode*root, DirectoryListing &obj, std::string uri, std::s
     ContextNode *cNode, *serverNode, *httpNode;
     DirectiveNode *dNode;
     std::string port, serverName;
+    std::vector <std::string> allowMeth ({"GET", "POST", "DELETE"});
     int iport;
     serverName = host.substr(0, host.find(":"));
     port = host.substr(host.find(":")+ 1,host.length());
@@ -26,6 +27,7 @@ void fillReqStruct(BaseNode*root, DirectoryListing &obj, std::string uri, std::s
     // shere <<PINK << "VAL of Context:"<<cNode->val.back()<<"\n"<<DEF ;
     if (cNode->val.back().compare("/") == 0)
         obj.setDefault(true);
+    obj.setAllowedMethods(allowMeth);
     for (int i = 0;i < cNode->nbrChilds;i++)
     {
         if (cNode->Childs[i]->typeNode == isDirective)
