@@ -6,7 +6,10 @@ void fillReqStruct(BaseNode*root, DirectoryListing &obj, std::string uri, std::s
     ContextNode *cNode, *serverNode, *httpNode;
     DirectiveNode *dNode;
     std::string port, serverName;
-    std::vector <std::string> allowMeth ({"GET", "POST", "DELETE"});
+    std::vector <std::string> allowMeth ;
+    allowMeth.push_back("GET");
+    allowMeth.push_back("POST");
+    allowMeth.push_back("DELETE");
     int iport;
     serverName = host.substr(0, host.find(":"));
     port = host.substr(host.find(":")+ 1,host.length());
