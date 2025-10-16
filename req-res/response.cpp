@@ -1,6 +1,6 @@
 #include "response.hpp"
 
-DirectoryListing::DirectoryListing() : hasIndexFile(false), autoIndex(false), _default(false), uploadSupport(false) {}
+DirectoryListing::DirectoryListing() : hasIndexFile(false), autoIndex(false), _default(false){}
 
 DirectoryListing::~DirectoryListing() {}
 
@@ -46,29 +46,19 @@ const std::string &DirectoryListing::getRoot() const
     return root;
 }
 
-bool   DirectoryListing::getUploadSupport() const
+std::vector<std::string> DirectoryListing::getAllowedMethods() const
 {
-    return uploadSupport;
+    return allowedMethods;
 }
 
-void   DirectoryListing::setUploadSupport(bool value)
-{
-    uploadSupport = value;
-}
-
-void DirectoryListing::setDefault(bool value)
+void   DirectoryListing::setDefault(bool value)
 {
     _default = value;
 }
 
-void DirectoryListing::setDeletePermission(bool value)
+void   DirectoryListing::setAllowedMethods(const std::vector<std::string> &methods)
 {
-    deletePerm = value;
-}
-
-bool   DirectoryListing::getDeletePermission() const
-{
-    return deletePerm;
+    allowedMethods = methods;
 }
 
 int checkPath(const std::string &path)
@@ -205,6 +195,12 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
             break;
         longestMatchingPrefix = Req.uri.substr(0, pos);
     }
+    std::vector<std::string> allowedMethods = locationConfig.getAllowedMethods();
+    if (std::find(allowedMethods.begin(), allowedMethods.end(), "GET") == allowedMethods.end())
+    {
+        responseBuffer = buildErrorResponse(405);
+        return;
+    }
     std::string fileSystemPath = locationConfig.getRoot();
     if (fileSystemPath.length() != 0 && fileSystemPath[fileSystemPath.length() - 1] != '/')
         fileSystemPath += '/';
@@ -293,9 +289,10 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
     std::vector<std::string> parts;
 
     fillReqStruct(ConfigNode, locationConfig, Req.uri, Req.headers.at("Host"));
-    if (!locationConfig.getUploadSupport())
+    std::vector<std::string> allowedMethods = locationConfig.getAllowedMethods();
+    if (std::find(allowedMethods.begin(), allowedMethods.end(), "POST") == allowedMethods.end())
     {
-        responseBuffer = buildErrorResponse(403);
+        responseBuffer = buildErrorResponse(405);
         return;
     }
     std::string uploadPath;
@@ -403,9 +400,10 @@ void HandleDeleteResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, s
             break;
         longestMatchingPrefix = Req.uri.substr(0, pos);
     }
-    if (!locationConfig.getDeletePermission())
+    std::vector<std::string> allowedMethods = locationConfig.getAllowedMethods();
+    if (std::find(allowedMethods.begin(), allowedMethods.end(), "DELETE") == allowedMethods.end())
     {
-        responseBuffer = buildErrorResponse(403);
+        responseBuffer = buildErrorResponse(405);
         return;
     }
     std::string fileSystemPath = locationConfig.getRoot();
