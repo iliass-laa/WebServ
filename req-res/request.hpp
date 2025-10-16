@@ -15,7 +15,6 @@ struct HttpRequest {
     std::map<std::string, std::string> headers;
     std::vector<char> body;
     std::string boundary;
-    size_t maxBodySize;
 };
 
 enum ParseStatus {
