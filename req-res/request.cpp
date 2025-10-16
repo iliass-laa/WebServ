@@ -66,7 +66,7 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> requestBuffer, std::ve
         HandlePostResponse(ConfigNode, Req, responseBuffer);
     else
         HandleDeleteResponse(ConfigNode, Req, responseBuffer);
-    printResponse(responseBuffer);
+    // printResponse(responseBuffer);
     if (Req.headers.at("Connection") == "close")
         return COMPLETE;
     else
