@@ -128,6 +128,7 @@ void Core::handleClientEvent(int client_fd, short events){
             client->writeData();
         if(client->getClientState() == WAITTING_FOR_REQUEST){
             event_loop.updateSocketEvents(client->getFd() ,POLLIN );
+
         }
 
     }
@@ -135,7 +136,7 @@ void Core::handleClientEvent(int client_fd, short events){
     // disconnect the client 
     // if ( !(client->isConnected()) || (events & (POLLERR | POLLHUP))){
     if ( !(client->isConnected())){
-        std::cout << "client"<< client->getFd() <<  " lose tcp connection !!!" << std::endl;
+        std::cout << RED << "client"<< client->getFd() <<  " lose tcp connection !!!" << DEF << std::endl;
         event_loop.removeSocket(client_fd);
         delete client;
         clients.erase(it);
