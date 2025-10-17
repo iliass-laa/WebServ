@@ -23,7 +23,6 @@ std::vector<char> buildErrorResponse(int status) {
     ss << "HTTP/1.1 " << code << " " << reason << "\r\n";
     ss << "Content-Type: text/html\r\n";
     ss << "Content-Length: " << bodyStr.size() << "\r\n";
-    ss << "Connection: close\r\n";
     ss << "\r\n";
     ss << bodyStr;
 
@@ -65,7 +64,7 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> requestBuffer, std::ve
         HandlePostResponse(ConfigNode, Req, responseBuffer);
     else
         HandleDeleteResponse(ConfigNode, Req, responseBuffer);
-    // printResponse(responseBuffer);
+    printResponse(responseBuffer);
     if (Req.headers.at("Connection") == "close")
         return COMPLETE;
     else
@@ -143,8 +142,8 @@ int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
         Req.headers[key] = value;
     }
     if (Req.headers.find("Content-Length") != Req.headers.end()) {
-        int contentLength = atoi(Req.headers["Content-Length"].c_str());
-        if ((int)bodyPart.size() < contentLength)
+        size_t contentLength = std::strtoull(Req.headers["Content-Length"].c_str(), NULL, 10);
+        if (bodyPart.size() < contentLength)
             return INCOMPLETE;
     }
     else if (Req.headers.find("Transfer-Encoding") != Req.headers.end() &&

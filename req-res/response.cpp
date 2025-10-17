@@ -118,10 +118,6 @@ int buildFileResponse(std::string path, std::vector<char> &responseBuffer, const
     responseStream << "HTTP/1.1 200 OK\r\n";
     responseStream << "Content-Length: " << size << "\r\n";
     responseStream << "Content-Type: " << getContentType(path) << "\r\n";
-    if (Req.headers.at("Connection") == "close")
-        responseStream << "Connection: close\r\n";
-    else
-        responseStream << "Connection: keep-alive\r\n";
     responseStream << "\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
@@ -134,10 +130,6 @@ void buildRedirectionResponse(const std::string &newLocation, std::vector<char> 
     std::ostringstream responseStream;
     responseStream << "HTTP/1.1 301 Moved Permanently\r\n";
     responseStream << "Location: " << newLocation << "\r\n";
-    if (Req.headers.at("Connection") == "close")
-        responseStream << "Connection: close\r\n";
-    else
-        responseStream << "Connection: keep-alive\r\n";
     responseStream << "\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
@@ -179,10 +171,6 @@ int buildAutoIndexResponse(const std::string &directoryPath, const std::string &
     responseStream << "HTTP/1.1 200 OK\r\n";
     responseStream << "Content-Length: " << body.size() << "\r\n";
     responseStream << "Content-Type: text/html\r\n";
-    if (Req.headers.at("Connection") == "close")
-        responseStream << "Connection: close\r\n";
-    else
-        responseStream << "Connection: keep-alive\r\n";
     responseStream << "\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
@@ -267,11 +255,6 @@ void buildPostResponse(std::vector<char> &responseBuffer, const struct HttpReque
     std::ostringstream responseStream;
     responseStream << "HTTP/1.1 201 Created\r\n";
     responseStream << "Content-Length: 32\r\n";
-    if (Req.headers.at("Connection") == "close")
-        responseStream << "Connection: close\r\n";
-    else
-        responseStream << "Connection: keep-alive\r\n";
-    responseStream << "\r\n";
     responseStream << "Resource created successfully.\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
@@ -411,10 +394,6 @@ void buildDelResponse(std::vector<char> &responseBuffer, const struct HttpReques
     std::ostringstream responseStream;
     responseStream << "HTTP/1.1 200 OK\r\n";
     responseStream << "Content-Length: 19\r\n";
-    if (Req.headers.at("Connection") == "close")
-        responseStream << "Connection: close\r\n";
-    else
-        responseStream << "Connection: keep-alive\r\n";
     responseStream << "\r\n";
     responseStream << "Resource deleted.\r\n";
     std::string responseHeaders = responseStream.str();
