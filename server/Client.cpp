@@ -54,7 +54,7 @@ bool Client::readData(){
     ssize_t bytes = recv(client_fd, buffer, BUFFER, 0); //
 
     if (bytes > 0){ 
-        // buffer[bytes] = '\0'; // need to reapproch this
+        buffer[bytes] = '\0'; // need to reapproch this
         std::vector<char> readed(buffer, buffer + bytes);
         reqBuff.clear();
         reqBuff.insert(reqBuff.begin(), readed.begin(), readed.end());
@@ -64,7 +64,7 @@ bool Client::readData(){
             std::cout   << *it ;
         }
         std::cout << DEF <<"<<<<<<<<<"<< std::endl;
-        std::cout << RED << "<<<<<<< REQUEST LOOKS GOOD FOR NOW "  <<"<<<<<<<<<"<< std::endl;
+        std::cout << RED << "<<<<<<< REQUEST LOOKS GOOD FOR NOW "  <<"<<<<<<<<<"<<DEF<< std::endl;
 
         int checkReq = handleRequest(root,reqBuff,respoBuff); // keep-alive == COMPLETEDEF
         if(COMPLETE == checkReq ){
