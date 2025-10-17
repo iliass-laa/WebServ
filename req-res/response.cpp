@@ -122,7 +122,8 @@ int buildFileResponse(std::string path, std::vector<char> &responseBuffer, const
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
     responseBuffer.insert(responseBuffer.end(), buffer.begin(), buffer.end());
-    return 0;
+    (void)Req;
+    return 0; 
 }
 
 void buildRedirectionResponse(const std::string &newLocation, std::vector<char> &responseBuffer, const struct HttpRequest Req)
@@ -133,6 +134,7 @@ void buildRedirectionResponse(const std::string &newLocation, std::vector<char> 
     responseStream << "\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
+    (void)Req;
 }
 
 int buildAutoIndexResponse(const std::string &directoryPath, const std::string &uri, std::vector<char> &responseBuffer, const struct HttpRequest Req)
@@ -175,6 +177,7 @@ int buildAutoIndexResponse(const std::string &directoryPath, const std::string &
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
     responseBuffer.insert(responseBuffer.end(), body.begin(), body.end());
+    (void)Req;
     return 0;
 }
 
@@ -258,6 +261,7 @@ void buildPostResponse(std::vector<char> &responseBuffer, const struct HttpReque
     responseStream << "Resource created successfully.\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
+    (void)Req;
 }
 
 void buildProcessResponse(std::vector<char> &responseBuffer, const struct HttpRequest Req)
@@ -398,6 +402,7 @@ void buildDelResponse(std::vector<char> &responseBuffer, const struct HttpReques
     responseStream << "Resource deleted.\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
+     (void)Req;
 }
 
 void HandleDeleteResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)
