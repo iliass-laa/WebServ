@@ -51,10 +51,10 @@ bool Client::hasDataToWrite() const
 bool Client::readData(){
     char buffer[BUFFER];
 
-    ssize_t bytes = recv(client_fd, buffer, sizeof(buffer), 0); //
+    ssize_t bytes = recv(client_fd, buffer, BUFFER, 0); //
 
-    if (bytes > 0){
-        buffer[bytes] = '\0';
+    if (bytes > 0){ 
+        // buffer[bytes] = '\0'; // need to reapproch this
         std::vector<char> readed(buffer, buffer + bytes);
         reqBuff.clear();
         reqBuff.insert(reqBuff.begin(), readed.begin(), readed.end());
@@ -64,6 +64,7 @@ bool Client::readData(){
             std::cout   << *it ;
         }
         std::cout << DEF <<"<<<<<<<<<"<< std::endl;
+        std::cout << RED << "<<<<<<< REQUEST LOOKS GOOD FOR NOW "  <<"<<<<<<<<<"<< std::endl;
 
         int checkReq = handleRequest(root,reqBuff,respoBuff); // keep-alive == COMPLETEDEF
         if(COMPLETE == checkReq ){
@@ -75,7 +76,7 @@ bool Client::readData(){
     else if (bytes < 0){
         connected = false; // Client disconnected
     }
-    return false;
+    return false;   
 }
 
 // return should be void no use 
@@ -93,7 +94,6 @@ bool Client::writeData(){ // to vector<char> of write_data
     if(responseSize > 0 && responseSize < BUFFER)
         resOffset =  responseSize;
     // memset()
-    std::cout <<PINK<< "\n\n>>" <<resBuff << DEF << "\n>>>>>Response DONE<<<<<\n>>>>>Response LENGTh :"<< resBuff.length()<<"<<<<<\n";
     resOffset = send(client_fd, resBuff.c_str(), resBuff.length(),0);
     //>> tillas was here : i have no idea why u send "resOffset" as len instead of  " resBuff.length()", sorry i commented ur line.
     // resOffset = send(client_fd, resBuff.c_str(), resOffset,0);
