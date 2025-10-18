@@ -103,7 +103,7 @@ std::string getContentType(const std::string &path)
     return "application/octet-stream";
 }
 
-int buildFileResponse(std::string path, std::vector<char> &responseBuffer, const struct HttpRequest Req)
+int buildFileResponse(std::string path, std::vector<char> &responseBuffer)
 {
     std::ifstream file(path.c_str(), std::ios::binary);
     if (!file)
@@ -122,7 +122,6 @@ int buildFileResponse(std::string path, std::vector<char> &responseBuffer, const
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
     responseBuffer.insert(responseBuffer.end(), buffer.begin(), buffer.end());
-    (void)Req;
     return 0; 
 }
 
@@ -137,7 +136,7 @@ void buildRedirectionResponse(const std::string &newLocation, std::vector<char> 
     (void)Req;
 }
 
-int buildAutoIndexResponse(const std::string &directoryPath, const std::string &uri, std::vector<char> &responseBuffer, const struct HttpRequest Req)
+int buildAutoIndexResponse(const std::string &directoryPath, const std::string &uri, std::vector<char> &responseBuffer)
 {
     std::vector<std::string> entries;
     DIR *dir = opendir(directoryPath.c_str());
@@ -177,7 +176,6 @@ int buildAutoIndexResponse(const std::string &directoryPath, const std::string &
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
     responseBuffer.insert(responseBuffer.end(), body.begin(), body.end());
-    (void)Req;
     return 0;
 }
 
@@ -228,14 +226,14 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
                 pathType = checkPath(indexPath);
                 if (S_ISREG(pathType))
                 {
-                    if (!buildFileResponse(indexPath, responseBuffer, Req))
+                    if (!buildFileResponse(indexPath, responseBuffer))
                         return;
                 }
             }
         }
         if (locationConfig.getAutoIndex())
         {
-            if (!buildAutoIndexResponse(fileSystemPath, Req.uri, responseBuffer, Req))
+            if (!buildAutoIndexResponse(fileSystemPath, Req.uri, responseBuffer))
                 return;
         }
         responseBuffer = buildErrorResponse(403);
@@ -243,7 +241,7 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
     }
     else if (S_ISREG(pathType))
     {
-        if (!buildFileResponse(fileSystemPath, responseBuffer, Req))
+        if (!buildFileResponse(fileSystemPath, responseBuffer))
             return;
     }
     else
@@ -253,7 +251,7 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
     }
 }
 
-void buildPostResponse(std::vector<char> &responseBuffer, const struct HttpRequest Req)
+void buildPostResponse(std::vector<char> &responseBuffer)
 {
     std::ostringstream responseStream;
     responseStream << "HTTP/1.1 201 Created\r\n";
@@ -261,18 +259,13 @@ void buildPostResponse(std::vector<char> &responseBuffer, const struct HttpReque
     responseStream << "Resource created successfully.\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
-    (void)Req;
 }
 
-void buildProcessResponse(std::vector<char> &responseBuffer, const struct HttpRequest Req)
+void buildProcessResponse(std::vector<char> &responseBuffer)
 {
     std::ostringstream responseStream;
     responseStream << "HTTP/1.1 200 OK\r\n";
     responseStream << "Content-Length: 32\r\n";
-    if (Req.headers.at("Connection") == "close")
-        responseStream << "Connection: close\r\n";
-    else
-        responseStream << "Connection: keep-alive\r\n";
     responseStream << "\r\n";
     responseStream << "Request processed succesfully.\r\n";
     std::string responseHeaders = responseStream.str();
@@ -308,10 +301,10 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
     // std::string endBoundary = boundary + "--";
     // std::cout << "End boundary ->>>>>>> " << endBoundary << std::endl;
     std::string rawboundary = Req.headers.at("Content-Type").substr(boundaryPos + 9);
-    while (!rawboundary.empty() && (rawboundary.back() == '\r' || rawboundary.back() == '\n' || rawboundary.back() == ' '))
+    while (!rawboundary.empty() && (rawboundary[rawboundary.size() - 1] == '\r' || rawboundary[rawboundary.size() - 1] == '\n' || rawboundary[rawboundary.size() - 1] == ' '))
         rawboundary.erase(rawboundary.size() - 1);
-    while (!rawboundary.empty() && (rawboundary.front() == ' ' || rawboundary.front() == '\r' || rawboundary.front() == '\n'))
-        rawboundary.erase(0, 1);
+    while (!rawboundary.empty() && (rawboundary[0] == ' ' || rawboundary[0] == '\r' || rawboundary[0] == '\n'))
+       rawboundary.erase(0, 1);
     std::string boundary = "--" + rawboundary;
     std::string endBoundary = boundary + "--";
     std::string body(Req.body.begin(), Req.body.end());
@@ -388,12 +381,12 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
         outFile.close();
     }
     if (writeSuccess)
-        buildPostResponse(responseBuffer, Req);
+        buildPostResponse(responseBuffer);
     else
-        buildProcessResponse(responseBuffer, Req);
+        buildProcessResponse(responseBuffer);
 }
 
-void buildDelResponse(std::vector<char> &responseBuffer, const struct HttpRequest Req)
+void buildDelResponse(std::vector<char> &responseBuffer)
 {
     std::ostringstream responseStream;
     responseStream << "HTTP/1.1 200 OK\r\n";
@@ -402,7 +395,6 @@ void buildDelResponse(std::vector<char> &responseBuffer, const struct HttpReques
     responseStream << "Resource deleted.\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
-     (void)Req;
 }
 
 void HandleDeleteResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)
@@ -443,7 +435,7 @@ void HandleDeleteResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, s
             responseBuffer = buildErrorResponse(500);
             return;
         }
-        buildDelResponse(responseBuffer, Req);
+        buildDelResponse(responseBuffer);
             return;
     }
     else if (S_ISDIR(pathType))
@@ -453,7 +445,7 @@ void HandleDeleteResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, s
            responseBuffer = buildErrorResponse(409);
            return;
        }
-       buildDelResponse(responseBuffer, Req);
+       buildDelResponse(responseBuffer);
        return;
     }
     else
