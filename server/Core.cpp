@@ -26,17 +26,20 @@ void Core::stop(){
 
 //********************RUN************************ *******************************************************
 void Core::run(){
-    fillServerConf(root, *this);
-    if(!addServers()){
-        return ;
-    }
-    running = true ;
-    while (running){
-        std::vector<std::pair<int,short> > readyEvents = event_loop.waitForEvents(-1); 
-        // time out here is 0 => non-blocking poll()
-        for(std::vector<std::pair<int,short> >::iterator it = readyEvents.begin() ; it != readyEvents.end() ;it++ )
+   
+
+        fillServerConf(root, *this);
+        if(!addServers()){
+            return ;
+        }
+        running = true ;
+        while (running){
+            std::vector<std::pair<int,short> > readyEvents = event_loop.waitForEvents(-1); 
+            // time out here is 0 => non-blocking poll()
+            for(std::vector<std::pair<int,short> >::iterator it = readyEvents.begin() ; it != readyEvents.end() ;it++ )
             handleSocketEvent(it->first , it->second);
-    }
+        }
+
 }   
 
 

@@ -9,6 +9,7 @@ Client::Client(int fd,BaseNode* cnf)
     , respoBuff()
     , resOffset(0)
     , responseSize(0)
+    , state(WAITTING_FOR_REQUEST)
     , keepAlive(true)
     // Constructor implementation
 {}
@@ -54,19 +55,22 @@ bool Client::readData(){
     ssize_t bytes = recv(client_fd, buffer, BUFFER, 0); //
 
     if (bytes > 0){ 
-        buffer[bytes] = '\0'; // need to reapproch this
         std::vector<char> readed(buffer, buffer + bytes);
         reqBuff.clear();
         reqBuff.insert(reqBuff.begin(), readed.begin(), readed.end());
 
-        std::cout << ">>>>>>>>>\t\t "<< GREEN ;
-        for (std::vector<char>::iterator it = reqBuff.begin(); it != reqBuff.end() ; it++ ){
-            std::cout   << *it ;
+        // std::cout << ">>>>>>>>>\t\t "<< GREEN ;
+        // for (std::vector<char>::iterator it = reqBuff.begin(); it != reqBuff.end() ; it++ ){
+        //     std::cout   << *it ;
+        // }
+        // std::cout << DEF <<"<<<<<<<<<"<< std::endl;
+        // std::cout << RED << "<<<<<<< REQUEST LOOKS GOOD FOR NOW "  <<"<<<<<<<<<"<<DEF<< std::endl;
+        int checkReq = -1;
+        try{
+            checkReq = handleRequest(root,reqBuff,respoBuff); // keep-alive == COMPLETEDEF
+        }catch (std::exception& e){
+            std::cout << e.what() << "driss " << std::endl;
         }
-        std::cout << DEF <<"<<<<<<<<<"<< std::endl;
-        std::cout << RED << "<<<<<<< REQUEST LOOKS GOOD FOR NOW "  <<"<<<<<<<<<"<<DEF<< std::endl;
-
-        int checkReq = handleRequest(root,reqBuff,respoBuff); // keep-alive == COMPLETEDEF
         if(COMPLETE == checkReq ){
             std::cout << BLUE <<" >>>>>>>>>>>>>>>>> is ever he was here who knows" << DEF<< std::endl;
             connected = false; // Client disconnected
