@@ -8,16 +8,16 @@ int main(int ac, char *av[])
     BaseNode *root;
     if (ac == 2) 
         confPath = av[1];
-    try
-    {
+    // try
+    // {
         root = parseConfigFile(confPath.c_str());
         // printTree(root, 0);
         Core magicSystem(root);
         magicSystem.run();   
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-    }
+    // }
+    // catch(const std::exception& e)
+    // {
+    //     std::cerr << e.what()  << "**"<< std::endl;
+    // }
     return 0;
 }
