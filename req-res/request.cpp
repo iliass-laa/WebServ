@@ -64,7 +64,7 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> requestBuffer, std::ve
         HandlePostResponse(ConfigNode, Req, responseBuffer);
     else
         HandleDeleteResponse(ConfigNode, Req, responseBuffer);
-    printResponse(responseBuffer);
+    // printResponse(responseBuffer);
     if (Req.headers.at("Connection") == "close")
         return COMPLETE;
     else
@@ -121,7 +121,7 @@ int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
 
     reqLineStream >> Req.method >> Req.uri >> Req.version;
     if (Req.method.empty() || Req.uri.empty() || Req.version.empty())
-        return ERROR;
+        return ((std::cout << "shsgsgsgsgs" << std::endl), ERROR);
     if (Req.method != "GET" && Req.method != "POST" && Req.method != "DELETE")
         return ERROR_BAD_METHOD;
     if (Req.version != "HTTP/1.1")

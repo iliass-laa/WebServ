@@ -56,8 +56,7 @@ bool Client::readData(){
 
     if (bytes > 0){ 
         std::vector<char> readed(buffer, buffer + bytes);
-        reqBuff.clear();
-        reqBuff.insert(reqBuff.begin(), readed.begin(), readed.end());
+        reqBuff.insert(reqBuff.end(), readed.begin(), readed.end());
 
         // std::cout << ">>>>>>>>>\t\t "<< GREEN ;
         // for (std::vector<char>::iterator it = reqBuff.begin(); it != reqBuff.end() ; it++ ){
@@ -68,6 +67,7 @@ bool Client::readData(){
         int checkReq = -1;
         try{
             checkReq = handleRequest(root,reqBuff,respoBuff); // keep-alive == COMPLETEDEF
+            std::cout << "return handel request " << checkReq << "  enenenen"  << std::endl;
         }catch (std::exception& e){
             std::cout << e.what() << "driss " << std::endl;
         }
