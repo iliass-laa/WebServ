@@ -82,7 +82,6 @@ int parseChunkedBody(std::vector<char> &body) {
         size_t lineEnd = std::string(body.begin() + pos, body.end()).find("\r\n");
         if (lineEnd == std::string::npos)
             return INCOMPLETE;
-
         std::string sizeStr(body.begin() + pos, body.begin() + pos + lineEnd);
         long chunkSize = strtol(sizeStr.c_str(), NULL, 16);
         pos += lineEnd + 2;
@@ -114,6 +113,23 @@ int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
         return INCOMPLETE;
     std::string headerPart = requestString.substr(0, pos);
     std::vector<char> bodyPart(requestString.begin() + pos + 4, requestString.end());
+    std::string headerString(headerPart.begin(), headerPart.end());
+    pos = headerString.find("Content-Length") != std::string::npos;
+    pos = headerString.find("Content-Length");
+    if (pos != std::string::npos) {
+        size_t colonPos = headerString.find(':', pos);
+        size_t newLinePos = headerString.find('\n', colonPos);
+        std::string contentLengthString = headerString.substr(colonPos + 1, newLinePos - (colonPos + 1));
+        contentLengthString.erase(0, contentLengthString.find_first_not_of(" \t\r"));
+        contentLengthString.erase(contentLengthString.find_last_not_of(" \t\r") + 1);
+        size_t contentLength = std::strtoull(contentLengthString.c_str(), NULL, 10);
+        // std::cout << ">>>>>>>>>CONTENT LENGTH : " << contentLength <<  "\n";
+        if (bodyPart.size() < contentLength)
+        {
+            std::cout << ">>>>>>>>>CONTENT LENGTH : " << contentLength << "\n";
+            return INCOMPLETE;
+        }
+    }
     std::istringstream headerStream(headerPart);
     std::string reqLine;
     std::getline(headerStream, reqLine);
@@ -141,12 +157,7 @@ int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
             value.erase(value.size()-1);
         Req.headers[key] = value;
     }
-    if (Req.headers.find("Content-Length") != Req.headers.end()) {
-        size_t contentLength = std::strtoull(Req.headers["Content-Length"].c_str(), NULL, 10);
-        if (bodyPart.size() < contentLength)
-            return INCOMPLETE;
-    }
-    else if (Req.headers.find("Transfer-Encoding") != Req.headers.end() &&
+    if (Req.headers.find("Transfer-Encoding") != Req.headers.end() &&
              Req.headers["Transfer-Encoding"] == "chunked") {
         int status = (parseChunkedBody(bodyPart));
         if (status != COMPLETE)
