@@ -105,64 +105,168 @@ int parseChunkedBody(std::vector<char> &body) {
     }
 }
 
-int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
+// int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
 
-    std::string requestString(requestBuffer.begin(), requestBuffer.end());
-    size_t pos = requestString.find("\r\n\r\n");
-    if (pos == std::string::npos)
+//     std::clock_t start, checkpoint;
+//     start = std::clock();
+//     std::string requestString(requestBuffer.begin(), requestBuffer.end());
+//     size_t pos = requestString.find("\r\n\r\n");
+//     if (pos == std::string::npos)
+//         return INCOMPLETE;
+//     checkpoint = std::clock();
+//     std::cout << "[TIME] search for \\r\\n\\r\\n: "
+//              << (double)(checkpoint - start) / CLOCKS_PER_SEC << "s\n";
+//     start = std::clock();
+//     std::string headerPart = requestString.substr(0, pos);
+//     std::vector<char> bodyPart(requestString.begin() + pos + 4, requestString.end());
+//     std::string headerString(headerPart.begin(), headerPart.end());
+//     std::istringstream headerStream(headerPart);
+//     std::string reqLine;
+//     std::getline(headerStream, reqLine);
+//     std::istringstream reqLineStream(reqLine);
+//     checkpoint = std::clock();
+//     std::cout << "[TIME] headerPart build: "
+//              << (double)(checkpoint - start) / CLOCKS_PER_SEC << "s\n";
+
+//     start = std::clock();
+//     reqLineStream >> Req.method >> Req.uri >> Req.version;
+//     if (Req.method.empty() || Req.uri.empty() || Req.version.empty())
+//         return ERROR;
+//     if (Req.method != "GET" && Req.method != "POST" && Req.method != "DELETE")
+//         return ERROR_BAD_METHOD;
+//     if (Req.version != "HTTP/1.1")
+//         return ERROR_BAD_VERSION;
+//     std::string headerLine;
+//     while (std::getline(headerStream, headerLine)) {
+//         if (headerLine == "\r")
+//             break;
+//         size_t colonPos = headerLine.find(":");
+//         if (colonPos == std::string::npos)
+//             return ERROR;
+//         std::string key = headerLine.substr(0, colonPos);
+//         std::string value = headerLine.substr(colonPos + 1);
+//         while (!value.empty() && (value[0] == ' ' || value[0] == '\t'))
+//             value.erase(0,1);
+//         while (!value.empty() && (value[value.size()-1] == ' ' || value[value.size()-1] == '\t'))
+//             value.erase(value.size()-1);
+//         Req.headers[key] = value;
+//     }
+
+//     if (Req.headers.find("Content-Length") != Req.headers.end()) {
+//         checkpoint = std::clock();
+//         std::cout << "[TIME] content-length parsing: "
+//                  << (double)(checkpoint - start) / CLOCKS_PER_SEC << "s\n";
+//         Req.contentLength = std::strtoul(Req.headers.at("Content-Length").c_str(), NULL, 10);
+//         if (bodyPart.size() < Req.contentLength)
+//             return INCOMPLETE;
+//     }
+//     if (Req.headers.find("Transfer-Encoding") != Req.headers.end() &&
+//              Req.headers["Transfer-Encoding"] == "chunked") {
+//         int status = (parseChunkedBody(bodyPart));
+//         if (status != COMPLETE)
+//             return status;
+//     }
+//     Req.body = bodyPart;
+//     return COMPLETE;
+// }
+
+int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
+    // std::clock_t start, checkpoint;
+    // start = std::clock();
+
+    const char *sep = "\r\n\r\n";
+    const char *sep_end = sep + 4;
+
+    std::vector<char>::const_iterator it = std::search(
+        requestBuffer.begin(), requestBuffer.end(),
+        sep, sep_end
+    );
+    // checkpoint = std::clock();
+    // std::cout << "[TIME] search for \\r\\n\\r\\n: "
+    //           << (double)(checkpoint - start) / CLOCKS_PER_SEC << "s\n";
+
+    if (it == requestBuffer.end())
         return INCOMPLETE;
-    std::string headerPart = requestString.substr(0, pos);
-    std::vector<char> bodyPart(requestString.begin() + pos + 4, requestString.end());
-    std::string headerString(headerPart.begin(), headerPart.end());
-    pos = headerString.find("Content-Length") != std::string::npos;
-    pos = headerString.find("Content-Length");
+
+    size_t headerEnd = it - requestBuffer.begin();
+    size_t bodyStart = headerEnd + 4;
+
+    // measure headerPart creation
+    // start = std::clock();
+    std::string headerPart(requestBuffer.begin(), requestBuffer.begin() + headerEnd);
+    // checkpoint = std::clock();
+    // std::cout << "[TIME] headerPart build: "
+    //           << (double)(checkpoint - start) / CLOCKS_PER_SEC << "s\n";
+
+    // measure Content-Length parsing
+    // start = std::clock();
+    size_t pos = headerPart.find("Content-Length");
+    size_t contentLength = 0;
     if (pos != std::string::npos) {
-        size_t colonPos = headerString.find(':', pos);
-        size_t newLinePos = headerString.find('\n', colonPos);
-        std::string contentLengthString = headerString.substr(colonPos + 1, newLinePos - (colonPos + 1));
+        size_t colonPos = headerPart.find(':', pos);
+        size_t newLinePos = headerPart.find('\n', colonPos);
+        std::string contentLengthString = headerPart.substr(colonPos + 1, newLinePos - (colonPos + 1));
         contentLengthString.erase(0, contentLengthString.find_first_not_of(" \t\r"));
         contentLengthString.erase(contentLengthString.find_last_not_of(" \t\r") + 1);
-        size_t contentLength = std::strtoull(contentLengthString.c_str(), NULL, 10);
-        // std::cout << ">>>>>>>>>CONTENT LENGTH : " << contentLength <<  "\n";
-        if (bodyPart.size() < contentLength)
-        {
-            std::cout << ">>>>>>>>>CONTENT LENGTH : " << contentLength << "\n";
-            return INCOMPLETE;
-        }
+        contentLength = std::strtoul(contentLengthString.c_str(), NULL, 10);
     }
+    // checkpoint = std::clock();
+    // std::cout << "[TIME] content-length parsing: "
+    //           << (double)(checkpoint - start) / CLOCKS_PER_SEC << "s\n";
+
+    // measure body completeness check
+    // start = std::clock();
+    if (contentLength && requestBuffer.size() - bodyStart < contentLength)
+    {
+        // std::cout << ">>>>>>>>>CONTENT LENGTH : " << contentLength << "\n";
+        // std::cout << ">>>>>>>>>BODY SIZE : " << requestBuffer.size() - bodyStart << "\n";
+        // checkpoint = std::clock();
+        // std::cout << "[TIME] incomplete check: "
+        //           << (double)(checkpoint - start) / CLOCKS_PER_SEC << "s\n";
+        return INCOMPLETE;
+    }
+
+    // checkpoint = std::clock();
+    // std::cout << "[TIME] total parse so far: "
+    //           << (double)(checkpoint) / CLOCKS_PER_SEC << "s since start of function\n";
+
+    std::vector<char> bodyPart(requestBuffer.begin() + bodyStart, requestBuffer.end());
     std::istringstream headerStream(headerPart);
     std::string reqLine;
     std::getline(headerStream, reqLine);
     std::istringstream reqLineStream(reqLine);
-
     reqLineStream >> Req.method >> Req.uri >> Req.version;
+
     if (Req.method.empty() || Req.uri.empty() || Req.version.empty())
-        return ((std::cout << "shsgsgsgsgs" << std::endl), ERROR);
+        return ERROR;
     if (Req.method != "GET" && Req.method != "POST" && Req.method != "DELETE")
         return ERROR_BAD_METHOD;
     if (Req.version != "HTTP/1.1")
         return ERROR_BAD_VERSION;
+
     std::string headerLine;
     while (std::getline(headerStream, headerLine)) {
         if (headerLine == "\r")
             break;
-        size_t colonPos = headerLine.find(":");
+        size_t colonPos = headerLine.find(':');
         if (colonPos == std::string::npos)
             return ERROR;
         std::string key = headerLine.substr(0, colonPos);
         std::string value = headerLine.substr(colonPos + 1);
         while (!value.empty() && (value[0] == ' ' || value[0] == '\t'))
-            value.erase(0,1);
+            value.erase(0, 1);
         while (!value.empty() && (value[value.size()-1] == ' ' || value[value.size()-1] == '\t'))
             value.erase(value.size()-1);
         Req.headers[key] = value;
     }
+
     if (Req.headers.find("Transfer-Encoding") != Req.headers.end() &&
-             Req.headers["Transfer-Encoding"] == "chunked") {
-        int status = (parseChunkedBody(bodyPart));
+        Req.headers["Transfer-Encoding"] == "chunked") {
+        int status = parseChunkedBody(bodyPart);
         if (status != COMPLETE)
             return status;
     }
     Req.body = bodyPart;
     return COMPLETE;
 }
+
