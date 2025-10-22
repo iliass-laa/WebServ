@@ -50,13 +50,13 @@ bool Client::hasDataToWrite() const
 }
 
 bool Client::readData(){
-    char buffer[BUFFER];
+    char buffer[64600];
 
-    ssize_t bytes = recv(client_fd, buffer, BUFFER, 0); //
+    ssize_t bytes = recv(client_fd, buffer, 64600, 0); //
 
     if (bytes > 0){ 
-        std::vector<char> readed(buffer, buffer + bytes);
-        reqBuff.insert(reqBuff.end(), readed.begin(), readed.end());
+        // std::vector<char> readed(buffer, buffer + bytes);
+        reqBuff.insert(reqBuff.end(), buffer, buffer + bytes);
 
         // std::cout << ">>>>>>>>>\t\t "<< GREEN ;
         // for (std::vector<char>::iterator it = reqBuff.begin(); it != reqBuff.end() ; it++ ){
