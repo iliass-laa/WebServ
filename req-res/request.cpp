@@ -30,18 +30,18 @@ std::vector<char> buildErrorResponse(int status) {
     return std::vector<char>(response.begin(), response.end());
 }
 
-// void printRequest(const struct HttpRequest &Req) {
-//     std::cout << "Method: " << Req.method << "\n";
-//     std::cout << "URI: " << Req.uri << "\n";
-//     std::cout << "Version: " << Req.version << "\n";
-//     std::cout << "Headers:\n";
-//     for (const auto &header : Req.headers) {
-//         std::cout << header.first << ": " << header.second << "\n";
-//     }
-//     std::cout << "Body (" << Req.body.size() << " bytes):\n";
-//     std::cout.write(Req.body.data(), Req.body.size());
-//     std::cout << "\n";
-// }
+void printRequest(const struct HttpRequest &Req) {
+    std::cout << "Method: " << Req.method << "\n";
+    std::cout << "URI: " << Req.uri << "\n";
+    std::cout << "Version: " << Req.version << "\n";
+    std::cout << "Headers:\n";
+    for (const auto &header : Req.headers) {
+        std::cout << header.first << ": " << header.second << "\n";
+    }
+    std::cout << "Body (" << Req.body.size() << " bytes):\n";
+    std::cout.write(Req.body.data(), Req.body.size());
+    std::cout << "\n";
+}
 
 void printResponse(const std::vector<char> &responseBuffer) {
     std::cout << "Response (" << responseBuffer.size() << " bytes):\n";
@@ -50,9 +50,8 @@ void printResponse(const std::vector<char> &responseBuffer) {
 }
 
 
-int handleRequest(BaseNode* ConfigNode, std::vector<char> requestBuffer, std::vector<char> &responseBuffer) {
-    struct HttpRequest Req;  
-    int status = parseRequest(requestBuffer, Req, headerParsed);
+int handleRequest(BaseNode* ConfigNode, std::vector<char> requestBuffer, std::vector<char> &responseBuffer, struct HttpRequest &Req) {
+    int status = parseRequest(requestBuffer, Req);
     if (status == INCOMPLETE)
         return INCOMPLETE;
     else if (status == ERROR_BAD_METHOD || status == ERROR_BAD_VERSION || status == ERROR)
@@ -105,12 +104,13 @@ int parseChunkedBody(std::vector<char> &body) {
     }
 }
 
-int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req, bool &headerParsed) {
+int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
 
-    // std::clock_t startTime = std::clock();
-    if (!headerParsed)
+    std::clock_t startTime, endTime;
+    startTime = std::clock();   
+    if (!Req.headerParsed)
     {
-        std::cout << "ALOOOOOOOOO" << std::endl;
+        // std::cout << "RequestBuffer = " << std::string(requestBuffer.begin(), requestBuffer.end()) << std::endl;
         std::string requestString(requestBuffer.begin(), requestBuffer.end());
         Req.headerEndPos = requestString.find("\r\n\r\n");
         if (Req.headerEndPos == std::string::npos)
@@ -143,16 +143,24 @@ int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req, bool 
                 value.erase(value.size()-1);
             Req.headers[key] = value;
         }
-        headerParsed = true;
+        Req.headerParsed = true;
     }
     if (Req.headers.find("Content-Length") != Req.headers.end()) {
         Req.contentLength = std::strtoul(Req.headers.at("Content-Length").c_str(), NULL, 10);
             if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) < Req.contentLength)
+            {
+                endTime = std::clock();
+                double seconds = double(endTime - startTime) / CLOCKS_PER_SEC;
+                std::cout << std::fixed << std::setprecision(6);
+                std::cout << "Time taken to parse request: " << seconds << " seconds" << std::endl;
                 return INCOMPLETE;
+            }
+                
     }
     std::vector<char> bodyPart(requestBuffer.begin() + Req.headerEndPos + 4, requestBuffer.end());
     if (Req.headers.find("Transfer-Encoding") != Req.headers.end() &&
             Req.headers["Transfer-Encoding"] == "chunked") {
+        Req.isChunked = true;
         int status = (parseChunkedBody(bodyPart));
         if (status != COMPLETE)
             return status;

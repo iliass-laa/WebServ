@@ -11,8 +11,14 @@ Client::Client(int fd,BaseNode* cnf)
     , responseSize(0)
     , state(WAITTING_FOR_REQUEST)
     , keepAlive(true)
+    , Req()
     // Constructor implementation
-{}
+{
+    Req.headerParsed = false;
+    Req.contentLength = 0;
+    Req.isChunked = false;
+    Req.headerEndPos = 0;
+}
 
 Client::~Client() {
     // Destructor implementation
@@ -52,12 +58,16 @@ bool Client::hasDataToWrite() const
 bool Client::readData(){
     char buffer[BUFFER];
 
+    std::clock_t startTime, endTime;
+    startTime = std::clock();
     ssize_t bytes = recv(client_fd, buffer, BUFFER, 0); //
 
     if (bytes > 0){ 
         // std::vector<char> readed(buffer, buffer + bytes);
-        reqBuff.insert(reqBuff.end(), buffer , buffer + bytes );
-
+        //if (!Req.isChunked && Req.headerParsed)
+        //    reqBuff.resize(Req.contentLength);
+        // then set whatever boolean you use to true so it only resizes once
+        reqBuff.insert(reqBuff.end(), buffer , buffer + bytes);
         // std::cout << ">>>>>>>>>\t\t "<< GREEN ;
         // for (std::vector<char>::iterator it = reqBuff.begin(); it != reqBuff.end() ; it++ ){
         //     std::cout   << *it ;
@@ -66,7 +76,13 @@ bool Client::readData(){
         // std::cout << RED << "<<<<<<< REQUEST LOOKS GOOD FOR NOW "  <<"<<<<<<<<<"<<DEF<< std::endl;
         int checkReq = -1;
         try{
-            checkReq = handleRequest(root,reqBuff,respoBuff); // keep-alive == COMPLETEDEF
+            endTime = std::clock();
+            double seconds = double(endTime - startTime) / CLOCKS_PER_SEC;
+
+// Print in normal decimal format with 6 decimal places
+            std::cout << std::fixed << std::setprecision(6);
+            std::cout << "READ DATA TIME: " << seconds << " seconds" << std::endl;
+            checkReq = handleRequest(root,reqBuff,respoBuff, Req); // keep-alive == COMPLETEDEF
             std::cout << "return handel request " << checkReq << "  enenenen"  << std::endl;
         }catch (std::exception& e){
             std::cout << e.what() << "driss " << std::endl;
@@ -87,6 +103,7 @@ bool Client::readData(){
 bool Client::writeData(){ // to vector<char> of write_data
     if(getClientState() == WAITTING_FOR_RESPONSE){
         state = SENDING_RESPONSE;
+        clearReqStruct();
         resBuff.clear();
         resBuff = getResBuffer();
         responseSize = respoBuff.size();
@@ -143,6 +160,14 @@ int Client::getClientState() const { return state;}
 void Client::setKeepAlive(int val){keepAlive = val;}
 int Client::getKeepAlive() const{return keepAlive;}
 
+void Client::setReqStruct (struct HttpRequest& req){
+    this->Req = req;
+}
+
+HttpRequest& Client::getReqStruct (){
+    return Req;
+}
+
 void Client::clearVectReq(){
     reqBuff.clear();
 }
@@ -152,3 +177,14 @@ void Client::clearVectRes(){
     resBuff.clear();
 }
 
+void Client::clearReqStruct(){
+    Req.method.clear();
+    Req.uri.clear();
+    Req.version.clear();
+    Req.headers.clear();
+    Req.body.clear();
+    Req.boundary.clear();
+    Req.contentLength = 0;
+    Req.headerEndPos = 0;
+    Req.headerParsed = false;
+}
