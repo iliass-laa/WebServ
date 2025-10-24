@@ -9,6 +9,20 @@
 
 class BaseNode;
 
+
+struct HttpRequest {
+    std::string method;
+    std::string uri;
+    std::string version;
+    std::map<std::string, std::string> headers;
+    std::vector<char> body;
+    std::string boundary;
+    size_t contentLength;
+    size_t headerEndPos;
+    bool   headerParsed;
+    bool   isChunked;
+};
+
 typedef enum clientState {
     READING_REQUEST, // 0
     WAITTING_FOR_REQUEST, // 2
@@ -29,6 +43,7 @@ private:
     ssize_t responseSize;
     int state;
     bool keepAlive;
+    struct HttpRequest Req;
     
 public:
     Client(int, BaseNode*);
@@ -45,6 +60,8 @@ public:
     std::string getReadBuffer();  
     std::vector<char>& getRespoBuffer();  
     std::string getResBuffer();
+    void setReqStruct (struct HttpRequest& req);
+    struct HttpRequest& getReqStruct ();
     void setResponseSize(ssize_t );
 
     void setClientState(int );
@@ -52,6 +69,7 @@ public:
 
     void setKeepAlive(int );
     int getKeepAlive() const;
+    void clearReqStruct();
     void clearVectReq();
     void clearVectRes();
 
