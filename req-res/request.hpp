@@ -17,6 +17,8 @@ struct HttpRequest {
     std::vector<char> body;
     std::string boundary;
     size_t contentLength;
+    size_t headerEndPos;
+    bool   headerParsed;
 };
 
 enum ParseStatus {
@@ -28,7 +30,7 @@ enum ParseStatus {
     ERROR
 };
 
-int		parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req);
+int		parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req, bool &headerParsed);
 void	HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer);
 std::vector<char> buildErrorResponse(int status);
 int handleRequest(BaseNode* ConfigNode, std::vector<char> requestBuffer, std::vector<char> &responseBuffer) ;
