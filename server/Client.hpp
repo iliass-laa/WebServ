@@ -5,7 +5,7 @@
 #include<vector>
 #include <sys/socket.h>
 #include "../req-res/request.hpp"
-#define BUFFER 5000000
+#define BUFFER 4096
 
 class BaseNode;
 

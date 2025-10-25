@@ -58,8 +58,8 @@ bool Client::hasDataToWrite() const
 bool Client::readData(){
     char buffer[BUFFER];
 
-    std::clock_t startTime, endTime;
-    startTime = std::clock();
+    // std::clock_t startTime, endTime;
+    // startTime = std::clock();
     ssize_t bytes = recv(client_fd, buffer, BUFFER, 0); //
 
     if (bytes > 0){ 
@@ -76,12 +76,12 @@ bool Client::readData(){
         // std::cout << RED << "<<<<<<< REQUEST LOOKS GOOD FOR NOW "  <<"<<<<<<<<<"<<DEF<< std::endl;
         int checkReq = -1;
         try{
-            endTime = std::clock();
-            double seconds = double(endTime - startTime) / CLOCKS_PER_SEC;
+            // endTime = std::clock();
+            // double seconds = double(endTime - startTime) / CLOCKS_PER_SEC;
 
 // Print in normal decimal format with 6 decimal places
-            std::cout << std::fixed << std::setprecision(6);
-            std::cout << "READ DATA TIME: " << seconds << " seconds" << std::endl;
+            // std::cout << std::fixed << std::setprecision(6);
+            // std::cout << "READ DATA TIME: " << seconds << " seconds" << std::endl;
             checkReq = handleRequest(root,reqBuff,respoBuff, Req); // keep-alive == COMPLETEDEF
             std::cout << "return handel request " << checkReq << "  enenenen"  << std::endl;
         }catch (std::exception& e){
