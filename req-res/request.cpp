@@ -50,10 +50,18 @@ void printResponse(const std::vector<char> &responseBuffer) {
 }
 
 
-int handleRequest(BaseNode* ConfigNode, std::vector<char> requestBuffer, std::vector<char> &responseBuffer, struct HttpRequest &Req) {
+int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::vector<char> &responseBuffer, struct HttpRequest &Req) {
+    std::clock_t startTime, endTime;
+    startTime = std::clock();
     int status = parseRequest(requestBuffer, Req);
+    endTime = std::clock();
+    double seconds = double(endTime - startTime) / CLOCKS_PER_SEC;
+    std::cout << std::fixed << std::setprecision(6);
+    std::cout << "Time taken outside parse: " << seconds << " seconds" << std::endl;
     if (status == INCOMPLETE)
+    {
         return INCOMPLETE;
+    }
     else if (status == ERROR_BAD_METHOD || status == ERROR_BAD_VERSION || status == ERROR)
         responseBuffer = buildErrorResponse(status);
     // printRequest(Req);
@@ -104,10 +112,10 @@ int parseChunkedBody(std::vector<char> &body) {
     }
 }
 
-int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
+int parseRequest(std::vector<char> &requestBuffer, struct HttpRequest &Req) {
 
-    std::clock_t startTime, endTime;
-    startTime = std::clock();   
+    std::clock_t startTime, checkTime, endTime;
+    startTime = std::clock();  
     if (!Req.headerParsed)
     {
         // std::cout << "RequestBuffer = " << std::string(requestBuffer.begin(), requestBuffer.end()) << std::endl;
@@ -149,8 +157,8 @@ int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
         Req.contentLength = std::strtoul(Req.headers.at("Content-Length").c_str(), NULL, 10);
             if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) < Req.contentLength)
             {
-                endTime = std::clock();
-                double seconds = double(endTime - startTime) / CLOCKS_PER_SEC;
+                checkTime = std::clock();
+                double seconds = double(checkTime - startTime) / CLOCKS_PER_SEC;
                 std::cout << std::fixed << std::setprecision(6);
                 std::cout << "Time taken to parse request: " << seconds << " seconds" << std::endl;
                 return INCOMPLETE;
@@ -166,6 +174,10 @@ int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req) {
             return status;
     }
     Req.body = bodyPart;
+    endTime = std::clock();
+    double seconds = double(endTime - startTime) / CLOCKS_PER_SEC;
+    std::cout << std::fixed << std::setprecision(6);
+    std::cout << "Time taken to parse request: " << seconds << " seconds" << std::endl;
     return COMPLETE;
 }
 
