@@ -296,10 +296,6 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
         responseBuffer = buildErrorResponse(415);
         return;
     }
-    // std::string rawboundary = Req.headers.at("Content-Type").substr(boundaryPos + 9);
-    // std::string boundary = "--" + rawboundary;
-    // std::string endBoundary = boundary + "--";
-    // std::cout << "End boundary ->>>>>>> " << endBoundary << std::endl;
     std::string rawboundary = Req.headers.at("Content-Type").substr(boundaryPos + 9);
     while (!rawboundary.empty() && (rawboundary[rawboundary.size() - 1] == '\r' || rawboundary[rawboundary.size() - 1] == '\n' || rawboundary[rawboundary.size() - 1] == ' '))
         rawboundary.erase(rawboundary.size() - 1);
@@ -309,8 +305,7 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
     std::string endBoundary = boundary + "--";
     std::string body(Req.body.begin(), Req.body.end());
     size_t start = body.find(boundary);
-    if (start == std::string::npos)
-    {
+     {
         responseBuffer = buildErrorResponse(400);
         return;
     }
