@@ -18,7 +18,6 @@ Core& Core::operator=(const Core& obj){
 
 
 
-
 //********************STOP******************************************************************************
 void Core::stop(){
     running = false;
@@ -27,8 +26,12 @@ void Core::stop(){
 //********************RUN************************ *******************************************************
 void Core::run(){
    
-
-        fillServerConf(root, *this);
+        try{
+            fillServerConf(root, *this);
+        }catch(ConfigFileError& e){
+            std::cout << e.what() << std::endl;
+            freeTree(root);
+        }
         if(!addServers()){
             return ;
         }
@@ -158,6 +161,7 @@ bool Core::addServers(){
         {
             std::cerr << "[server][addServers] Failed to create server on port " << *it << std::endl;
             delete server;
+            freeTree(root);
             return false;
         }
 
