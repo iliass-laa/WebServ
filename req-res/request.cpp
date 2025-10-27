@@ -64,7 +64,7 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
         return INCOMPLETE;
     else if (status != COMPLETE && status != COMPLETEDEF)
         responseBuffer = buildErrorResponse(status);
-    printRequest(Req);
+    // printRequest(Req);
     if (Req.method == "GET")
         HandleGetResponse(ConfigNode, Req, responseBuffer);
     else if (Req.method == "POST")
@@ -79,38 +79,68 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
     
 }
 
+// int parseChunkedBody(std::vector<char> &body) {
+//     size_t pos = 0;
+//     std::vector<char> temp;
+
+//     while (true) {
+//         if (pos >= body.size())
+//             return INCOMPLETE;
+//         size_t lineEnd = std::string(body.begin() + pos, body.end()).find("\r\n");
+//         if (lineEnd == std::string::npos)
+//             return INCOMPLETE;
+//         std::string sizeStr(body.begin() + pos, body.begin() + pos + lineEnd);
+//         long chunkSize = strtol(sizeStr.c_str(), NULL, 16);
+//         pos += lineEnd + 2;
+//         if (chunkSize == 0) {
+//             if (pos + 2 > body.size())
+//                 return INCOMPLETE;
+//             if (body[pos] != '\r' || body[pos + 1] != '\n')
+//                 return ERROR;
+//             body = temp;
+//             return COMPLETE;
+//         }
+
+//         if (pos + chunkSize + 2 > body.size())
+//             return INCOMPLETE;
+//         temp.insert(temp.end(), body.begin() + pos, body.begin() + pos + chunkSize);
+
+//         pos += chunkSize;
+//         if (body[pos] != '\r' || body[pos + 1] != '\n')
+//             return ERROR;
+//         pos += 2;
+//     }
+// }
+
 int parseChunkedBody(std::vector<char> &body) {
     size_t pos = 0;
-    std::vector<char> temp;
+    std::vector<char> result;
+    result.reserve(body.size());
 
-    while (true) {
-        if (pos >= body.size())
-            return INCOMPLETE;
-        size_t lineEnd = std::string(body.begin() + pos, body.end()).find("\r\n");
-        if (lineEnd == std::string::npos)
-            return INCOMPLETE;
-        std::string sizeStr(body.begin() + pos, body.begin() + pos + lineEnd);
+    while (pos < body.size()) {
+        size_t lineEnd = pos;
+        while (lineEnd + 1 < body.size() && !(body[lineEnd] == '\r' && body[lineEnd + 1] == '\n'))
+            ++lineEnd;
+        if (lineEnd + 1 >= body.size())
+            return ERROR;
+        std::string sizeStr(body.begin() + pos, body.begin() + lineEnd);
         long chunkSize = strtol(sizeStr.c_str(), NULL, 16);
-        pos += lineEnd + 2;
+        pos = lineEnd + 2;
+
         if (chunkSize == 0) {
-            if (pos + 2 > body.size())
-                return INCOMPLETE;
-            if (body[pos] != '\r' || body[pos + 1] != '\n')
+            if (pos + 1 >= body.size() || body[pos] != '\r' || body[pos + 1] != '\n')
                 return ERROR;
-            body = temp;
+            body.swap(result);
             return COMPLETE;
         }
-
-        if (pos + chunkSize + 2 > body.size())
-            return INCOMPLETE;
-        temp.insert(temp.end(), body.begin() + pos, body.begin() + pos + chunkSize);
-
-        pos += chunkSize;
-        if (body[pos] != '\r' || body[pos + 1] != '\n')
+        if (pos + chunkSize + 1 >= body.size())
             return ERROR;
-        pos += 2;
+        result.insert(result.end(), body.begin() + pos, body.begin() + pos + chunkSize);
+        pos += chunkSize + 2;
     }
+    return ERROR;
 }
+
 
 bool isChunkedBodyComplete(const std::vector<char>& buf)
 {
@@ -123,7 +153,7 @@ bool isChunkedBodyComplete(const std::vector<char>& buf)
 
     for (size_t i = scanStart; i <= buf.size() - endChunkLen; ++i)
     {
-        if (std::memcmp(&buf[i], endChunk, endChunkLen) == 0)
+        if (memcmp(&buf[i], endChunk, endChunkLen) == 0)
             return true;
     }
     return false;
@@ -175,11 +205,11 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
             Req.isChunked = true;
         Req.headerParsed = true;
     }
-    // if (Req.isChunked)
-    // {
-    //     if (!isChunkedBodyComplete(std::vector<char>(requestBuffer.begin() + Req.headerEndPos + 4, requestBuffer.end())))
-    //         return INCOMPLETE;
-    // }
+    if (Req.isChunked)
+    {
+        if (!isChunkedBodyComplete(requestBuffer))
+            return INCOMPLETE;
+    }
     if (Req.headers.find("Content-Length") != Req.headers.end()) {
         Req.contentLength = std::strtoul(Req.headers.at("Content-Length").c_str(), NULL, 10);  
             // if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) > Req.maxBodySize)
