@@ -293,7 +293,7 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
     size_t boundaryPos = Req.headers.at("Content-Type").find("boundary=");
     if (boundaryPos == std::string::npos)
     {
-        responseBuffer = buildErrorResponse(400);
+        responseBuffer = buildErrorResponse(415);
         return;
     }
     // std::string rawboundary = Req.headers.at("Content-Type").substr(boundaryPos + 9);
@@ -373,6 +373,7 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
         std::ofstream outFile(fullPath.c_str(), std::ios::binary);
         if (!outFile)
         {
+            std::cout << "Failed to open file for writing: " << fullPath << std::endl;
             responseBuffer = buildErrorResponse(500);
             return;
         }
