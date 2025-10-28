@@ -21,6 +21,10 @@ struct HttpRequest {
     size_t headerEndPos;
     bool   headerParsed;
     bool   isChunked;
+<<<<<<< HEAD
+=======
+    size_t maxBodySize;
+>>>>>>> fe7d159c647a0bb7bd9187ad2d11b74569ecca9c
 };
 
 typedef enum clientState {

@@ -3,11 +3,21 @@
 #include"Socket.hpp"
 #include"Client.hpp"
 #include"EventLoop.hpp"
+<<<<<<< HEAD
+=======
+#include"../parsing/headers/webserver.hpp"
+>>>>>>> fe7d159c647a0bb7bd9187ad2d11b74569ecca9c
 #include<vector>
 #include<set>
 #include<map>
 #include<iostream>
 #include<string>
+<<<<<<< HEAD
+=======
+
+
+class ConfigFileError;
+>>>>>>> fe7d159c647a0bb7bd9187ad2d11b74569ecca9c
 // #include"../parsing/headers/AST.hpp"
 class BaseNode;
 class Client;
