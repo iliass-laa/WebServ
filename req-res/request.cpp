@@ -4,15 +4,17 @@ std::vector<char> buildErrorResponse(int status) {
     int code;
     std::string reason;
     switch (status) {
-        case ERROR_BAD_METHOD:  code = 501; reason = "Not Implemented"; break;
-        case ERROR_BAD_VERSION: code = 505; reason = "HTTP Version Not Supported"; break;
-        case ERROR:             code = 400; reason = "Bad Request"; break;
-        case 404:               code = 404; reason = "Not Found"; break;
-        case 403:               code = 403; reason = "Forbidden"; break;
-        case 409:               code = 409; reason = "Conflict"; break;
-        case 405:               code = 405; reason = "Method Not Allowed"; break;
-        case 500:               code = 500; reason = "Internal Server Error"; break;
-        default:                code = 400; reason = "Bad Request"; break;
+        case ERROR_BAD_METHOD:      code = 501; reason = "Not Implemented"; break;
+        case ERROR_BAD_VERSION:     code = 505; reason = "HTTP Version Not Supported"; break;
+        case ERROR:                 code = 400; reason = "Bad Request"; break;
+        case ERROR_BODY_TOO_LARGE:  code = 413; reason = "Payload Too Large"; break;
+        case 404:                   code = 404; reason = "Not Found"; break;
+        case 415:                   code = 415; reason = "Unsupported Media Type"; break;
+        case 403:                   code = 403; reason = "Forbidden"; break;
+        case 409:                   code = 409; reason = "Conflict"; break;
+        case 405:                   code = 405; reason = "Method Not Allowed"; break;
+        case 500:                   code = 500; reason = "Internal Server Error"; break;
+        default:                    code = 400; reason = "Bad Request"; break;
     }
 
     std::ostringstream body;
@@ -53,16 +55,14 @@ void printResponse(const std::vector<char> &responseBuffer) {
 int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::vector<char> &responseBuffer, struct HttpRequest &Req) {
     // std::clock_t startTime, endTime;
     // startTime = std::clock();
-    int status = parseRequest(requestBuffer, Req);
+    int status = parseRequest(ConfigNode, requestBuffer, Req);
     // endTime = std::clock();
     // double seconds = double(endTime - startTime) / CLOCKS_PER_SEC;
     // std::cout << std::fixed << std::setprecision(6);
     // std::cout << "Time taken outside parse: " << seconds << " seconds" << std::endl;
     if (status == INCOMPLETE)
-    {
         return INCOMPLETE;
-    }
-    else if (status == ERROR_BAD_METHOD || status == ERROR_BAD_VERSION || status == ERROR)
+    else if (status != COMPLETE && status != COMPLETEDEF)
         responseBuffer = buildErrorResponse(status);
     // printRequest(Req);
     if (Req.method == "GET")
@@ -79,43 +79,91 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
     
 }
 
+// int parseChunkedBody(std::vector<char> &body) {
+//     size_t pos = 0;
+//     std::vector<char> temp;
+
+//     while (true) {
+//         if (pos >= body.size())
+//             return INCOMPLETE;
+//         size_t lineEnd = std::string(body.begin() + pos, body.end()).find("\r\n");
+//         if (lineEnd == std::string::npos)
+//             return INCOMPLETE;
+//         std::string sizeStr(body.begin() + pos, body.begin() + pos + lineEnd);
+//         long chunkSize = strtol(sizeStr.c_str(), NULL, 16);
+//         pos += lineEnd + 2;
+//         if (chunkSize == 0) {
+//             if (pos + 2 > body.size())
+//                 return INCOMPLETE;
+//             if (body[pos] != '\r' || body[pos + 1] != '\n')
+//                 return ERROR;
+//             body = temp;
+//             return COMPLETE;
+//         }
+
+//         if (pos + chunkSize + 2 > body.size())
+//             return INCOMPLETE;
+//         temp.insert(temp.end(), body.begin() + pos, body.begin() + pos + chunkSize);
+
+//         pos += chunkSize;
+//         if (body[pos] != '\r' || body[pos + 1] != '\n')
+//             return ERROR;
+//         pos += 2;
+//     }
+// }
+
 int parseChunkedBody(std::vector<char> &body) {
     size_t pos = 0;
-    std::vector<char> temp;
+    std::vector<char> result;
+    result.reserve(body.size());
 
-    while (true) {
-        if (pos >= body.size())
-            return INCOMPLETE;
-        size_t lineEnd = std::string(body.begin() + pos, body.end()).find("\r\n");
-        if (lineEnd == std::string::npos)
-            return INCOMPLETE;
-        std::string sizeStr(body.begin() + pos, body.begin() + pos + lineEnd);
+    while (pos < body.size()) {
+        size_t lineEnd = pos;
+        while (lineEnd + 1 < body.size() && !(body[lineEnd] == '\r' && body[lineEnd + 1] == '\n'))
+            ++lineEnd;
+        if (lineEnd + 1 >= body.size())
+            return ERROR;
+        std::string sizeStr(body.begin() + pos, body.begin() + lineEnd);
         long chunkSize = strtol(sizeStr.c_str(), NULL, 16);
-        pos += lineEnd + 2;
+        pos = lineEnd + 2;
+
         if (chunkSize == 0) {
-            if (pos + 2 > body.size())
-                return INCOMPLETE;
-            if (body[pos] != '\r' || body[pos + 1] != '\n')
+            if (pos + 1 >= body.size() || body[pos] != '\r' || body[pos + 1] != '\n')
                 return ERROR;
-            body = temp;
+            body.swap(result);
             return COMPLETE;
         }
-
-        if (pos + chunkSize + 2 > body.size())
-            return INCOMPLETE;
-        temp.insert(temp.end(), body.begin() + pos, body.begin() + pos + chunkSize);
-
-        pos += chunkSize;
-        if (body[pos] != '\r' || body[pos + 1] != '\n')
+        if (pos + chunkSize + 1 >= body.size())
             return ERROR;
-        pos += 2;
+        result.insert(result.end(), body.begin() + pos, body.begin() + pos + chunkSize);
+        pos += chunkSize + 2;
     }
+    return ERROR;
 }
 
-int parseRequest(std::vector<char> &requestBuffer, struct HttpRequest &Req) {
+
+bool isChunkedBodyComplete(const std::vector<char>& buf)
+{
+    const char* endChunk = "0\r\n\r\n";
+    const size_t endChunkLen = 5;
+
+    if (buf.size() < endChunkLen)
+        return false;
+    size_t scanStart = (buf.size() > 50) ? buf.size() - 50 : 0;
+
+    for (size_t i = scanStart; i <= buf.size() - endChunkLen; ++i)
+    {
+        if (memcmp(&buf[i], endChunk, endChunkLen) == 0)
+            return true;
+    }
+    return false;
+}
+
+int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct HttpRequest &Req) {
 
     // std::clock_t startTime, checkTime, endTime;
     // startTime = std::clock();  
+    (void)ConfigNode;
     if (!Req.headerParsed)
     {
         // std::cout << "RequestBuffer = " << std::string(requestBuffer.begin(), requestBuffer.end()) << std::endl;
@@ -147,14 +195,25 @@ int parseRequest(std::vector<char> &requestBuffer, struct HttpRequest &Req) {
             std::string value = headerLine.substr(colonPos + 1);
             while (!value.empty() && (value[0] == ' ' || value[0] == '\t'))
                 value.erase(0,1);
-            while (!value.empty() && (value[value.size()-1] == ' ' || value[value.size()-1] == '\t'))
+            while (!value.empty() && (value[value.size()-1] == ' ' || value[value.size()-1] == '\t' || value[value.size()-1] == '\r' || value[value.size()-1] == '\n'))
                 value.erase(value.size()-1);
             Req.headers[key] = value;
+            // Req.maxBodySize = getMaxBodySize(ConfigNode, Req.uri);
         }
+        if (Req.headers.find("Transfer-Encoding") != Req.headers.end() &&
+            Req.headers["Transfer-Encoding"] == "chunked")
+            Req.isChunked = true;
         Req.headerParsed = true;
     }
+    if (Req.isChunked)
+    {
+        if (!isChunkedBodyComplete(requestBuffer))
+            return INCOMPLETE;
+    }
     if (Req.headers.find("Content-Length") != Req.headers.end()) {
-        Req.contentLength = std::strtoul(Req.headers.at("Content-Length").c_str(), NULL, 10);
+        Req.contentLength = std::strtoul(Req.headers.at("Content-Length").c_str(), NULL, 10);  
+            // if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) > Req.maxBodySize)
+            //     return ERROR_BODY_TOO_LARGE;
             if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) < Req.contentLength)
             {
                 // checkTime = std::clock();
@@ -166,9 +225,7 @@ int parseRequest(std::vector<char> &requestBuffer, struct HttpRequest &Req) {
                 
     }
     std::vector<char> bodyPart(requestBuffer.begin() + Req.headerEndPos + 4, requestBuffer.end());
-    if (Req.headers.find("Transfer-Encoding") != Req.headers.end() &&
-            Req.headers["Transfer-Encoding"] == "chunked") {
-        Req.isChunked = true;
+    if (Req.isChunked){
         int status = (parseChunkedBody(bodyPart));
         if (status != COMPLETE)
             return status;

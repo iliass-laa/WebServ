@@ -293,13 +293,9 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
     size_t boundaryPos = Req.headers.at("Content-Type").find("boundary=");
     if (boundaryPos == std::string::npos)
     {
-        responseBuffer = buildErrorResponse(400);
+        responseBuffer = buildErrorResponse(415);
         return;
     }
-    // std::string rawboundary = Req.headers.at("Content-Type").substr(boundaryPos + 9);
-    // std::string boundary = "--" + rawboundary;
-    // std::string endBoundary = boundary + "--";
-    // std::cout << "End boundary ->>>>>>> " << endBoundary << std::endl;
     std::string rawboundary = Req.headers.at("Content-Type").substr(boundaryPos + 9);
     while (!rawboundary.empty() && (rawboundary[rawboundary.size() - 1] == '\r' || rawboundary[rawboundary.size() - 1] == '\n' || rawboundary[rawboundary.size() - 1] == ' '))
         rawboundary.erase(rawboundary.size() - 1);
@@ -309,8 +305,7 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
     std::string endBoundary = boundary + "--";
     std::string body(Req.body.begin(), Req.body.end());
     size_t start = body.find(boundary);
-    if (start == std::string::npos)
-    {
+     {
         responseBuffer = buildErrorResponse(400);
         return;
     }
@@ -373,6 +368,7 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
         std::ofstream outFile(fullPath.c_str(), std::ios::binary);
         if (!outFile)
         {
+            std::cout << "Failed to open file for writing: " << fullPath << std::endl;
             responseBuffer = buildErrorResponse(500);
             return;
         }
