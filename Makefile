@@ -1,5 +1,10 @@
 CC = c++
+<<<<<<< HEAD
 CPPFLAGS = -Wall -Wextra -Werror -fsanitize=address -g -std=c++98
+=======
+# CPPFLAGS = -Wall -Wextra -Werror -fsanitize=address -g -std=c++98
+CPPFLAGS =  -Wall -Wextra -Werror
+>>>>>>> f7a9b36808bd0477d2fe5f59d16b6ac1072fba39
 
 # Automatically find all .cpp files in the repository (exclude .git and root/webserv placeholders)
 SERVER = $(shell find ./server -name '*.cpp' | sort)
