@@ -16,6 +16,7 @@ void printPairs(std::set<std::string > &pairs)
 
 void addPair(std::string val,  std::set <std::string> &pairs)
 {
+    std::string errMsg("Job for webServ.service failed because the control process exited with error code.");
     std::string defaultInter("0.0.0.0"),port, inter, newVal;
     std::set <std::string> :: iterator it, toErase;
     size_t pos;
@@ -30,6 +31,8 @@ void addPair(std::string val,  std::set <std::string> &pairs)
     pos = newVal.find(":");
     port = newVal.substr(pos+1, newVal.length());
     inter =  newVal.substr(0 , pos);
+    // if (pairs.find(newVal) != pairs.end())
+    //     throw(ConfigFileError(errMsg + "\nCheck this pair (duplicated on the same server Context):" + newVal));
     if (inter.compare(defaultInter) == 0)
     {
         while (it!= pairs.end())
