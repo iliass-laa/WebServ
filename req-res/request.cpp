@@ -163,7 +163,6 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
 
     // std::clock_t startTime, checkTime, endTime;
     // startTime = std::clock();  
-    (void)ConfigNode;
     if (!Req.headerParsed)
     {
         // std::cout << "RequestBuffer = " << std::string(requestBuffer.begin(), requestBuffer.end()) << std::endl;
@@ -198,7 +197,7 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
             while (!value.empty() && (value[value.size()-1] == ' ' || value[value.size()-1] == '\t' || value[value.size()-1] == '\r' || value[value.size()-1] == '\n'))
                 value.erase(value.size()-1);
             Req.headers[key] = value;
-            // Req.maxBodySize = getMaxBodySize(ConfigNode, Req.uri);
+            Req.maxBodySize = getMaxBodySize(ConfigNode, Req.uri); // implement ilyass
         }
         if (Req.headers.find("Transfer-Encoding") != Req.headers.end() &&
             Req.headers["Transfer-Encoding"] == "chunked")
