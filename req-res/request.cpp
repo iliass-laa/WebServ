@@ -65,6 +65,11 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
         responseBuffer = buildErrorResponse(status);
     // printRequest(Req);
     // ->>>> TILLAS Need to work on this :handleCGI_Premium();
+    if (Req.uri.compare(0, 9, "/cgi-bin/"))
+    {
+        handleCGI_Premium(Req, responseBuffer);
+        return;
+    }
     if (Req.method == "GET")
         HandleGetResponse(ConfigNode, Req, responseBuffer);
     else if (Req.method == "POST")
@@ -199,13 +204,14 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
             Req.headers[key] = value;
 
             getMaxBodySize(ConfigNode, Req.maxBodySize, Req.headers.at("Host")); // implement ilyass
-            // Req.maxBodySize = getMaxBodySize(ConfigNode, Req.uri); // implement ilyass
         }
         if (Req.headers.find("Transfer-Encoding") != Req.headers.end() &&
             Req.headers["Transfer-Encoding"] == "chunked")
             Req.isChunked = true;
         Req.headerParsed = true;
     }
+    if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) > Req.maxBodySize)
+        return ERROR_BODY_TOO_LARGE;
     if (Req.isChunked)
     {
         if (!isChunkedBodyComplete(requestBuffer))
@@ -213,8 +219,6 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
     }
     if (Req.headers.find("Content-Length") != Req.headers.end()) {
         Req.contentLength = std::strtoul(Req.headers.at("Content-Length").c_str(), NULL, 10);  
-            // if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) > Req.maxBodySize)
-            //     return ERROR_BODY_TOO_LARGE;
             if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) < Req.contentLength)
             {
                 // checkTime = std::clock();
