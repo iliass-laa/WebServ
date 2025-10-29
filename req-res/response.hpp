@@ -5,6 +5,7 @@ class DirectoryListing {
     private :
         std::string root;
         std::vector<std::string> indexFile;
+        std::pair <bool, std::string> redirect;
         bool    hasIndexFile;
         bool   autoIndex;
         bool   _default; //is it correspond to when it's location / { ... } // yes ??
@@ -26,6 +27,8 @@ class DirectoryListing {
     void   setAllowedMethods(const std::vector<std::string> &methods);
     size_t getMaxBodySize() const;
     void   setMaxBodySize(size_t size);
+    std::pair <bool, std::string>   getRedirect();
+    void   setRedirect(std::pair <bool, std::string>);
 };
 
 

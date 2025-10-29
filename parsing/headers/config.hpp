@@ -9,6 +9,7 @@
 #define SingleQ '\''
 #define DoubleQ '"'
 
+#define DEF_MAX_BODY_SIZE  1073741824 
 
 
 
