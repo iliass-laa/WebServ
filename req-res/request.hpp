@@ -25,3 +25,6 @@ std::vector<char> buildErrorResponse(int status);
 int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::vector<char> &responseBuffer, struct HttpRequest &Req); ;
 void    HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer);
 void HandleDeleteResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer);
+
+
+void getMaxBodySize(BaseNode *root, size_t &mxBdSz , std::string host);

@@ -1,5 +1,4 @@
 #include "request.hpp"
-
 std::vector<char> buildErrorResponse(int status) {
     int code;
     std::string reason;
@@ -65,6 +64,7 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
     else if (status != COMPLETE && status != COMPLETEDEF)
         responseBuffer = buildErrorResponse(status);
     // printRequest(Req);
+    // ->>>> TILLAS Need to work on this :handleCGI_Premium();
     if (Req.method == "GET")
         HandleGetResponse(ConfigNode, Req, responseBuffer);
     else if (Req.method == "POST")
@@ -197,7 +197,9 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
             while (!value.empty() && (value[value.size()-1] == ' ' || value[value.size()-1] == '\t' || value[value.size()-1] == '\r' || value[value.size()-1] == '\n'))
                 value.erase(value.size()-1);
             Req.headers[key] = value;
-            Req.maxBodySize = getMaxBodySize(ConfigNode, Req.uri); // implement ilyass
+
+            getMaxBodySize(ConfigNode, Req.maxBodySize, Req.headers.at("Host")); // implement ilyass
+            // Req.maxBodySize = getMaxBodySize(ConfigNode, Req.uri); // implement ilyass
         }
         if (Req.headers.find("Transfer-Encoding") != Req.headers.end() &&
             Req.headers["Transfer-Encoding"] == "chunked")
