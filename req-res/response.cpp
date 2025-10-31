@@ -51,6 +51,16 @@ std::vector<std::string> DirectoryListing::getAllowedMethods() const
     return allowedMethods;
 }
 
+std::pair <bool, std::string>   DirectoryListing::getRedirect()
+{
+    return redirect;
+}
+
+void  DirectoryListing::setRedirect(std::pair <bool, std::string> rd)
+{
+    redirect = rd;
+}
+
 void   DirectoryListing::setDefault(bool value)
 {
     _default = value;
@@ -125,15 +135,15 @@ int buildFileResponse(std::string path, std::vector<char> &responseBuffer)
     return 0; 
 }
 
-void buildRedirectionResponse(const std::string &newLocation, std::vector<char> &responseBuffer, const struct HttpRequest Req)
+void buildRedirectionResponse(const std::string &newLocation, std::vector<char> &responseBuffer)
 {
     std::ostringstream responseStream;
     responseStream << "HTTP/1.1 301 Moved Permanently\r\n";
     responseStream << "Location: " << newLocation << "\r\n";
+    responseStream << "Content-Length: 0\r\n";
     responseStream << "\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
-    (void)Req;
 }
 
 int buildAutoIndexResponse(const std::string &directoryPath, const std::string &uri, std::vector<char> &responseBuffer)
@@ -210,11 +220,16 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
         responseBuffer = buildErrorResponse(404);
         return;
     }
+    if (locationConfig.getRedirect().first)
+    {
+        buildRedirectionResponse(locationConfig.getRedirect().second, responseBuffer);
+        return;
+    }
     if (S_ISDIR(pathType))
     {
         if ((!fileSystemPath.empty() && fileSystemPath[fileSystemPath.size() - 1] != '/'))
         {
-            buildRedirectionResponse(Req.uri + '/', responseBuffer, Req);
+            buildRedirectionResponse(Req.uri + '/', responseBuffer);
             return;
         }
         if (locationConfig.getHasIndexFile())
