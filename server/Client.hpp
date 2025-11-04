@@ -35,6 +35,7 @@ typedef enum clientState {
 class Client {
 private:
     BaseNode* root;
+    Core& theBase;
     int client_fd;
     bool connected;
     std::vector<char> reqBuff; // for request
@@ -47,7 +48,7 @@ private:
     struct HttpRequest Req;
     
 public:
-    Client(int, BaseNode*);
+    Client(int, BaseNode* ,Core&);
     ~Client();
     Client(const Client& other);
     Client& operator=(const Client& other);

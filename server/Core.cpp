@@ -48,17 +48,27 @@ void Core::run(){
 
 //*****************HANDEL**SOCKET**EVENT******************************************************************
 void Core::handleSocketEvent(int fd, short events){
+    Client* cl = NULL;
     if(isServerSocket(fd)){
         std::cout << "[server socket] " << fd << std::endl;
         handleNewConnection(fd);
     }
-    else{
+    else if((cl = isCgi(fd))){
+        handelCgiRecponce(fd, events,cl);
+    }
+    else {
         // std::cout << "client " << fd << std::endl;
         handleClientEvent(fd, events);
     }
 }
 
 
+void    Core::handelCgiRecponce(int fd, short events, Client* cl){
+    // Tillas do your magic 
+    (void)fd;
+    (void)events;
+    (void)cl;
+}
 
 
 //***********IS**SERVER**SOCKET***************************************************************************
@@ -95,7 +105,7 @@ void Core::handleNewConnection(int server_fd){
     // accept new connection 
     int new_client = server->accept();
     if(new_client != -1){
-        Client* cl = new Client(new_client, root);
+        Client* cl = new Client(new_client, root, *this);
         event_loop.addSocket(new_client, POLLIN);
         clients[new_client] = cl;
         std::cout << "\t\t[new client connected] [" << new_client << "] !!" << std::endl ;
@@ -103,7 +113,20 @@ void Core::handleNewConnection(int server_fd){
     return ;
 }
 
+void Core::handleNewCgi(int fd_cgi, Client* clt){
+    std::pair<int , Client*> cc(fd_cgi, clt);
+    cgi.insert(cc);
+    event_loop.addSocket(fd_cgi, POLLIN);
+    std::cout << "\t\t[new cgi connected] [" << fd_cgi << "] !!" << std::endl ;
+    return ;
+}
 
+Client* Core::isCgi(int fd_cgi){
+    std::map<int , Client*>::iterator it = cgi.find(fd_cgi);
+    if(it != cgi.end())
+        return it->second;
+    return NULL;
+}
 
 //***************HANDEL**CLIENT**EVENT********************************************************************
 void Core::handleClientEvent(int client_fd, short events){
