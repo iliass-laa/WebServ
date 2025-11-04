@@ -20,6 +20,7 @@ class Core {
     private:
         std::vector<Socket*> servers;
         std::map<int, Client*> clients;
+        std::map<int, Client*> cgi;
         EventLoop event_loop;
         bool running;
         BaseNode* root;
@@ -30,6 +31,10 @@ class Core {
         void handleNewConnection(int server_fd);
         void handleClientEvent(int client_fd, short events);
         void processClientRequest(Client *client);
+        void handleNewCgi(int fd_cgi, Client* cl);
+        Client* isCgi(int fd_cgi);
+        void handelCgiRecponce(int, short,Client*);
+
         // void editSocket();
         
     public:

@@ -1,7 +1,8 @@
 #include "Client.hpp"
 
-Client::Client(int fd,BaseNode* cnf)
-: root(cnf)               // initialize in same order as declaration
+Client::Client(int fd,BaseNode* cnf, Core& core)
+    : root(cnf)   
+    , theBase(core)            // initialize in same order as declaration
     , client_fd(fd)
     , connected(true)
     , reqBuff()
@@ -83,6 +84,7 @@ bool Client::readData(){
             // std::cout << std::fixed << std::setprecision(6);
             // std::cout << "READ DATA TIME: " << seconds << " seconds" << std::endl;
             checkReq = handleRequest(root,reqBuff,respoBuff, Req); // keep-alive == COMPLETEDEF
+            
             std::cout << "return handel request " << checkReq << "  enenenen"  << std::endl;
         }catch (std::exception& e){
             std::cout << e.what() << "driss " << std::endl;

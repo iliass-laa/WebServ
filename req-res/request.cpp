@@ -68,6 +68,7 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
     if (Req.uri.compare(0, 9, "/cgi-bin/"))
     {
         handleCGI_Premium(Req, responseBuffer);
+        
         return COMPLETE;
     }
     if (Req.method == "GET")
