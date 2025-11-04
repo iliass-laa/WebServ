@@ -31,18 +31,18 @@ std::vector<char> buildErrorResponse(int status) {
     return std::vector<char>(response.begin(), response.end());
 }
 
-void printRequest(const struct HttpRequest &Req) {
-    std::cout << "Method: " << Req.method << "\n";
-    std::cout << "URI: " << Req.uri << "\n";
-    std::cout << "Version: " << Req.version << "\n";
-    std::cout << "Headers:\n";
-    for (const auto &header : Req.headers) {
-        std::cout << header.first << ": " << header.second << "\n";
-    }
-    std::cout << "Body (" << Req.body.size() << " bytes):\n";
-    std::cout.write(Req.body.data(), Req.body.size());
-    std::cout << "\n";
-}
+// void printRequest(const struct HttpRequest &Req) {
+//     std::cout << "Method: " << Req.method << "\n";
+//     std::cout << "URI: " << Req.uri << "\n";
+//     std::cout << "Version: " << Req.version << "\n";
+//     std::cout << "Headers:\n";
+//     for (const auto &header : Req.headers) {
+//         std::cout << header.first << ": " << header.second << "\n";
+//     }
+//     std::cout << "Body (" << Req.body.size() << " bytes):\n";
+//     std::cout.write(Req.body.data(), Req.body.size());
+//     std::cout << "\n";
+// }
 
 void printResponse(const std::vector<char> &responseBuffer) {
     std::cout << "Response (" << responseBuffer.size() << " bytes):\n";
@@ -68,7 +68,8 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
     if (Req.uri.compare(0, 9, "/cgi-bin/"))
     {
         handleCGI_Premium(Req, responseBuffer);
-        return;
+        
+        return COMPLETE;
     }
     if (Req.method == "GET")
         HandleGetResponse(ConfigNode, Req, responseBuffer);
