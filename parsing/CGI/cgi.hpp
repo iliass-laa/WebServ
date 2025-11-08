@@ -1,29 +1,41 @@
 #pragma once
 #include "../headers/webserver.hpp"
+#include "../../req-res/response.hpp"
+#include "../../server/HttpRequest.hpp"
+// #include "../../server/Client.hpp"
 
 
-class cgiInfo{
-    int cgiFd;
-    Client *cl;
-    
-    public :
-        cgiInfo();
-        cgiInfo();
 
-};
-
+struct HttpRequest;
+class Client;
+// struct HttpRequest {
+//     std::string method;
+//     std::string uri;
+//     std::string version;
+//     std::map<std::string, std::string> headers;
+//     std::vector<char> body;
+//     std::string boundary;
+//     size_t contentLength;
+//     size_t headerEndPos;
+//     bool   headerParsed;
+//     bool   isChunked;
+//     size_t maxBodySize;
+// };
 
 class cgiHandling
 {
-    // char 
+    Client *cl;
+    int sv[2], childPID;
+    DirectoryListing locationConfig;
 
-    std::vector <int> ScriptId;
-    
-    // void cgiExec();
-
+    void childStart(BaseNode *root,  HttpRequest req);
     public :
         cgiHandling ();
+        cgiHandling (Client *cl);
         ~cgiHandling ();
 
-        void handelCGI(BaseNode *, HttpRequest, std::vector<char> &);
+        void setClient(Client *cl);
+        int handelCGI(BaseNode *root, HttpRequest req);
+        int generateResponse();
+        // int getSvForMainP();
 };

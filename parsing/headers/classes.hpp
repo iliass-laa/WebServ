@@ -67,5 +67,19 @@ class ConfigFileInfos : public LocationConfig , public ServerConfig
 };  
 
 
+class CustomizeError : public std::exception {
+private:
+    std::string msg; 
+public:
+    const char* what() const throw(){  
+        return msg.c_str();
+    }
+    
+    CustomizeError() : msg("Error\n") {}
+    
+    CustomizeError(const std::string& message) : msg(message) {}
+    virtual ~CustomizeError()throw(){};
+};
+
 
 #endif

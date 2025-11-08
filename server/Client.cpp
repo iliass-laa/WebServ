@@ -25,7 +25,7 @@ Client::~Client() {
     // Destructor implementation
 }
 
-Client::Client(const Client& other) {
+Client::Client(const Client& other):theBase(other.theBase) {
     // Copy constructor implementation
     (void)other;
 }
@@ -57,40 +57,47 @@ bool Client::hasDataToWrite() const
 }
 
 bool Client::readData(){
+
     char buffer[BUFFER];
-
-    // std::clock_t startTime, endTime;
-    // startTime = std::clock();
     ssize_t bytes = recv(client_fd, buffer, BUFFER, 0); //
-
     if (bytes > 0){ 
-        // std::vector<char> readed(buffer, buffer + bytes);
-        //if (!Req.isChunked && Req.headerParsed)
-        //    reqBuff.resize(Req.contentLength);
-        // then set whatever boolean you use to true so it only resizes once
-        reqBuff.insert(reqBuff.end(), buffer , buffer + bytes);
-        // std::cout << ">>>>>>>>>\t\t "<< GREEN ;
-        // for (std::vector<char>::iterator it = reqBuff.begin(); it != reqBuff.end() ; it++ ){
-        //     std::cout   << *it ;
-        // }
-        // std::cout << DEF <<"<<<<<<<<<"<< std::endl;
-        // std::cout << RED << "<<<<<<< REQUEST LOOKS GOOD FOR NOW "  <<"<<<<<<<<<"<<DEF<< std::endl;
-        int checkReq = -1;
-        try{
-            // endTime = std::clock();
-            // double seconds = double(endTime - startTime) / CLOCKS_PER_SEC;
 
-// Print in normal decimal format with 6 decimal places
-            // std::cout << std::fixed << std::setprecision(6);
-            // std::cout << "READ DATA TIME: " << seconds << " seconds" << std::endl;
+        reqBuff.insert(reqBuff.end(), buffer , buffer + bytes);
+        int checkReq = -1;
+        try
+        {
             checkReq = handleRequest(root,reqBuff,respoBuff, Req); // keep-alive == COMPLETEDEF
-            
-            std::cout << "return handel request " << checkReq << "  enenenen"  << std::endl;
+            std::cout << CYAN <<"CLIENT :: Reding DATA (after HandelReq)\n"
+                        <<"URI :"<< Req.uri 
+                        <<"\ncl_fd :"<< client_fd
+                        <<"\ncl_Addr :"<< this
+                        << "\nHandel Req Return:"<< checkReq
+                        << DEF << "\n";
+            if (checkReq == CGI)
+            {
+                try 
+                {
+                    std::cout <<PINK <<">>>>CLIENT_FD  THAT GOT CGI:"<< this->client_fd<< "\n"<<DEF;
+                    int newFd = cgi.handelCGI(root, Req);
+                    theBase.addToEventLoop(newFd);
+                    theBase.setCGI_FD(newFd, this);
+                    std::cout << BLUE<<"checkReq is CGI :\n" <<"NewFD :"<< newFd<< "\n"<<DEF;
+                }
+                catch (std::exception& e){
+                std::cout << RED<<"CGI FAILED :"<< e.what()<< DEF << std::endl;
+                }
+                checkReq = COMPLETEDEF;
+            }
+            // std::cout << "return handel request " << checkReq << "  enenenen"  << std::endl;
         }catch (std::exception& e){
-            std::cout << e.what() << "driss " << std::endl;
+            std::cout << CYAN<< "return handel request " << checkReq << "  AFTER EXCEPTION \n"  <<DEF<< std::endl;
+            std::cout << e.what() << "Driss " << std::endl;
         }
         if(COMPLETE == checkReq ){
-            std::cout << BLUE <<" >>>>>>>>>>>>>>>>> is ever he was here who knows" << DEF<< std::endl;
+            std::cout << CYAN <<" CLIENT ::>>>>>>>>>>>>>>>>> is ever he was here who knows" << std::endl;
+            std::cout <<" >>>>>>>>>>>>>>>>> I AM ABOUT TO SET THE 'CONNECTED=FALSE' " << std::endl;
+            std::cout  <<" >>>>>>>>>>>>>>>>>to this CLIENT :" << this << std::endl;
+            std::cout  <<" >>>>>>>>>>>>>>>>>to this CLIENT fd:" << this->getFd() << DEF<< std::endl;
             connected = false; // Client disconnected
         }
         return checkReq; // keep alive 
@@ -100,9 +107,32 @@ bool Client::readData(){
     }
     return false;   
 }
+// long check[2];
 
 // return should be void no use 
 bool Client::writeData(){ // to vector<char> of write_data
+
+
+    // if (check[0] == 0)
+    // {
+    //     check[0] = static this;
+    //     check[1] = 1;
+    // }
+    // else{
+    //     if (check[0] == client_fd)
+    //         check[1] ++;
+    //     if (check[1] == 8)
+    //     {
+    //         std::cout << RED 
+    //                 << check[0] << "<<-- this client has been here for :" 
+    //                 <<check[1] <<"times\n"<<DEF; 
+    //         exit(1); 
+    //     }
+    // }
+
+    std::cout << CYAN << "CLIET ::i am about to send a RESPO to this CL:" << this 
+            << "\nFD_CL : "<< this->getFd()
+            <<"\nCL_STATE :" << getClientState()<< "\n";
     if(getClientState() == WAITTING_FOR_RESPONSE){
         state = SENDING_RESPONSE;
         clearReqStruct();
@@ -110,14 +140,18 @@ bool Client::writeData(){ // to vector<char> of write_data
         resBuff = getResBuffer();
         responseSize = respoBuff.size();
     }
+    std::cout << CYAN <<"CLIENT :iam STUCK HERE \n"; 
+    printVecChar(respoBuff) ;
+    std::cout << "\n\nThe string Form:>>>\t\t\t"<< PINK << resBuff << DEF<< std::endl;
     if(!resBuff.size() || !connected)
         return false;
-    // std::cout << ">>>\t\t\t"<< PINK << resBuff << DEF<< std::endl;
     resOffset = BUFFER;
     if(responseSize > 0 && responseSize < BUFFER)
         resOffset =  responseSize;
     // memset()
     resOffset = send(client_fd, resBuff.c_str(), resBuff.length(),0);
+    std::cout << CYAN << "CLIET ::RESPO to this CL:" << this 
+            << ",is SENT\nFD_CL : "<< this->getFd() << DEF << "\n";
     //>> tillas was here : i have no idea why u send "resOffset" as len instead of  " resBuff.length()", sorry i commented ur line.
     // resOffset = send(client_fd, resBuff.c_str(), resOffset,0);
     if (resOffset > 0 )
@@ -190,3 +224,4 @@ void Client::clearReqStruct(){
     Req.headerEndPos = 0;
     Req.headerParsed = false;
 }
+

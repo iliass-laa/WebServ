@@ -8,7 +8,7 @@
 #include "classes.hpp"
 #include "AST.hpp"
 #include "colors.hpp"
-#include "../../server/Core.hpp"
+// #include "../../server/Core.hpp"
 #include<set>
 
 
@@ -97,5 +97,8 @@ void fillServerConf(BaseNode *root, Core &obj);
 int  getPortFromDirective(std::string str);
 std::string  getInterFromDirective(std::string str);
 bool serverNameisInterface(std::string serverName, std::vector<std::string> interfaces);
+
+
+void printVecChar( std::vector<char> Vec);
 
 #endif
