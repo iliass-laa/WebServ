@@ -65,12 +65,9 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
         responseBuffer = buildErrorResponse(status);
     // printRequest(Req);
     // ->>>> TILLAS Need to work on this :handleCGI_Premium();
-    if (Req.uri.compare(0, 9, "/cgi-bin/"))
-    {
-        handleCGI_Premium(Req, responseBuffer);
-        
-        return COMPLETE;
-    }
+    if (!Req.uri.compare(0, 9, "/cgi-bin/"))
+            return CGI;
+    // std::cout << PINK << Req.method << "\n" << DEF;
     if (Req.method == "GET")
         HandleGetResponse(ConfigNode, Req, responseBuffer);
     else if (Req.method == "POST")
@@ -78,11 +75,21 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
     else
         HandleDeleteResponse(ConfigNode, Req, responseBuffer);
     // printResponse(responseBuffer);
-    if (Req.headers.at("Connection") == "close")
-        return COMPLETE;
-    else
-        return COMPLETEDEF;
-    
+
+
+
+
+    // FIDRISS :: CHECK THIS it may throw an exception  
+    // if (Req.headers.at("Connection") == "close")
+    // { 
+    //     std::cout<< GREEN <<"AAALLO\n" << DEF;
+    //     return COMPLETE;
+    // }
+    // else
+    //     return COMPLETEDEF;
+
+
+    return COMPLETEDEF;    
 }
 
 // int parseChunkedBody(std::vector<char> &body) {
@@ -169,6 +176,7 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
 
     // std::clock_t startTime, checkTime, endTime;
     // startTime = std::clock();  
+    // std::cout << GREEN<<"ParseReq\n" << DEF;
     if (!Req.headerParsed)
     {
         // std::cout << "RequestBuffer = " << std::string(requestBuffer.begin(), requestBuffer.end()) << std::endl;
@@ -187,6 +195,18 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
             return ERROR;
         if (Req.method != "GET" && Req.method != "POST" && Req.method != "DELETE")
             return ERROR_BAD_METHOD;
+     
+        if (Req.uri.compare("/.well-known/appspecific/com.chrome.devtools.json") == 0)
+        {
+            return ERROR;
+        }
+        // if (Req.uri.length() >= 20)
+        // {
+        //     std::cout << GREEN << Req.uri << "\n" <<DEF;
+        //     exit(1); 
+        // }
+
+
         if (Req.version != "HTTP/1.1")
             return ERROR_BAD_VERSION;
         std::string headerLine;
@@ -222,10 +242,6 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
         Req.contentLength = std::strtoul(Req.headers.at("Content-Length").c_str(), NULL, 10);  
             if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) < Req.contentLength)
             {
-                // checkTime = std::clock();
-                // double seconds = double(checkTime - startTime) / CLOCKS_PER_SEC;
-                // std::cout << std::fixed << std::setprecision(6);
-                // std::cout << "Time taken to parse request: " << seconds << " seconds" << std::endl;
                 return INCOMPLETE;
             }
                 
@@ -237,10 +253,6 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
             return status;
     }
     Req.body = bodyPart;
-    // endTime = std::clock();
-    // double seconds = double(endTime - startTime) / CLOCKS_PER_SEC;
-    // std::cout << std::fixed << std::setprecision(6);
-    // std::cout << "Time taken to parse request: " << seconds << " seconds" << std::endl;
     return COMPLETE;
 }
 

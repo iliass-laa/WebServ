@@ -2,6 +2,16 @@
 #include"../parsing/headers/webserver.hpp"
 
 
+void printVecChar( std::vector<char> Vec)
+{
+    std::vector<char>:: iterator it = Vec.begin(); 
+    while (it != Vec.end())
+    {
+        std::cout << *it ; 
+        it++;
+    }
+}
+
 // ORTHODOX FORM
 Core::Core():running(false),root(NULL){}
 
@@ -40,7 +50,7 @@ void Core::run(){
             std::vector<std::pair<int,short> > readyEvents = event_loop.waitForEvents(0); 
             // time out here is 0 => non-blocking poll()
             for(std::vector<std::pair<int,short> >::iterator it = readyEvents.begin() ; it != readyEvents.end() ;it++ )
-            handleSocketEvent(it->first , it->second);
+                handleSocketEvent(it->first , it->second);
         }
 
 }   
@@ -54,7 +64,7 @@ void Core::handleSocketEvent(int fd, short events){
         handleNewConnection(fd);
     }
     else if((cl = isCgi(fd))){
-        handelCgiRecponce(fd, events,cl);
+        handelCgiResponce(fd, events,cl);
     }
     else {
         // std::cout << "client " << fd << std::endl;
@@ -62,12 +72,27 @@ void Core::handleSocketEvent(int fd, short events){
     }
 }
 
+void    Core::handelCgiResponce(int fd, short events, Client* client){
 
-void    Core::handelCgiRecponce(int fd, short events, Client* cl){
-    // Tillas do your magic 
+    std::cout << PINK << "handelCgiResponce><<< \n"
+            << "Fd i read from AS CGI:" << fd <<"\n"
+            << "events :" << events<<"\n";
+    client->getCGI().generateResponse();
+    // resOffset = send(cl->client_fd, cl->resBuff.c_str(), resBuff.length(),0); 
+    // fd = cl->client_fd;
+    client->getRespoBuffer() = buildErrorResponse(403);
+    std::cout << "THe buffer generated from CGI :\n";
+    printVecChar(client->getRespoBuffer()) ;
+    std::cout << "\n"<<DEF ;
+    client->writeData();
+    std::cout << YELLOW<<"CGI ::AFTER WRITING DATA  \n"<< DEF;
+    if(client->getClientState() == WAITTING_FOR_REQUEST){
+        event_loop.updateSocketEvents(client->getFd() ,POLLIN );
+    }
+
     (void)fd;
     (void)events;
-    (void)cl;
+    (void)client;
 }
 
 
@@ -113,13 +138,18 @@ void Core::handleNewConnection(int server_fd){
     return ;
 }
 
-void Core::handleNewCgi(int fd_cgi, Client* clt){
-    std::pair<int , Client*> cc(fd_cgi, clt);
-    cgi.insert(cc);
-    event_loop.addSocket(fd_cgi, POLLIN);
-    std::cout << "\t\t[new cgi connected] [" << fd_cgi << "] !!" << std::endl ;
-    return ;
+void Core::setCGI_FD(int fd, Client *cl){
+    std::pair <int, Client *> p (fd, cl);
+    cgi.insert(p);
 }
+
+// void Core::handleNewCgi(int fd_cgi, Client* clt){
+//     std::pair<int , Client*> cc(fd_cgi, clt);
+//     cgi.insert(cc);
+//     event_loop.addSocket(fd_cgi, POLLIN);
+//     std::cout << "\t\t[new cgi connected] [" << fd_cgi << "] !!" << std::endl ;
+//     return ;
+// }
 
 Client* Core::isCgi(int fd_cgi){
     std::map<int , Client*>::iterator it = cgi.find(fd_cgi);
@@ -130,6 +160,12 @@ Client* Core::isCgi(int fd_cgi){
 
 //***************HANDEL**CLIENT**EVENT********************************************************************
 void Core::handleClientEvent(int client_fd, short events){
+    std::string stt[6] = {"READING_REQUEST", // 0
+    "WAITTING_FOR_REQUEST", // 2
+    "SENDING_RESPONSE", // 1
+    "WAITTING_FOR_RESPONSE", // 2
+    "INACTIVE",
+    "WAITTING"};
     // retrive client from map 
     std::map<int, Client*>::iterator it = clients.find(client_fd) ;
     if(it == clients.end()){
@@ -142,8 +178,16 @@ void Core::handleClientEvent(int client_fd, short events){
         client->setClientState(READING_REQUEST);
         int readDataState = WAITTING;
         if(client->getClientState() == READING_REQUEST)
+        {
             readDataState = client->readData(); 
+            std::cout << GREEN<<">>>>CORE : \n"
+                     << "Reading from this CLient :" << client 
+                     << "\nFD :  " << client->getFd()
+                     <<"\nReading State: "<< stt[readDataState]
+                     << DEF << "\n";
+        }
         if( readDataState == COMPLETE || readDataState == COMPLETEDEF){
+            std::cout << CYAN<<">>>SETTING SOCKET EVENT TO POLLOUT \n"<< DEF;
             event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
             client->setClientState(WAITTING_FOR_RESPONSE);
             client->clearVectReq();
@@ -154,7 +198,12 @@ void Core::handleClientEvent(int client_fd, short events){
     else if(events & POLLOUT ){
         // std::cout << " **** Sending Response ****"<< std::endl;
         if(client->getClientState() == WAITTING_FOR_RESPONSE || client->getClientState() == SENDING_RESPONSE )
+        {
+            std::cout << GREEN << "CORE :: Sending to this CLient :" << client 
+                    << ", FD :  " << client->getFd()
+                    << DEF << "\n";
             client->writeData();
+        }
         if(client->getClientState() == WAITTING_FOR_REQUEST){
             event_loop.updateSocketEvents(client->getFd() ,POLLIN );
 
@@ -165,10 +214,21 @@ void Core::handleClientEvent(int client_fd, short events){
     // disconnect the client 
     // if ( !(client->isConnected()) || (events & (POLLERR | POLLHUP))){
     if ( !(client->isConnected())){
+        std::cout << GREEN << "CORE :: \n"
+            <<"SEEMS like this client is"<< RED<<" Leaving Us  "
+            << GREEN<<":\n"
+            <<"CL Addr:" << client
+            << "\nCL fd :" <<client->getFd() << "\n"<<DEF;
         std::cout << RED << "client"<< client->getFd() <<  " lose tcp connection !!!" << DEF << std::endl;
         event_loop.removeSocket(client_fd);
         delete client;
         clients.erase(it);
+    }
+    else{
+        std::cout << GREEN << "CORE :: \n"
+            <<"SEEMS like this client is still With Us :\n"
+            <<"CL Addr:" << client
+            << "\nCL fd :" <<client->getFd() << "\n"<<DEF;
     }
 }
 
@@ -204,6 +264,14 @@ void Core::setPairs(std::set<std::string>& param){
 }
 
 
+
+void Core::addToEventLoop(int newFd)
+{
+    event_loop.addSocket(newFd, POLLIN);
+}
+
+
+
 // void Core::editSocket(client){
 
 // }
@@ -221,5 +289,7 @@ void Core::setPairs(std::set<std::string>& param){
                 isClientEvent
                     HandelCLientEvent
 */
+
+
 
 

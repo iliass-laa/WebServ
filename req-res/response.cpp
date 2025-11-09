@@ -196,7 +196,6 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
     while (true)
     {
         fillReqStruct(ConfigNode, locationConfig, longestMatchingPrefix, Req.headers.at("Host"));
-        // std::cout << GREEN << "FILL REQ STRUCT DONE!\n"<< DEF;
         if (!locationConfig.getDefault())
             break;
         size_t pos = Req.uri.find_last_of('/');
@@ -320,7 +319,8 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
     std::string endBoundary = boundary + "--";
     std::string body(Req.body.begin(), Req.body.end());
     size_t start = body.find(boundary);
-     {
+    if (start == std::string::npos)
+    {
         responseBuffer = buildErrorResponse(400);
         return;
     }

@@ -10,7 +10,7 @@ html {
 
 body {
     font-family: 'Segoe UI', Tahoma, Verdana, Arial, sans-serif;
-    background: linear-gradient(135deg, #66d8ea 0%, #4b79a2 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 2rem 1rem;
     color: #333;
@@ -27,7 +27,7 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, #59c9a4 0%, #4b71a2 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     z-index: -1;
 }
 
@@ -178,6 +178,10 @@ input[type="text"]:focus {
     width: 100%;
 }
 
+#downloadBtn {
+    margin-top: 1.5rem;
+    width: 100%;
+}
 /* File Upload Styling */
 #uploadForm {
     margin-top: 0;
@@ -211,7 +215,7 @@ input[type="file"] {
 }
 
 .file-input-label:hover {
-    border-color: #2c895e;
+    border-color: #667eea;
     background: #f9fafb;
     color: #667eea;
 }

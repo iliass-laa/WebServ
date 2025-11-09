@@ -8,6 +8,7 @@
 #include <dirent.h>
 #include "../parsing/headers/webserver.hpp"
 #include "../parsing/headers/AST.hpp"
+#include "../server/HttpRequest.hpp"
 
 enum ParseStatus {
     INCOMPLETE,
@@ -16,7 +17,8 @@ enum ParseStatus {
     ERROR_BAD_METHOD,
     ERROR_BAD_VERSION,
     ERROR,
-    ERROR_BODY_TOO_LARGE
+    ERROR_BODY_TOO_LARGE,
+    CGI
 };
 
 int		parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct HttpRequest &Req);

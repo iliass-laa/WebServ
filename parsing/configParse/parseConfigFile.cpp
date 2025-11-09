@@ -197,8 +197,5 @@ BaseNode *parseConfigFile(const char *path)
     }
     BaseNode *root;
     root = buildTree(tk);
-    (void)root;
-    // printTree(root, 0);
-    // freeTree(root);
     return root;
 }

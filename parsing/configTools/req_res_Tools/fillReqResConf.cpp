@@ -42,6 +42,8 @@ std::size_t checkForMaxBodySize(ContextNode *cNode){
                 ret = translateMBS(dNode->value.back());
         }
     }
+    if (ret <= 0)
+        ret = DEF_MAX_BODY_SIZE;
     return ret;
 }
 
@@ -68,7 +70,7 @@ void checkDirectiveChilds(ContextNode *cNode, DirectoryListing &obj)
                 obj.setAllowedMethods(dNode->value);
         }
     }
-    std::cout << "Root :" << obj.getRoot() << "\n";
+    // std::cout << "Root :" << obj.getRoot() << "\n";
 }
 
 void fillReqStruct(BaseNode*root, DirectoryListing &obj, std::string uri, std::string host)
@@ -82,7 +84,7 @@ void fillReqStruct(BaseNode*root, DirectoryListing &obj, std::string uri, std::s
     obj.setAllowedMethods(allowMethDef);
 
     std::cout <<PINK << "URI :"<<uri
-                << ",HOST : "<< host
+                << "| HOST : "<< host
                 <<"\n"<<DEF ;
 
     int iport;
@@ -103,11 +105,11 @@ void fillReqStruct(BaseNode*root, DirectoryListing &obj, std::string uri, std::s
     cNode = findLocationContext(serverNode, uri);
     // if (!cNode)
     //     throw(ConfigFileError("No Location Found"));
-    std::cout <<PINK << "VAL of Context:"<<cNode->val.back()<<"\n"<<DEF ;
+    // std::cout <<PINK << "VAL of Context:"<<cNode->val.back()<<"\n"<<DEF ;
     if (cNode->val.back().compare("/") == 0)
         obj.setDefault(true);
     checkDirectiveChilds(cNode, obj);
-    printThingsToCheck(obj);
+    // printThingsToCheck(obj);
  }
 
 

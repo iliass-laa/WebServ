@@ -5,24 +5,17 @@
 #include<vector>
 #include <sys/socket.h>
 #include "../req-res/request.hpp"
+#include "../parsing/headers/webserver.hpp"
+#include "Core.hpp"
+#include "HttpRequest.hpp"
+#include "../parsing/CGI/cgi.hpp"
 #define BUFFER 4096
 
 class BaseNode;
+class Core;
+class cgiHandling;
 
 
-struct HttpRequest {
-    std::string method;
-    std::string uri;
-    std::string version;
-    std::map<std::string, std::string> headers;
-    std::vector<char> body;
-    std::string boundary;
-    size_t contentLength;
-    size_t headerEndPos;
-    bool   headerParsed;
-    bool   isChunked;
-    size_t maxBodySize;
-};
 
 typedef enum clientState {
     READING_REQUEST, // 0
@@ -36,6 +29,7 @@ class Client {
 private:
     BaseNode* root;
     Core& theBase;
+    cgiHandling cgi;
     int client_fd;
     bool connected;
     std::vector<char> reqBuff; // for request
@@ -46,6 +40,7 @@ private:
     int state;
     bool keepAlive;
     struct HttpRequest Req;
+    bool isCGI;
     
 public:
     Client(int, BaseNode* ,Core&);
@@ -74,6 +69,7 @@ public:
     void clearReqStruct();
     void clearVectReq();
     void clearVectRes();
+    cgiHandling &getCGI(){return cgi;};
 
 };
 #endif // CLIENT_HPP

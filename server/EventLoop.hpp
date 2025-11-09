@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include<iostream>
 #include<poll.h>
+#include "../parsing/headers/colors.hpp"
 
 class EventLoop {
     private :

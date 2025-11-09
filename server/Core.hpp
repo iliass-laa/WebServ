@@ -33,7 +33,7 @@ class Core {
         void processClientRequest(Client *client);
         void handleNewCgi(int fd_cgi, Client* cl);
         Client* isCgi(int fd_cgi);
-        void handelCgiRecponce(int, short,Client*);
+        void handelCgiResponce(int, short,Client*);
 
         // void editSocket();
         
@@ -44,10 +44,12 @@ class Core {
         Core(const Core& other);
         Core& operator=(const Core& other);
         bool addServers();
+        void addToEventLoop(int newFd);
         // bool addServer(int port);
         void run();
         void stop();
         void setPairs(std::set<std::string>&);
+        void setCGI_FD(int , Client *);
 };
 
 #endif

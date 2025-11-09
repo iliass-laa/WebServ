@@ -22,11 +22,11 @@ enum methods{
 };
 
 
-enum response_Types{
-    STATIC,
-    REVERSE_PROXY,
-    CGI
-};
+// enum response_Types{
+//     STATIC,
+//     REVERSE_PROXY,
+//     CGI
+// };
 
 enum errors{
    PATH_NOT_FOUND,
