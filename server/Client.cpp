@@ -12,6 +12,7 @@ Client::Client(int fd,BaseNode* cnf, Core& core)
     , Req()
     , isCGI(false)
     , requestReaded(false)
+    , respoSize(0)
     // Constructor implementation
 {
     Req.headerParsed = false;
@@ -100,15 +101,19 @@ bool Client::writeData(){
         resBuffString = getresBuffStringer();
         std::cout << BLUE <<  "requestReaded is True and the BuffStr of responce is getting filled\n";
         requestReaded = false;
+        respoSize = respoBuff.size();
     }
-    // } 
-    // std::cout <<  BLUE << "CL Addr :: "<< this << "<<\n";
-    // std::cout <<  BLUE << "CL ReqReaded :: "<< getRequestReaded() << "<<\n";
-    // std::cout <<  BLUE << "CL ReqReaded :: "<< requestReaded << "<<\n";
-    // std::cout <<  BLUE << "Str RESPO >>>"<< resBuffString << "\n";
-    resOffset = send(client_fd, resBuffString.c_str(), resBuffString.length(),0);
+    if(!respoSize)
+        return true; // nothing to send
+    resOffset = BUFFER;
+    if(respoSize > 0 && respoSize < BUFFER)
+        resOffset = respoSize;
+
+    resOffset = send(client_fd, resBuffString.c_str(), resOffset,0);
     std::cout << BLUE << "SEND :: "<< resOffset << "\n" << DEF; 
-    if(resOffset <= 0 || resOffset ==static_cast<ssize_t> (resBuffString.length())){
+    if(resOffset > 0 )
+        respoSize -= resOffset; 
+    if(resOffset <= 0 || respoSize == 0 ){
         respoBuff.clear();
         requestReaded = false;
         return true;
