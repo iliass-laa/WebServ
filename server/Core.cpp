@@ -4,11 +4,18 @@
 
 void printVecChar( std::vector<char> Vec)
 {
+    int i = 0;
     std::vector<char>:: iterator it = Vec.begin(); 
     while (it != Vec.end())
     {
+        if (i == 600)
+        {
+            std::cout << "....\n" ; 
+            break;
+        }
         std::cout << *it ; 
         it++;
+        i++;
     }
 }
 
@@ -74,9 +81,12 @@ void Core::handleSocketEvent(int fd, short events){
 
 void    Core::handelCgiResponce(int fd, short events, Client* client){
 
+    // std::string Eve[5] = {"", "POLLIN", "", "", "POLLOUT"};
     std::cout << PINK << "handelCgiResponce><<< \n"
             << "Fd i read from AS CGI:" << fd <<"\n"
-            << "events :" << events<<"\n";
+            << "events :" <<( events )<<"\n"
+            << "clFD:" << client->getFd()<<"\n";
+
     client->getCGI().generateResponse();
     // resOffset = send(cl->client_fd, cl->resBuff.c_str(), resBuff.length(),0); 
     // fd = cl->client_fd;
@@ -86,13 +96,8 @@ void    Core::handelCgiResponce(int fd, short events, Client* client){
     std::cout << "\n"<<DEF ;
     client->writeData();
     std::cout << YELLOW<<"CGI ::AFTER WRITING DATA  \n"<< DEF;
-    if(client->getClientState() == WAITTING_FOR_REQUEST){
-        event_loop.updateSocketEvents(client->getFd() ,POLLIN );
-    }
-
-    (void)fd;
-    (void)events;
-    (void)client;
+    // if(client->getClientState() == WAITTING_FOR_REQUEST){
+    // event_loop.updateSocketEvents(client->getFd() ,POLLIN );
 }
 
 
@@ -159,7 +164,14 @@ Client* Core::isCgi(int fd_cgi){
 }
 
 //***************HANDEL**CLIENT**EVENT********************************************************************
+int nTime;
 void Core::handleClientEvent(int client_fd, short events){
+    std::cout << RED << "Client :" << client_fd 
+                << "\n for the " <<nTime << " Times\n"
+                << "Event ::" <<events << "\n"<<DEF;
+    nTime++;
+    if (nTime == 50)
+        exit(22);
     std::string stt[6] = {"READING_REQUEST", // 0
     "WAITTING_FOR_REQUEST", // 2
     "SENDING_RESPONSE", // 1
@@ -181,15 +193,24 @@ void Core::handleClientEvent(int client_fd, short events){
         {
             readDataState = client->readData(); 
             std::cout << GREEN<<">>>>CORE : \n"
-                     << "Reading from this CLient :" << client 
+                     << "Just finifsh Reading from this CLient :" << client 
                      << "\nFD :  " << client->getFd()
                      <<"\nReading State: "<< stt[readDataState]
+                     << "\n DID this Client Asks for CGI :" << client->getIsCGI()
                      << DEF << "\n";
         }
         if( readDataState == COMPLETE || readDataState == COMPLETEDEF){
-            std::cout << CYAN<<">>>SETTING SOCKET EVENT TO POLLOUT \n"<< DEF;
+             std::cout << GREEN<<">>>>CORE : \n"
+                     << "SETTING SOCKET EVENT TO POLLOUT for This Client :" << client 
+                     << "\nFD :  " << client->getFd()
+                     <<"\nReading State: "<< stt[readDataState]
+                     << DEF << "\n";
+            // std::cout << CYAN<<">>>SETTING SOCKET EVENT TO POLLOUT \n"<< DEF;
+            // if (client->getIsCGI())
+            // {
             event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
             client->setClientState(WAITTING_FOR_RESPONSE);
+            // }
             client->clearVectReq();
         }
     }
@@ -201,6 +222,7 @@ void Core::handleClientEvent(int client_fd, short events){
         {
             std::cout << GREEN << "CORE :: Sending to this CLient :" << client 
                     << ", FD :  " << client->getFd()
+                    << "events : " << events
                     << DEF << "\n";
             client->writeData();
         }

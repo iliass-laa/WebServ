@@ -70,6 +70,6 @@ public:
     void clearVectReq();
     void clearVectRes();
     cgiHandling &getCGI(){return cgi;};
-
+    bool getIsCGI(){return isCGI;};
 };
 #endif // CLIENT_HPP

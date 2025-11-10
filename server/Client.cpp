@@ -13,6 +13,7 @@ Client::Client(int fd,BaseNode* cnf, Core& core)
     , state(WAITTING_FOR_REQUEST)
     , keepAlive(true)
     , Req()
+    , isCGI(false)
     // Constructor implementation
 {
     Req.headerParsed = false;
@@ -81,6 +82,7 @@ bool Client::readData(){
                     int newFd = cgi.handelCGI(root, Req);
                     theBase.addToEventLoop(newFd);
                     theBase.setCGI_FD(newFd, this);
+                    isCGI = true; 
                     std::cout << BLUE<<"checkReq is CGI :\n" <<"NewFD :"<< newFd<< "\n"<<DEF;
                 }
                 catch (std::exception& e){
@@ -107,29 +109,9 @@ bool Client::readData(){
     }
     return false;   
 }
-// long check[2];
 
 // return should be void no use 
 bool Client::writeData(){ // to vector<char> of write_data
-
-
-    // if (check[0] == 0)
-    // {
-    //     check[0] = static this;
-    //     check[1] = 1;
-    // }
-    // else{
-    //     if (check[0] == client_fd)
-    //         check[1] ++;
-    //     if (check[1] == 8)
-    //     {
-    //         std::cout << RED 
-    //                 << check[0] << "<<-- this client has been here for :" 
-    //                 <<check[1] <<"times\n"<<DEF; 
-    //         exit(1); 
-    //     }
-    // }
-
     std::cout << CYAN << "CLIET ::i am about to send a RESPO to this CL:" << this 
             << "\nFD_CL : "<< this->getFd()
             <<"\nCL_STATE :" << getClientState()<< "\n";

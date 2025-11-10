@@ -34,5 +34,25 @@
 	<button id="downloadBtn">Download</button>
     <div id="outputOfDownload"></div>
 
+    <form id="uploadForm" accept-charset="UTF-8">
+        <div class="form-group">
+            <label for="fileInput">Select File</label>
+            <div class="file-input-wrapper">
+                <input 
+                    type="file" 
+                    id="fileInput" 
+                    accept=".txt, .jpg, .jpeg, .png, .gif, .bmp, .webp, .mov, .mp4"
+                    multiple
+                >
+                <label for="fileInput" class="file-input-label">
+                    Click to browse or drag and drop
+                </label>
+                <span id="fileName"></span>
+            </div>
+        </div>
+        <button type="submit" id="uploadBtn">Upload File</button>
+        <div id="message"></div>
+    </form>
+
 </body>
 </html>

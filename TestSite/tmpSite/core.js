@@ -113,3 +113,52 @@ window.addEventListener("DOMContentLoaded", () => {
                 });
             });
         });
+// ✅ FIXED - waits for DOM
+window.addEventListener("DOMContentLoaded", () => {
+    const uploadForm = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const message = document.getElementById('message');
+    const fileName = document.getElementById('fileName');
+
+    uploadForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        console.log("Upload form submitted");
+
+        if (!fileInput.files.length) {
+            console.error('No file selected');
+            return;
+        }
+
+        const formData = new FormData();
+
+        for (const file of fileInput.files) {
+            formData.append('files[]', file);
+        }
+
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = 'Uploading...';
+
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log('Upload successful:', data);
+            message.textContent = 'Files uploaded successfully!';
+            message.classList.add('success');
+            uploadForm.reset();
+            fileName.textContent = '';
+        })
+        .catch(error => {
+            console.error('Upload error:', error);
+            message.textContent = 'Error uploading files: ' + error.message;
+            message.classList.add('error');
+        })
+        .finally(() => {
+            uploadBtn.disabled = false;
+            uploadBtn.textContent = 'Upload File';
+        });
+    });
+});

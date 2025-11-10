@@ -50,7 +50,11 @@ int cgiHandling::handelCGI(BaseNode *root, HttpRequest req)
         throw (CustomizeError("SocketPair Failed!\n"));
     pid = fork();
     if (pid== -1)
+    {
+        close (sv[0]);
+        close (sv[1]);
         throw (CustomizeError("Fork Failed!\n"));
+    }
     if (pid == 0)
         childStart(root, req);
     else    
