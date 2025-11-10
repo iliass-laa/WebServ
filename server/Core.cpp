@@ -92,28 +92,11 @@ void    Core::handelCgiResponce(int fd, short events, Client* client){
 
     client->getRespoBuffer().clear();
     client->getCGI().generateResponse(fd, client->getRespoBuffer());
-    // resOffset = send(cl->client_fd, cl->resBuffString.c_str(), resBuffString.length(),0); 
-    // fd = cl->client_fd;
-    // std::string respHi();
-
-
-    // client->getRespoBuffer() = buildErrorResponse(404);
-
-    std::cout << "THe buffer generated from CGI :\n";
-    printVecChar(client->getRespoBuffer()) ;
-    std::cout << "\n"<<DEF ;
-    std::cout << "THe buffer generated from CGI :\n";
-    std::cout <<"CL ReqReaded ::"<< client->getRequestReaded() << "\n"; 
-    // std::cout <<"CL ReqReaded ::"<< requestReaded<< "\n"; 
-    std::cout <<"CL ADDR ::"<< client << "\n"; 
     client->setRequestReaded(true);
-
     event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
 
 
     std::cout << YELLOW<<"CGI ::AFTER WRITING DATA  \n"<< DEF;
-    
-    // close(fd);
     event_loop.removeSocket(fd);
     std::map<int, Client*> :: iterator it  = cgi.find(fd) ;
     if (it != cgi.end())
