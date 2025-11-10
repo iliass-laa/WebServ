@@ -33,14 +33,13 @@ private:
     int client_fd;
     bool connected;
     std::vector<char> reqBuff; // for request
-    std::string resBuff; // for response
+    std::string resBuffString; // for response
     std::vector<char> respoBuff; // for response
     ssize_t resOffset;
-    ssize_t responseSize;
     int state;
-    bool keepAlive;
     struct HttpRequest Req;
     bool isCGI;
+    bool requestReaded;
     
 public:
     Client(int, BaseNode* ,Core&);
@@ -51,25 +50,18 @@ public:
     int getFd() const ;
     bool writeData();
     bool readData();
-    void queueResponse(const std::string &response);
-    bool hasDataToRead() const ;
-    bool hasDataToWrite() const ;
-    std::string getReadBuffer();  
     std::vector<char>& getRespoBuffer();  
-    std::string getResBuffer();
+    std::string getresBuffStringer();
     void setReqStruct (struct HttpRequest& req);
     struct HttpRequest& getReqStruct ();
-    void setResponseSize(ssize_t );
 
     void setClientState(int );
     int getClientState() const;
 
-    void setKeepAlive(int );
-    int getKeepAlive() const;
     void clearReqStruct();
     void clearVectReq();
     void clearVectRes();
     cgiHandling &getCGI(){return cgi;};
-
+    void setRequestState(bool);
 };
 #endif // CLIENT_HPP
