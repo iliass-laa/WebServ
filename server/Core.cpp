@@ -88,7 +88,7 @@ void    Core::handelCgiResponce(int fd, short events, Client* client){
             << "clFD:" << client->getFd()<<"\n";
 
     client->getCGI().generateResponse();
-    // resOffset = send(cl->client_fd, cl->resBuff.c_str(), resBuff.length(),0); 
+    // resOffset = send(cl->client_fd, cl->resBuffString.c_str(), resBuffString.length(),0); 
     // fd = cl->client_fd;
     client->getRespoBuffer() = buildErrorResponse(403);
     std::cout << "THe buffer generated from CGI :\n";
@@ -187,50 +187,19 @@ void Core::handleClientEvent(int client_fd, short events){
     Client* client = it->second;
     
     if( events & POLLIN ){
-        client->setClientState(READING_REQUEST);
-        int readDataState = WAITTING;
-        if(client->getClientState() == READING_REQUEST)
-        {
-            readDataState = client->readData(); 
-            std::cout << GREEN<<">>>>CORE : \n"
-                     << "Just finifsh Reading from this CLient :" << client 
-                     << "\nFD :  " << client->getFd()
-                     <<"\nReading State: "<< stt[readDataState]
-                     << "\n DID this Client Asks for CGI :" << client->getIsCGI()
-                     << DEF << "\n";
-        }
-        if( readDataState == COMPLETE || readDataState == COMPLETEDEF){
-             std::cout << GREEN<<">>>>CORE : \n"
-                     << "SETTING SOCKET EVENT TO POLLOUT for This Client :" << client 
-                     << "\nFD :  " << client->getFd()
-                     <<"\nReading State: "<< stt[readDataState]
-                     << DEF << "\n";
-            // std::cout << CYAN<<">>>SETTING SOCKET EVENT TO POLLOUT \n"<< DEF;
-            // if (client->getIsCGI())
-            // {
+        int readDataState = client->readData(); 
+
+        if( readDataState){
+            client->setRequestState(true);
             event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
-            client->setClientState(WAITTING_FOR_RESPONSE);
-            // }
             client->clearVectReq();
         }
     }
     
     // send response
     else if(events & POLLOUT ){
-        // std::cout << " **** Sending Response ****"<< std::endl;
-        if(client->getClientState() == WAITTING_FOR_RESPONSE || client->getClientState() == SENDING_RESPONSE )
-        {
-            std::cout << GREEN << "CORE :: Sending to this CLient :" << client 
-                    << ", FD :  " << client->getFd()
-                    << "events : " << events
-                    << DEF << "\n";
-            client->writeData();
-        }
-        if(client->getClientState() == WAITTING_FOR_REQUEST){
+        if(client->writeData())
             event_loop.updateSocketEvents(client->getFd() ,POLLIN );
-
-        }
-
     }
     
     // disconnect the client 
@@ -245,12 +214,6 @@ void Core::handleClientEvent(int client_fd, short events){
         event_loop.removeSocket(client_fd);
         delete client;
         clients.erase(it);
-    }
-    else{
-        std::cout << GREEN << "CORE :: \n"
-            <<"SEEMS like this client is still With Us :\n"
-            <<"CL Addr:" << client
-            << "\nCL fd :" <<client->getFd() << "\n"<<DEF;
     }
 }
 
@@ -291,7 +254,6 @@ void Core::addToEventLoop(int newFd)
 {
     event_loop.addSocket(newFd, POLLIN);
 }
-
 
 
 // void Core::editSocket(client){
