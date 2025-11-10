@@ -4,6 +4,7 @@
 #include "../../server/HttpRequest.hpp"
 // #include "../../server/Client.hpp"
 
+#define BUFFER 4096
 
 
 struct HttpRequest;
@@ -24,6 +25,7 @@ class Client;
 
 class cgiHandling
 {
+    char **env;
     Client *cl;
     int sv[2], childPID;
     DirectoryListing locationConfig;
@@ -36,6 +38,6 @@ class cgiHandling
 
         void setClient(Client *cl);
         int handelCGI(BaseNode *root, HttpRequest req);
-        int generateResponse();
+        int generateResponse(int fd, std::vector <char> &respoBuff);
         // int getSvForMainP();
 };

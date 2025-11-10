@@ -9,7 +9,7 @@ cgiHandling::~cgiHandling (){}
 
 void cgiHandling::childStart(BaseNode *root,  HttpRequest req)
 {
-    std::string scriptFullPath;
+    std::string scriptFullPath, scriptOutPut;
     char buff[1024];
     int rd;
     close(sv[1]);
@@ -30,12 +30,22 @@ void cgiHandling::childStart(BaseNode *root,  HttpRequest req)
             std::cout << buff << "<<\n";
         }
     }
+
+    scriptOutPut = "HTTP/1.1 200 OK\r\n"
+                       "Content-Type: text/plain\r\n"
+                       "Content-Length: 11\r\n"
+                    //    "Connection: close\r\n"
+                       "\r\n"
+                       "Hello World";
     std::cout << PINK << "CGI DONE EXEC THE SCRIPT \n" << DEF ;
-    write(sv[0], "Done\n", 5);
+    send(sv[0], scriptOutPut.c_str(), scriptOutPut.length(), 0);
+    // close(1);
+    // dup(sv[0]);
+    // execve(scriptFullPath.c_str(), NULL, env);
+
     close(sv[0]);
     std::cout << PINK <<"CHILD exits !\n"<<DEF;
     exit(28);
-    // execve()
     (void)root;
     (void)req;
 }
@@ -44,7 +54,6 @@ void cgiHandling::setClient(Client *val){cl = val;}
 
 int cgiHandling::handelCGI(BaseNode *root, HttpRequest req)
 {
-    // setInfo(req);
     int pid;
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv))
         throw (CustomizeError("SocketPair Failed!\n"));
@@ -63,7 +72,20 @@ int cgiHandling::handelCGI(BaseNode *root, HttpRequest req)
     return sv[1];
 }
 
-int cgiHandling::generateResponse()
+int cgiHandling::generateResponse(int fd, std::vector <char> &respoBuff)
 {
+    char buff[BUFFER];
+    int rd;
+    respoBuff.clear();
+    while (1)
+    {
+        rd = recv(fd, buff, BUFFER - 1, 0);
+        buff[rd]='\0';
+        respoBuff.insert(respoBuff.end(), buff, buff + rd);
+        if (rd == 0)
+            break;
+    }
+    std::cout <<"Readin this VEC::\n";
+    printVecChar(respoBuff);
     return 0;
 }

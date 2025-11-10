@@ -58,6 +58,7 @@ bool Client::readData(){
             checkReq = handleRequest(root,reqBuff,respoBuff, Req); // keep-alive == COMPLETEDEF
             if (checkReq == CGI)
             {
+                respoBuff.clear();
                 try 
                 {
                     int newFd = cgi.handelCGI(root, Req);
@@ -89,20 +90,27 @@ bool Client::readData(){
     return true;   
 }
 
+
 // return should be void no use 
-bool Client::writeData(){ // to vector<char> of write_data
+bool Client::writeData(){
+// to vector<char> of write_data
     if(requestReaded){
         clearReqStruct();
         resBuffString.clear();
         resBuffString = getresBuffStringer();
-    } 
-    std::cout <<  BLUE << "CL Addr :: "<< this << "<<\n";
-    std::cout <<  BLUE << "CL ReqReaded :: "<< getRequestReaded() + "<<\n";
-    std::cout <<  BLUE << "Str RESPO >>>"<< resBuffString + "\n";
+        std::cout << BLUE <<  "requestReaded is True and the BuffStr of responce is getting filled\n";
+        requestReaded = false;
+    }
+    // } 
+    // std::cout <<  BLUE << "CL Addr :: "<< this << "<<\n";
+    // std::cout <<  BLUE << "CL ReqReaded :: "<< getRequestReaded() << "<<\n";
+    // std::cout <<  BLUE << "CL ReqReaded :: "<< requestReaded << "<<\n";
+    // std::cout <<  BLUE << "Str RESPO >>>"<< resBuffString << "\n";
     resOffset = send(client_fd, resBuffString.c_str(), resBuffString.length(),0);
     std::cout << BLUE << "SEND :: "<< resOffset << "\n" << DEF; 
     if(resOffset <= 0 || resOffset ==static_cast<ssize_t> (resBuffString.length())){
         respoBuff.clear();
+        requestReaded = false;
         return true;
     }
     return false;

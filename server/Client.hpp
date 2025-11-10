@@ -63,6 +63,7 @@ public:
     void clearVectRes();
     cgiHandling &getCGI(){return cgi;};
     bool getIsCGI(){return isCGI;};
+    void setIsCGI(bool val){isCGI = val;};
     void setRequestReaded(bool);
     bool getRequestReaded(){return requestReaded;};
 };
