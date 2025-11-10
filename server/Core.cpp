@@ -82,20 +82,43 @@ void Core::handleSocketEvent(int fd, short events){
 void    Core::handelCgiResponce(int fd, short events, Client* client){
 
     // std::string Eve[5] = {"", "POLLIN", "", "", "POLLOUT"};
+    if (!(events & POLLIN))
+        return;
     std::cout << PINK << "handelCgiResponce><<< \n"
             << "Fd i read from AS CGI:" << fd <<"\n"
             << "events :" <<( events )<<"\n"
             << "clFD:" << client->getFd()<<"\n";
+    char buff[BUFFER];
 
+    int rd = read(fd, buff, BUFFER - 1);
+    buff[rd]='\0';
+    std::cout <<"Readin this ::" <<  buff << "\n";
     client->getCGI().generateResponse();
     // resOffset = send(cl->client_fd, cl->resBuffString.c_str(), resBuffString.length(),0); 
     // fd = cl->client_fd;
-    client->getRespoBuffer() = buildErrorResponse(404);
+    // std::string respHi();
+    // client->getRespoBuffer() = buildErrorResponse(404);
+
     std::cout << "THe buffer generated from CGI :\n";
     printVecChar(client->getRespoBuffer()) ;
     std::cout << "\n"<<DEF ;
+    std::cout << "THe buffer generated from CGI :\n";
+    std::cout <<"CL ReqReaded ::"<< client->getRequestReaded() << "\n"; 
+    std::cout <<"CL ADDR ::"<< client << "\n"; 
+    // client->setRequestReaded(true);
     client->writeData();
     std::cout << YELLOW<<"CGI ::AFTER WRITING DATA  \n"<< DEF;
+    event_loop.updateSocketEvents(client->getFd() ,POLLIN );
+    
+    // close(fd);
+    event_loop.removeSocket(fd);
+    std::map<int, Client*> :: iterator it  = cgi.find(fd) ;
+    if (it != cgi.end())
+        cgi.erase(it);
+
+    // client->setRequestReaded(true);
+    // event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
+    // client->clearVectReq();
     // if(client->getClientState() == WAITTING_FOR_REQUEST){
     // event_loop.updateSocketEvents(client->getFd() ,POLLIN );
 }
@@ -190,7 +213,7 @@ void Core::handleClientEvent(int client_fd, short events){
         int readDataState = client->readData(); 
 
         if( readDataState){
-            client->setRequestState(true);
+            client->setRequestReaded(true);
             event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
             client->clearVectReq();
         }

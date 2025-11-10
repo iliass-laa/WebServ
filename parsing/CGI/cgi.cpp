@@ -34,7 +34,7 @@ void cgiHandling::childStart(BaseNode *root,  HttpRequest req)
     write(sv[0], "Done\n", 5);
     close(sv[0]);
     std::cout << PINK <<"CHILD exits !\n"<<DEF;
-    exit(0);
+    exit(28);
     // execve()
     (void)root;
     (void)req;

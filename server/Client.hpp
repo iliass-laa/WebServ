@@ -63,6 +63,7 @@ public:
     void clearVectRes();
     cgiHandling &getCGI(){return cgi;};
     bool getIsCGI(){return isCGI;};
-    void setRequestState(bool);
+    void setRequestReaded(bool);
+    bool getRequestReaded(){return requestReaded;};
 };
 #endif // CLIENT_HPP

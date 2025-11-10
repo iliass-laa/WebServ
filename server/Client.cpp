@@ -95,7 +95,10 @@ bool Client::writeData(){ // to vector<char> of write_data
         clearReqStruct();
         resBuffString.clear();
         resBuffString = getresBuffStringer();
-    }
+    } 
+    std::cout <<  BLUE << "CL Addr :: "<< this << "<<\n";
+    std::cout <<  BLUE << "CL ReqReaded :: "<< getRequestReaded() + "<<\n";
+    std::cout <<  BLUE << "Str RESPO >>>"<< resBuffString + "\n";
     resOffset = send(client_fd, resBuffString.c_str(), resBuffString.length(),0);
     std::cout << BLUE << "SEND :: "<< resOffset << "\n" << DEF; 
     if(resOffset <= 0 || resOffset ==static_cast<ssize_t> (resBuffString.length())){
@@ -114,8 +117,8 @@ std::string Client::getresBuffStringer(){
 }  
 
 
-void Client::setRequestState(bool val){
-    requestReaded = val;
+void Client::setRequestReaded(bool val){
+    this->requestReaded = val;
 }
 
 void Client::setClientState(int state){
