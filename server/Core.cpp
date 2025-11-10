@@ -57,7 +57,7 @@ void Core::run(){
             std::vector<std::pair<int,short> > readyEvents = event_loop.waitForEvents(0); 
             // time out here is 0 => non-blocking poll()
             for(std::vector<std::pair<int,short> >::iterator it = readyEvents.begin() ; it != readyEvents.end() ;it++ )
-            handleSocketEvent(it->first , it->second);
+                handleSocketEvent(it->first , it->second);
         }
 
 }   

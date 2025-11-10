@@ -26,6 +26,33 @@
         <input type="text" id="fname" name="fname"><br>
         <label for="lname">Last name:</label><br>
         <input type="text" id="lname" name="lname"><br>
+        <label for="age">Age:</label><br>
+        <input type="text" id="age" name="age"><br>
+        <button id="submitBtn" type="button">Submit</button>  
+    </form>
+
+    <!-- File Upload Form -->
+   <form id="uploadForm" accept-charset="UTF-8">
+    <div class="form-group">
+        <label for="fileInput">Select File</label>
+        <div class="file-input-wrapper">
+            <input 
+                type="file" 
+                id="fileInput" 
+                accept=".txt, .jpg, .jpeg, .png, .gif, .bmp, .webp, .mov, .mp4"
+            >
+            <label for="fileInput" class="file-input-label">
+                Click to browse or drag and drop
+            </label>
+            <span id="fileName"></span>
+        </div>
+    </div>
+    <button type="submit" id="uploadBtn">Upload File</button>
+</form>
+<div id="message" class="message"></div>
+
+</body>
+</html>
         <label for="lname">Age:</label><br>
         <input type="number" id="age" name="age">
     </form>
