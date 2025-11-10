@@ -68,7 +68,9 @@ bool Client::readData(){
                 catch (std::exception& e){
                 std::cout << RED<<"CGI FAILED :"<< e.what()<< DEF << std::endl;
                 }
-                checkReq = COMPLETEDEF;
+                clearVectReq();
+                return false;
+                // checkReq = COMPLETEDEF;
             }
             // std::cout << "return handel request " << checkReq << "  enenenen"  << std::endl;
         }catch (std::exception& e){
@@ -81,7 +83,8 @@ bool Client::readData(){
     }
     else if (bytes <= 0){
         std::cout << "bytes readed " << bytes << std::endl;
-        // connected = false;
+        if (!isCGI)
+            connected = false;
     }
     return true;   
 }
@@ -94,7 +97,8 @@ bool Client::writeData(){ // to vector<char> of write_data
         resBuffString = getresBuffStringer();
     }
     resOffset = send(client_fd, resBuffString.c_str(), resBuffString.length(),0);
-    if(resOffset <= 0 ){
+    std::cout << BLUE << "SEND :: "<< resOffset << "\n" << DEF; 
+    if(resOffset <= 0 || resOffset ==static_cast<ssize_t> (resBuffString.length())){
         respoBuff.clear();
         return true;
     }

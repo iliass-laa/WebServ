@@ -90,7 +90,7 @@ void    Core::handelCgiResponce(int fd, short events, Client* client){
     client->getCGI().generateResponse();
     // resOffset = send(cl->client_fd, cl->resBuffString.c_str(), resBuffString.length(),0); 
     // fd = cl->client_fd;
-    client->getRespoBuffer() = buildErrorResponse(403);
+    client->getRespoBuffer() = buildErrorResponse(404);
     std::cout << "THe buffer generated from CGI :\n";
     printVecChar(client->getRespoBuffer()) ;
     std::cout << "\n"<<DEF ;
