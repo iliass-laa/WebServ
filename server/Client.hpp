@@ -40,6 +40,7 @@ private:
     struct HttpRequest Req;
     bool isCGI;
     bool requestReaded;
+    ssize_t respoSize;
     
 public:
     Client(int, BaseNode* ,Core&);
