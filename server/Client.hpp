@@ -41,6 +41,7 @@ private:
     bool isCGI;
     bool requestReaded;
     ssize_t respoSize;
+    ssize_t respoSended;
     
 public:
     Client(int, BaseNode* ,Core&);

@@ -180,8 +180,8 @@ void Core::handleClientEvent(int client_fd, short events){
                 << "\n for the " <<nTime << " Times\n"
                 << "Event ::" <<events << "\n"<<DEF;
     nTime++;
-    // if (nTime == 50)
-    //     exit(22);
+    if (nTime == 500)
+        exit(22);
     std::string stt[6] = {"READING_REQUEST", // 0
     "WAITTING_FOR_REQUEST", // 2
     "SENDING_RESPONSE", // 1

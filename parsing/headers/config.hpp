@@ -9,7 +9,10 @@
 #define SingleQ '\''
 #define DoubleQ '"'
 
-#define DEF_MAX_BODY_SIZE  1073741824 
+#define GIGABYTE 1073741824
+#define KILOBYTE 1024
+#define MEGABYTE 1048576
+#define DEF_MAX_BODY_SIZE  GIGABYTE 
 
 
 

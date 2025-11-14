@@ -13,6 +13,7 @@ Client::Client(int fd,BaseNode* cnf, Core& core)
     , isCGI(false)
     , requestReaded(false)
     , respoSize(0)
+    , respoSended(0)
     // Constructor implementation
 {
     Req.headerParsed = false;
@@ -72,9 +73,7 @@ bool Client::readData(){
                 }
                 clearVectReq();
                 return false;
-                // checkReq = COMPLETEDEF;
             }
-            // std::cout << "return handel request " << checkReq << "  enenenen"  << std::endl;
         }catch (std::exception& e){
             std::cout << CYAN<< "return handel request " << checkReq << "  AFTER EXCEPTION \n"  <<DEF<< std::endl;
             std::cout << e.what() << "Driss " << std::endl;
@@ -85,8 +84,8 @@ bool Client::readData(){
     }
     else if (bytes <= 0){
         std::cout << "bytes readed " << bytes << std::endl;
-        if (!isCGI)
-            connected = false;
+        // if (!isCGI)
+        connected = false;
     }
     return true;   
 }
@@ -96,24 +95,30 @@ bool Client::readData(){
 bool Client::writeData(){
 // to vector<char> of write_data
     if(requestReaded){
+        std::cout << CYAN << "Client ::About to clear Things\n"<<DEF;
         clearReqStruct();
         resBuffString.clear();
         resBuffString = getresBuffStringer();
-        std::cout << BLUE <<  "requestReaded is True and the BuffStr of responce is getting filled\n";
+        // std::cout << BLUE <<  "requestReaded is True and the BuffStr of responce is getting filled\n" <<DEF;
         requestReaded = false;
         respoSize = respoBuff.size();
+        respoSended = 0;
     }
     if(!respoSize)
         return true; // nothing to send
     resOffset = BUFFER;
     if(respoSize > 0 && respoSize < BUFFER)
-        resOffset = respoSize;
+        resOffset = respoSize ;
+    if (respoSize - respoSended < BUFFER)
+        resOffset = respoSize - respoSended;
 
-    resOffset = send(client_fd, resBuffString.c_str(), resOffset,0);
-    std::cout << BLUE << "SEND :: "<< resOffset << "\n" << DEF; 
-    if(resOffset > 0 )
-        respoSize -= resOffset; 
-    if(resOffset <= 0 || respoSize == 0 ){
+   
+    const char *msg = resBuffString.c_str() + respoSended;
+    // std::cout << msg <<"\n<<<<<<<\n" ;
+    resOffset = send(client_fd, msg, resOffset,0);
+    respoSended += resOffset;
+
+    if(resOffset <= 0 ||  respoSended == respoSize ){
         respoBuff.clear();
         requestReaded = false;
         return true;

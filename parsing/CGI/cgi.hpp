@@ -4,40 +4,37 @@
 #include "../../server/HttpRequest.hpp"
 // #include "../../server/Client.hpp"
 
-#define BUFFER 4096
+#define BUFFER_SIZE 4096
 
 
-struct HttpRequest;
+// struct HttpRequest;
 class Client;
-// struct HttpRequest {
-//     std::string method;
-//     std::string uri;
-//     std::string version;
-//     std::map<std::string, std::string> headers;
-//     std::vector<char> body;
-//     std::string boundary;
-//     size_t contentLength;
-//     size_t headerEndPos;
-//     bool   headerParsed;
-//     bool   isChunked;
-//     size_t maxBodySize;
-// };
 
 class cgiHandling
 {
-    char **env;
-    Client *cl;
-    int sv[2], childPID;
     DirectoryListing locationConfig;
+    Client *cl;
+    std::string scriptFullPath ;
+    std::vector  <char*> Env, Args;
+    std::vector  <std::string> strEnv, strArgs;
+    int sv[2], childPID;
 
-    void childStart(BaseNode *root,  HttpRequest req);
+
+    void childStart(BaseNode *root,  HttpRequest &req);
+    // void getFullScriptPath(BaseNode *root, HttpRequest &req);
+    void getFullScriptPath(BaseNode *root, HttpRequest &req, std::string &);
+    void getEnvVars( HttpRequest &req);
+    void getArgs();
+    void buildProperReponse(std::vector<char>&);
+    void sendChuckedResponse_CGI(){};
     public :
         cgiHandling ();
         cgiHandling (Client *cl);
         ~cgiHandling ();
 
         void setClient(Client *cl);
-        int handelCGI(BaseNode *root, HttpRequest req);
+        int handelCGI(BaseNode *root, HttpRequest &req);
         int generateResponse(int fd, std::vector <char> &respoBuff);
+        
         // int getSvForMainP();
 };
