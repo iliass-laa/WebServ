@@ -174,7 +174,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const output1 = document.getElementById("output1");
     
     cgiBtnPhp.addEventListener("click", () => {
-        fetch("/cgi-bin/sleeping.py")
+        fetch("/cgi-bin/infiniteLoop.php")
             .then(response => response.text())
             .then(data => {
                 output1.innerHTML = data;
