@@ -80,16 +80,13 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
 
 
     // FIDRISS :: CHECK THIS it may throw an exception  
-    // if (Req.headers.at("Connection") == "close")
-    // { 
-    //     std::cout<< GREEN <<"AAALLO\n" << DEF;
-    //     return COMPLETE;
-    // }
-    // else
-    //     return COMPLETEDEF;
-
-
-    return COMPLETEDEF;    
+    if (Req.headers.at("Connection") == "close")
+    { 
+        std::cout<< GREEN <<"AAALLO\n" << DEF;
+        return COMPLETE;
+    }
+    else
+        return COMPLETEDEF; 
 }
 
 // int parseChunkedBody(std::vector<char> &body) {

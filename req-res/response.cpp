@@ -192,17 +192,7 @@ int buildAutoIndexResponse(const std::string &directoryPath, const std::string &
 void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)
 {
     DirectoryListing locationConfig;
-    std::string longestMatchingPrefix = Req.uri;
-    while (true)
-    {
-        fillReqStruct(ConfigNode, locationConfig, longestMatchingPrefix, Req.headers.at("Host"));
-        if (!locationConfig.getDefault())
-            break;
-        size_t pos = Req.uri.find_last_of('/');
-        if (pos == std::string::npos || pos == 0)
-            break;
-        longestMatchingPrefix = Req.uri.substr(0, pos);
-    }
+    fillReqStruct(ConfigNode, locationConfig, Req.uri, Req.headers.at("Host"));
     std::vector<std::string> allowedMethods = locationConfig.getAllowedMethods();
     if (std::find(allowedMethods.begin(), allowedMethods.end(), "GET") == allowedMethods.end())
     {
@@ -412,18 +402,8 @@ void buildDelResponse(std::vector<char> &responseBuffer)
 void HandleDeleteResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)
 {
     DirectoryListing locationConfig;
-    std::string longestMatchingPrefix = Req.uri;
 
-    while (true)
-    {
-        fillReqStruct(ConfigNode, locationConfig, longestMatchingPrefix, Req.headers.at("Host"));
-        if (!locationConfig.getDefault())
-            break;
-        size_t pos = Req.uri.find_last_of('/');
-        if (pos == std::string::npos || pos == 0)
-            break;
-        longestMatchingPrefix = Req.uri.substr(0, pos);
-    }
+    fillReqStruct(ConfigNode, locationConfig, Req.uri, Req.headers.at("Host"));
     std::vector<std::string> allowedMethods = locationConfig.getAllowedMethods();
     if (std::find(allowedMethods.begin(), allowedMethods.end(), "DELETE") == allowedMethods.end())
     {
