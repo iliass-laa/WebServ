@@ -14,8 +14,7 @@
 void printCharP_Vec(std::vector <char *> &vec)
 {
     std::vector<char *>:: iterator it = vec.begin();
-    // std::cout << CYAN << "Printing Vector of Char Pointers \n";
-
+    std::cout << CYAN << "Printing Vector of Char Pointers \n";
     while(it != vec.end())
     {
         std::cout <<">>" << *it << "<<<\n";
@@ -55,41 +54,20 @@ void cgiHandling::childStart(BaseNode *root,  HttpRequest &req)
         }
     }
 
-
-
-    getFullScriptPath(root, req, scriptFullPath);
+    // getFullScriptPath(root, req);
+      std::cout<< GREEN
+             <<"===============\n"
+            << scriptFullPath << "\n"
+            <<"==============\n"<<DEF;
     getEnvVars(req);
-    // getArgs();
-
-    // std::cout <<YELLOW
-    //         << "CGI :: iam executing this Script:\n"
-    //         << "path: " << scriptFullPath << "\n"
-    //         << "pathAdr :" << &scriptFullPath<< "\n"
-    //         <<   "this obj addr:" << this
-    //         << "\n"
-    //         <<DEF;
-    // printCharP_Vec(Env);
     close(1);
     dup(sv[0]);
-    // char **tmpArgs = NULL;
-    // execRet = execve(scriptFullPath.c_str(), args, env);
-    // execRet = execve(scriptFullPath.c_str(), &Args[0], &Env[0]);
-    // scriptFullPath = "/bin/ls";
-
     std::vector<char*> tmpArgs;
     tmpArgs.push_back(const_cast<char*>(scriptFullPath.c_str()));  // argv[0] = script name
-    // Add any other arguments here
-    tmpArgs.push_back(NULL);  // NULL-terminate
+    tmpArgs.push_back(NULL); 
     Env.push_back(NULL);
 
-// Execute
-
     execRet = execve(scriptFullPath.c_str(), &tmpArgs[0], &Env[0]);
-    // std::cerr << PINK << "CGI DONE EXEC THE SCRIPT \n"  ;
-    // std::cerr <<  "errno :" << errno << "\n"
-    //         << "executable Path ::"  << scriptFullPath<< "\n";
-    // std::cerr <<  "errno :" << strerror(errno) << "\n";
-
     close(sv[0]);
     std::cerr << PINK <<"CHILD exits by Failure ! code :" << execRet << "\n"<<DEF;
     exit(010);
@@ -99,10 +77,40 @@ void cgiHandling::childStart(BaseNode *root,  HttpRequest &req)
 
 void cgiHandling::setClient(Client *val){cl = val;}
 
+int cgiHandling::checkScriptPath(BaseNode *root,HttpRequest &req){
+    int retStat;
+    struct stat sb;
+    getFullScriptPath(root, req);
+    
+
+    retStat = stat(scriptFullPath.c_str(), &sb);
+    if (retStat!=0)
+        return 1;
+    if (!S_ISREG(sb.st_mode))
+        return 1;
+    if (!(S_IXUSR & sb.st_mode))
+        return 1;
+    return 0;
+}
+#include <fcntl.h>
+
 int cgiHandling::handelCGI(BaseNode *root, HttpRequest &req)
 {
+    if (checkScriptPath(root, req))
+        return 0;
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv))
         throw (CustomizeError("SocketPair Failed!\n"));
+    
+    // fcntl(sv[0],F_SETFL, SOCK_NONBLOCK);
+    // fcntl(sv[1],F_SETFL ,SOCK_NONBLOCK);
+
+
+    int flags = fcntl(sv[0], F_GETFL, 0);
+    fcntl(sv[0], F_SETFL, flags | O_NONBLOCK);
+
+    flags = fcntl(sv[1], F_GETFL, 0);
+    fcntl(sv[1], F_SETFL, flags | O_NONBLOCK);
+    
     childPID = fork();
     if (childPID== -1)
     {
@@ -112,16 +120,6 @@ int cgiHandling::handelCGI(BaseNode *root, HttpRequest &req)
     }
     if (childPID == 0)
         childStart(root, req);
-    // else
-    // {
-    //     std::cout <<YELLOW
-    //         << "CGI :: iam executing this Script:\n"
-    //         << "path: " << scriptFullPath << "\n"
-    //         << "pathAddr :" << &scriptFullPath<< "\n"
-    //         <<   "this obj addr:" << this
-    //         << "\n"
-    //         <<DEF;
-    // }
     close(sv[0]);
     return sv[1];
 }
@@ -162,14 +160,32 @@ int cgiHandling::generateResponse(int sv, std::vector <char> &respoBuff)
 {
     char buff[BUFFER_SIZE];
     int rd;
-    respoBuff.clear();
+    // respoBuff.clear();
     while (1)
     {
+        std::cout << RED << "Before ...\n ";
         rd = recv(sv, buff, BUFFER_SIZE - 1, 0);
-        buff[rd]='\0';
-        respoBuff.insert(respoBuff.end(), buff, buff + rd);
-        if (rd == 0)
-            break;
+        std::cout << "return :" << rd
+                << "\nAfter ...\n ";
+        if (rd >=0)
+        {
+            buff[rd]='\0';
+            respoBuff.insert(respoBuff.end(), buff, buff + rd);
+            if (rd == 0)
+            {
+                std::cout << CYAN << "EOF Reached :\n"<<DEF ;
+                break;
+            }
+        }
+        else
+        {
+            std::cout << ">>Errno: " << errno << " (" << strerror(errno) << ")\n";
+            if (errno== EAGAIN || errno == EWOULDBLOCK)
+            {
+                std::cout << "No data for the Moment to read\n";
+            }
+            return 1;
+        }
     }
 
     std::cout << "Response Readed from the child CGI :\n";            
@@ -180,25 +196,18 @@ int cgiHandling::generateResponse(int sv, std::vector <char> &respoBuff)
 }
 
 
-void cgiHandling::getFullScriptPath(BaseNode *root, HttpRequest &req, std::string &p)
+void cgiHandling::getFullScriptPath(BaseNode *root, HttpRequest &req)
 {
     DirectoryListing obj;
-        
     std::map <std::string , std::string> :: iterator it = req.headers.find("Host");; 
-    // if (it == req.headers.end())
-    // {
-    //     exit (1);
-    // }
     std::string hostFound = it->second;
     fillReqStruct(root, obj, req.uri, req.headers.at("Host") );
-    
     scriptFullPath = obj.getRoot() + req.uri;
-    p = obj.getRoot() + req.uri;
-    // std::cout << GREEN << "FOUND this Host : " << hostFound + "\n"
-    //         << "found this full Script PAth :" << scriptFullPath  <<"\n"
-    //         << "path Addr :" << &scriptFullPath   << "\n"
-    //         <<   "this obj addr:" << this   
-    // << DEF<< "\n" ;
+    std::cout <<"===============\n"
+            << scriptFullPath << "\n"
+            <<"==============\n";
+    // p = obj.getRoot() + req.uri;
+    // (void)p;
 }
 
 std::string genNewForm(std::string &old)

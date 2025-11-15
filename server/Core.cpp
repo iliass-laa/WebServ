@@ -81,7 +81,6 @@ void Core::handleSocketEvent(int fd, short events){
 
 void    Core::handelCgiResponce(int fd, short events, Client* client){
 
-    // std::string Eve[5] = {"", "POLLIN", "", "", "POLLOUT"};
     if (!(events & POLLIN))
         return;
     std::cout << PINK << "handelCgiResponce><<< \n"
@@ -89,9 +88,12 @@ void    Core::handelCgiResponce(int fd, short events, Client* client){
             << "events :" <<( events )<<"\n"
             << "clFD:" << client->getFd()<<"\n";
    
-
-    client->getRespoBuffer().clear();
-    client->getCGI().generateResponse(fd, client->getRespoBuffer());
+    int genresp = client->getCGI().generateResponse(fd, client->getRespoBuffer()); 
+    if (genresp == 1)
+    {
+        std::cout << "here >>>>>>\n";
+        return ;
+    }
     client->setRequestReaded(true);
     event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
 

@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-// echo("Content-type: image/png\n\n");
+echo("Content-Type: image/png\n");
 // echo "Content-type: text/html\n\n";
 echo "Content-length: 270328\n\n";
 

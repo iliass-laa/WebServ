@@ -64,9 +64,18 @@ bool Client::readData(){
                 try 
                 {
                     int newFd = cgi.handelCGI(root, Req);
-                    theBase.addToEventLoop(newFd);
-                    theBase.setCGI_FD(newFd, this);
-                    isCGI = true; 
+                    if (newFd)
+                    {
+                        theBase.addToEventLoop(newFd);
+                        theBase.setCGI_FD(newFd, this);
+                        isCGI = true; 
+                    }
+                    else
+                    {
+                        respoBuff.clear();
+                        respoBuff =  buildErrorResponse(403); 
+                        return true;
+                    }   
                 }
                 catch (std::exception& e){
                 std::cout << RED<<"CGI FAILED :"<< e.what()<< DEF << std::endl;
@@ -114,7 +123,6 @@ bool Client::writeData(){
 
    
     const char *msg = resBuffString.c_str() + respoSended;
-    // std::cout << msg <<"\n<<<<<<<\n" ;
     resOffset = send(client_fd, msg, resOffset,0);
     respoSended += resOffset;
 

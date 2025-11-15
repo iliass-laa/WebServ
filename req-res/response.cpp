@@ -270,6 +270,7 @@ void buildPostResponse(std::vector<char> &responseBuffer)
     std::ostringstream responseStream;
     responseStream << "HTTP/1.1 201 Created\r\n";
     responseStream << "Content-Length: 32\r\n";
+    responseStream << "\r\n";
     responseStream << "Resource created successfully.\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());

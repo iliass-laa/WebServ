@@ -21,12 +21,13 @@ class cgiHandling
 
 
     void childStart(BaseNode *root,  HttpRequest &req);
-    // void getFullScriptPath(BaseNode *root, HttpRequest &req);
-    void getFullScriptPath(BaseNode *root, HttpRequest &req, std::string &);
+    void getFullScriptPath(BaseNode *root, HttpRequest &req);
+    // void getFullScriptPath(BaseNode *root, HttpRequest &req, std::string &);
     void getEnvVars( HttpRequest &req);
     void getArgs();
     void buildProperReponse(std::vector<char>&);
     void sendChuckedResponse_CGI(){};
+    int checkScriptPath(BaseNode *,HttpRequest &);
     public :
         cgiHandling ();
         cgiHandling (Client *cl);

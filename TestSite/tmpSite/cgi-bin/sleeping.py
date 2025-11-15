@@ -3,7 +3,7 @@ import time
 import sys
 
 print("Content-Type: text/plain")
-print("Transfer-Encoding: chunked")
+# print("Transfer-Encoding: chunked")
 print()
 for i in range(5):
     print(f"Message {i}")
