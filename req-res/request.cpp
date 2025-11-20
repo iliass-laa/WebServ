@@ -54,7 +54,15 @@ void printResponse(const std::vector<char> &responseBuffer) {
 int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::vector<char> &responseBuffer, struct HttpRequest &Req) {
     // std::clock_t startTime, endTime;
     // startTime = std::clock();
-    int status = parseRequest(ConfigNode, requestBuffer, Req);
+    int status;
+    status = parseRequest(ConfigNode, requestBuffer, Req);
+    // try {
+
+    // }
+    // catch(std::exception &e)
+    // {
+    //     std::cout << "==> Caugth this exception:" << e.what() << "\n";
+    // }
     // endTime = std::clock();
     // double seconds = double(endTime - startTime) / CLOCKS_PER_SEC;
     // std::cout << std::fixed << std::setprecision(6);
@@ -68,25 +76,40 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
     if (!Req.uri.compare(0, 9, "/cgi-bin/"))
             return CGI;
     // std::cout << PINK << Req.method << "\n" << DEF;
-    if (Req.method == "GET")
-        HandleGetResponse(ConfigNode, Req, responseBuffer);
-    else if (Req.method == "POST")
-        HandlePostResponse(ConfigNode, Req, responseBuffer);
-    else
-        HandleDeleteResponse(ConfigNode, Req, responseBuffer);
+    
+    try{
+
+        if (Req.method == "GET")
+            HandleGetResponse(ConfigNode, Req, responseBuffer);
+        else if (Req.method == "POST")
+            HandlePostResponse(ConfigNode, Req, responseBuffer);
+        else
+            HandleDeleteResponse(ConfigNode, Req, responseBuffer);
+    }
+    catch (std::exception &e)
+    {
+        std::cout << "==> Caugth this exception:" << e.what() << "\n";
+    }
+    
     // printResponse(responseBuffer);
 
 
 
-
-    // FIDRISS :: CHECK THIS it may throw an exception  
-    if (Req.headers.at("Connection") == "close")
+    // FIDRISS :: CHECK THIS it may throw an exception
+    std::map <std::string, std::string> ::iterator it;
+    it= Req.headers.find("Connection");
+    if (it == Req.headers.end())
+        std::cout << "Connection Not found \n";
+    if (it == Req.headers.end() || Req.headers.at("Connection") == "close")
     { 
         std::cout<< GREEN <<"AAALLO\n" << DEF;
         return COMPLETE;
     }
     else
+    {
+        std::cout<< GREEN <<"WAAALLO\n" << DEF;
         return COMPLETEDEF; 
+    }
 }
 
 // int parseChunkedBody(std::vector<char> &body) {
@@ -171,6 +194,10 @@ bool isChunkedBodyComplete(const std::vector<char>& buf)
 
 int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct HttpRequest &Req) {
 
+    std::map <std::string, std::string> ::iterator it;
+    it= Req.headers.find("Connection");
+    if (it == Req.headers.end())
+        std::cout << "Connection Not found \n";
     // std::clock_t startTime, checkTime, endTime;
     // startTime = std::clock();  
     // std::cout << GREEN<<"ParseReq\n" << DEF;

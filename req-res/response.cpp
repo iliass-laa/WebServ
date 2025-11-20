@@ -192,7 +192,15 @@ int buildAutoIndexResponse(const std::string &directoryPath, const std::string &
 void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)
 {
     DirectoryListing locationConfig;
-    fillReqStruct(ConfigNode, locationConfig, Req.uri, Req.headers.at("Host"));
+    // std::map
+
+    try{
+        fillReqStruct(ConfigNode, locationConfig, Req.uri, Req.headers.at("Host"));
+    }
+    catch (std::exception &e)
+    {
+        std::cout << "==> Caugth this exception:" << e.what() << "\n";
+    }
     std::vector<std::string> allowedMethods = locationConfig.getAllowedMethods();
     if (std::find(allowedMethods.begin(), allowedMethods.end(), "GET") == allowedMethods.end())
     {

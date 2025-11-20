@@ -8,8 +8,11 @@
 #include "classes.hpp"
 #include "AST.hpp"
 #include "colors.hpp"
+// #include "../configParse/checkTree.hpp"
 // #include "../../server/Core.hpp"
-#include<set>
+// #include<set>
+
+// class checkTree;
 
 
 void testSocket(char *path, BaseNode *root);

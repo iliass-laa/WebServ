@@ -55,6 +55,8 @@ void checkDirectiveChilds(ContextNode *cNode, DirectoryListing &obj)
 
     // std::cout << RED << "Checking Directive for this Context:" <<co[cNode->type_Context]
     //             <<DEF << "\n";
+    if (!cNode)
+        return;
     for (int i = 0;i < cNode->nbrChilds;i++)
     {
         if (cNode->Childs[i]->typeNode == isDirective)
@@ -106,9 +108,22 @@ void fillReqStruct(BaseNode*root, DirectoryListing &obj, std::string uri, std::s
     // if (!cNode)
     //     throw(ConfigFileError("No Location Found"));
     // std::cout <<PINK << "VAL of Context:"<<cNode->val.back()<<"\n"<<DEF ;
-    if (cNode->val.back().compare("/") == 0)
+    // if (!cNode)
+    if (cNode && cNode->val.size() && cNode->val.back().compare("/") == 0)
         obj.setDefault(true);
     checkDirectiveChilds(cNode, obj);
+    // obj.setDefault(true);
+    std::vector <std::string> defIndex;
+    if (obj.getHasIndexFile() == false)
+    {
+        defIndex.push_back("index.html");
+        obj.setIndexFile(defIndex);
+    }
+    // std::cout <<YELLOW 
+    //         << "what does the fill  Req Res did:\n"
+    //         << "Root :" <<obj.getRoot() << "\n"
+    //         << "index :" << obj.getHasIndexFile()
+    //         << "\n"<<DEF;
     // printThingsToCheck(obj);
  }
 

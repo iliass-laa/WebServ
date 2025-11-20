@@ -4,14 +4,11 @@
 #include "includes.hpp"
 
 #define  MainContext 0
-#define  EventsContext 1
-#define  HttpContext 2
-#define  TypesContext 3
-#define  ServerContext 4
-#define  LocationContext 5
+#define  HttpContext 1
+#define  ServerContext 2
+#define  LocationContext 3
 
 
-#include <list>
 
 class Core;
 enum NodeType{

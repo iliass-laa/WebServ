@@ -5,13 +5,17 @@ int getEndOfContext(TokenizerData &tk, int start, int &nbrC,int &nbrD)
 {
     int first, nbrBraquets = 0;
     first = start;
+    // std::cout << PINK 
+    //             << "First Token passed to Get End of Context:" 
+    //             << tk.tokens[start]  << "\n"
+    //             << DEF;
     while (static_cast<size_t>(start) < tk.tokens.size())
     {
         
         if (tk.tokens[start].compare("{") == 0 )
         {
-            if (nbrBraquets==1)
-                nbrC++;
+            // if (nbrBraquets==1)
+            //     nbrC++;
             nbrBraquets ++;
         }
         else if (tk.tokens[start].compare("}") == 0)
@@ -22,10 +26,12 @@ int getEndOfContext(TokenizerData &tk, int start, int &nbrC,int &nbrD)
             if (!nbrBraquets && first)
                 return start;
         }
-        if (nbrBraquets == 1 && tk.tokens[start] == ";")
-            nbrD++;
+        // if (nbrBraquets == 1 && tk.tokens[start] == ";")
+        //     nbrD++;
         start ++;
     }
+    (void)nbrC;
+    (void)nbrD;
     return start;
 }
 
@@ -34,8 +40,8 @@ int getEndOfContext(TokenizerData &tk, int start, int &nbrC,int &nbrD)
 
 int getContextType(TokenizerData &tk,int index)
 {
-    std::string Contexts[6] = {"main", "events","http", "types", "server", "location"};
-    for(int i = 0; i < 6;i++)
+    std::string Contexts[4] = {"main","http", "server", "location"};
+    for(int i = 0; i < 4;i++)
     {
         if (tk.tokens[index].compare(Contexts[i]) == 0)
             return i;
@@ -75,16 +81,15 @@ BaseNode *creatContextNode(TokenizerData &tk, int &start, int typeC)
 {
     ContextNode *Node;
     int typeOfContext, end;
-
     Node = new ContextNode();
     Node->type_Context = typeC;
     if (typeC != MainContext)
         getVal(Node, tk, start, typeC);
-    end = getEndOfContext(tk, start, Node->nbrChildsC, Node->nbrChildsD);
-    // std::cout << "type of COntext: " << typeC << "\n";
-    // std::cout << "--->start of COntext: " << start << " ";
-    // std::cout << "End of COntext: " << end << "\n";
     
+    
+    end = getEndOfContext(tk, start, Node->nbrChildsC, Node->nbrChildsD);
+    Node->nbrChildsC = 0;
+    Node->nbrChildsD = 0;
     if (tk.tokens[start].compare("{") == 0)
         start ++;
     while(start < end)
@@ -94,10 +99,12 @@ BaseNode *creatContextNode(TokenizerData &tk, int &start, int typeC)
         {
             start++;
             Node->Childs.push_back(creatContextNode(tk, start, typeOfContext));
+            Node->nbrChildsC ++;
         }
         else
         {
             Node->Childs.push_back(createDirectiveNode(tk, start));
+            Node->nbrChildsD ++;
         }
     }
     if (static_cast<size_t>(start) <  tk.tokens.size() )
@@ -105,7 +112,7 @@ BaseNode *creatContextNode(TokenizerData &tk, int &start, int typeC)
         if (tk.tokens[start].compare("}") == 0)
             start++;
     }
-    Node->nbrChilds  = Node->nbrChildsC + Node->nbrChildsD;
+    Node->nbrChilds  =  Node->nbrChildsC + Node->nbrChildsD;
     return Node;
 }
 

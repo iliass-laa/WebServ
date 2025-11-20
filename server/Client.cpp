@@ -85,7 +85,7 @@ bool Client::readData(){
             }
         }catch (std::exception& e){
             std::cout << CYAN<< "return handel request " << checkReq << "  AFTER EXCEPTION \n"  <<DEF<< std::endl;
-            std::cout << e.what() << "Driss " << std::endl;
+            std::cout << e.what() << "/******/ " << std::endl;
         }
         if(checkReq == COMPLETE || checkReq == COMPLETEDEF)
             return true;

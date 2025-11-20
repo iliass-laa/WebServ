@@ -8,7 +8,7 @@ void printSpaces(int level)
     {
         std::cout << " ";
     }
-    std::cout << "->";
+    std::cout << "=>";
 }
 
 void    printDirective( DirectiveNode * root,int Level)
@@ -27,8 +27,8 @@ void    printDirective( DirectiveNode * root,int Level)
 
 void    printTypContextandVal(int type, std::vector <std::string> &val, int level, int nbrChilds)
 {
-    std::string Contexts[6] = {"main", "events","http", "types", "server", "location"};
-    for(int i = 0; i < 6;i++)
+    std::string Contexts[4] = {"main", "http", "server", "location"};
+    for(int i = 0; i < 4;i++)
     {
         if (i==type)
         {
