@@ -19,6 +19,7 @@ Client::Client(int fd,BaseNode* cnf, Core& core)
     Req.headerParsed = false;
     Req.contentLength = 0;
     Req.isChunked = false;
+    Req.cookiesIndex = false;
     Req.headerEndPos = 0;
 }
 
