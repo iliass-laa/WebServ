@@ -89,7 +89,7 @@ bool Client::readData(){
         }
         if(checkReq == COMPLETE || checkReq == COMPLETEDEF)
             return true;
-        return false;
+        return ((std::cout << RED <<"exit read here" << DEF<< std::endl),false);
     }
     else if (bytes <= 0){
         std::cout << "bytes readed " << bytes << std::endl;

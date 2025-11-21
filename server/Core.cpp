@@ -177,6 +177,7 @@ Client* Core::isCgi(int fd_cgi){
 
 //***************HANDEL**CLIENT**EVENT********************************************************************
 int nTime;
+int i = 0;
 void Core::handleClientEvent(int client_fd, short events){
     std::cout << RED << "Client :" << client_fd 
                 << "\n for the " <<nTime << " Times\n"
@@ -199,10 +200,12 @@ void Core::handleClientEvent(int client_fd, short events){
     Client* client = it->second;
     
     if( events & POLLIN ){
+        i++;
         int readDataState = client->readData(); 
-
+        std::cout <<  PINK << "readState " << readDataState << " times " <<  i <<DEF << std::endl;
         if( readDataState){
             client->setRequestReaded(true);
+            std::cout << RED << ">>>>>>>>>>>>>>\n"<<  client->getresBuffStringer() <<  DEF << std::endl; 
             event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
             client->clearVectReq();
         }
@@ -220,7 +223,7 @@ void Core::handleClientEvent(int client_fd, short events){
         std::cout << GREEN << "CORE :: \n"
             <<"SEEMS like this client is"<< RED<<" Leaving Us  "
             << GREEN<<":\n"
-            <<"CL Addr:" << client
+            <<"CL Addr:" 
             << "\nCL fd :" <<client->getFd() << "\n"<<DEF;
         std::cout << RED << "client"<< client->getFd() <<  " lose tcp connection !!!" << DEF << std::endl;
         event_loop.removeSocket(client_fd);
