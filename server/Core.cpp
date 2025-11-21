@@ -179,9 +179,9 @@ Client* Core::isCgi(int fd_cgi){
 int nTime;
 int i = 0;
 void Core::handleClientEvent(int client_fd, short events){
-    std::cout << RED << "Client :" << client_fd 
-                << "\n for the " <<nTime << " Times\n"
-                << "Event ::" <<events << "\n"<<DEF;
+    // std::cout << RED << "Client :" << client_fd 
+    //             << "\n for the " <<nTime << " Times\n"
+    //             << "Event ::" <<events << "\n"<<DEF;
     nTime++;
     if (nTime == 500)
         exit(22);
@@ -220,12 +220,12 @@ void Core::handleClientEvent(int client_fd, short events){
     // disconnect the client 
     // if ( !(client->isConnected()) || (events & (POLLERR | POLLHUP))){
     if ( !(client->isConnected())){
-        std::cout << GREEN << "CORE :: \n"
-            <<"SEEMS like this client is"<< RED<<" Leaving Us  "
-            << GREEN<<":\n"
-            <<"CL Addr:" 
-            << "\nCL fd :" <<client->getFd() << "\n"<<DEF;
-        std::cout << RED << "client"<< client->getFd() <<  " lose tcp connection !!!" << DEF << std::endl;
+        // std::cout << GREEN << "CORE :: \n"
+        //     <<"SEEMS like this client is"<< RED<<" Leaving Us  "
+        //     << GREEN<<":\n"
+        //     <<"CL Addr:" << client
+        //     << "\nCL fd :" <<client->getFd() << "\n"<<DEF;
+        // std::cout << RED << "client"<< client->getFd() <<  " lose tcp connection !!!" << DEF << std::endl;
         event_loop.removeSocket(client_fd);
         delete client;
         clients.erase(it);

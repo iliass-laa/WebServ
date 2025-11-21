@@ -58,6 +58,8 @@ void lastCheck (std::set<std::string > &pairs)
         else
             it++;
     }
+    // if (pairs.empty())
+        // throw (ConfigFileError("Need Some Pairs\n"));
 }
 
 void addPair(std::string val,  std::set <std::string> &pairs)

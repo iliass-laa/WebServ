@@ -13,5 +13,7 @@ struct HttpRequest {
     size_t headerEndPos;
     bool   headerParsed;
     bool   isChunked;
+    bool   cookiesIndex;
+    std::map<std::string, std::string> cookies;
     size_t maxBodySize;
 };

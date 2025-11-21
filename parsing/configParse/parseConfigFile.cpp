@@ -1,4 +1,5 @@
 #include "../headers/webserver.hpp"
+#include "../configParse/checkTree.hpp"
 
 
 int getNextQ(std::string line, int start, int Quote)
@@ -159,7 +160,7 @@ void splitTheLine(std::string line, TokenizerData &tk)
         tk.tokens.insert(tk.tokens.end(), tmpTokens.begin(), tmpTokens.end());
     else
     {
-        std::cout << ">>>>>>>>>>i am about to throw !, Extra closing braquets \n";
+        // std::cout << ">>>>>>>>>>i am about to throw !, Extra closing braquets \n";
         throw (ConfigFileError());
     }
 }
@@ -185,17 +186,30 @@ void tokenizer(std::fstream &f, TokenizerData &tk)
 
 BaseNode *parseConfigFile(const char *path)
 {
+    checkTree lastDance;
     TokenizerData tk;
+    BaseNode *root;
     std::fstream f(path);
     if (f.fail())
-        throw(ConfigFileError());
+        throw(ConfigFileError("Config File Not Found (Path incorrect)!"));
     tokenizer(f, tk);
     if (!tk.braquets.empty())
     {
         std::cerr <<"A Brquets left open\n";
         throw(ConfigFileError());
     }
-    BaseNode *root;
+    if (tk.tokens.size() == 0)
+        throw(ConfigFileError("Config File is Empty ! please Consider Filling it Properly."));
     root = buildTree(tk);
+    try 
+    {
+        lastDance.finalChecking(root);
+    }
+    catch(std::exception &e)
+    {
+        std::cerr <<RED << e.what() << " <<\n"<<DEF;
+        freeTree(root);
+        return NULL;
+    }
     return root;
 }

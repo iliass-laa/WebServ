@@ -13,6 +13,7 @@
 #include <cerrno>
 #include <map>
 #include <vector>
+#include <set>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
