@@ -210,7 +210,6 @@ void parseCookies(std::string Cookies, std::map<std::string, std::string> &cooki
             while (!value.empty() && (value[value.size() - 1] == ' ' || value[value.size() - 1] == '\t'))
                 value.erase(value.size() - 1);
             cookiesMap[key] = value;
-            //nigger nigger git nigger
         }
     }
 }
@@ -308,74 +307,3 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
     Req.body = bodyPart;
     return COMPLETE;
 }
-
-// int parseRequest(std::vector<char> requestBuffer, struct HttpRequest &Req, bool &headerParsed, size_t &headerEnd) {
-
-//     const char *sep = "\r\n\r\n";
-//     const char *sep_end = sep + 4;
-
-//     std::vector<char>::const_iterator it = std::search(
-//         requestBuffer.begin(), requestBuffer.end(),
-//         sep, sep_end
-//     );
-
-//     if (it == requestBuffer.end())
-//         return INCOMPLETE;
-
-//     size_t headerEnd = it - requestBuffer.begin();
-
-//     std::string headerPart(requestBuffer.begin(), requestBuffer.begin() + headerEnd);
-//     size_t pos = headerPart.find("Content-Length");
-//     size_t contentLength = 0;
-//     if (pos != std::string::npos) {
-//         size_t colonPos = headerPart.find(':', pos);
-//         size_t newLinePos = headerPart.find('\n', colonPos);
-//         std::string contentLengthString = headerPart.substr(colonPos + 1, newLinePos - (colonPos + 1));
-//         contentLengthString.erase(0, contentLengthString.find_first_not_of(" \t\r"));
-//         contentLengthString.erase(contentLengthString.find_last_not_of(" \t\r") + 1);
-//         contentLength = std::strtoul(contentLengthString.c_str(), NULL, 10);
-//     }
-//     size_t bodyStart = headerEnd + 4;
-//     if (contentLength && requestBuffer.size() - bodyStart < contentLength)
-//         return INCOMPLETE;
-
-//     std::vector<char> bodyPart(requestBuffer.begin() + bodyStart, requestBuffer.end());
-//     std::istringstream headerStream(headerPart);
-//     std::string reqLine;
-//     std::getline(headerStream, reqLine);
-//     std::istringstream reqLineStream(reqLine);
-//     reqLineStream >> Req.method >> Req.uri >> Req.version;
-
-//     if (Req.method.empty() || Req.uri.empty() || Req.version.empty())
-//         return ERROR;
-//     if (Req.method != "GET" && Req.method != "POST" && Req.method != "DELETE")
-//         return ERROR_BAD_METHOD;
-//     if (Req.version != "HTTP/1.1")
-//         return ERROR_BAD_VERSION;
-
-//     std::string headerLine;
-//     while (std::getline(headerStream, headerLine)) {
-//         if (headerLine == "\r")
-//             break;
-//         size_t colonPos = headerLine.find(':');
-//         if (colonPos == std::string::npos)
-//             return ERROR;
-//         std::string key = headerLine.substr(0, colonPos);
-//         std::string value = headerLine.substr(colonPos + 1);
-//         while (!value.empty() && (value[0] == ' ' || value[0] == '\t'))
-//             value.erase(0, 1);
-//         while (!value.empty() && (value[value.size()-1] == ' ' || value[value.size()-1] == '\t'))
-//             value.erase(value.size()-1);
-//         Req.headers[key] = value;
-//     }
-
-//     if (Req.headers.find("Transfer-Encoding") != Req.headers.end() &&
-//         Req.headers["Transfer-Encoding"] == "chunked") {
-//         int status = parseChunkedBody(bodyPart);
-//         if (status != COMPLETE)
-//             return status;
-//     }
-//     Req.body = bodyPart;
-//     return COMPLETE;
-// }
-
