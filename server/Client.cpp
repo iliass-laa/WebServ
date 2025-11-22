@@ -21,6 +21,7 @@ Client::Client(int fd,BaseNode* cnf, Core& core)
     Req.isChunked = false;
     Req.cookiesIndex = false;
     Req.headerEndPos = 0;
+    Req.thisClient = this;
 }
 
 Client::~Client() {
@@ -183,3 +184,36 @@ void Client::clearReqStruct(){
     Req.headerParsed = false;
 }
 
+
+
+
+bool Client::handelSession(){
+    
+    // Approch of handling Session per client
+    /*
+        check is cookies exist on req , use boolean 
+            check for SID  = exist 
+                update session or remove it , regenerate new SID
+            check for SID  = not found
+                create new session generate new SID
+        update (clear or fill ) cookie vector + SID cookie
+        update boolean
+    */
+    // bool state;
+    std::map<std::string ,std::string>& cookie = Req.cookies; 
+    std::map<std::string , std::string>::iterator obj ;
+    if( (obj = cookie.find("SID")) != cookie.end() && cookie.size() > 1){
+        // session exist
+        Req.cookiesIndex = theBase.updateSession(obj->first, cookie);
+    }else if( cookie.size() != 0){ // need to be tested  
+        // new session
+        Req.cookiesIndex = theBase.newSession(cookie);
+    }
+    else if(cookie.size() == 0)
+        Req.cookiesIndex = false;
+    else{
+        // generate session
+        ;
+    }
+    return false;
+}

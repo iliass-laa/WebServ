@@ -22,8 +22,11 @@ void printVecChar( std::vector<char> Vec)
 // ORTHODOX FORM
 Core::Core():running(false),root(NULL){}
 
-Core::Core(BaseNode* obj):running(false), root(obj){}
- 
+Core::Core(BaseNode* obj)
+    :sessionMaster(Session(300))
+    ,running(false) 
+    ,root(obj) 
+    {}
 Core::~Core(){}
 Core::Core(const Core& obj){
     (void)obj;
@@ -270,10 +273,6 @@ void Core::addToEventLoop(int newFd)
     event_loop.addSocket(newFd, POLLIN);
 }
 
-
-// void Core::editSocket(client){
-
-// }
 /*  
     algo
 
@@ -289,6 +288,34 @@ void Core::addToEventLoop(int newFd)
                     HandelCLientEvent
 */
 
+/************************************************** */
+/**************************SESSION***************** */
+/************************************************** */
+
+bool Core::updateSession(std::string sid, std::map<std::string, std::string>& cookies)
+{
+    Session_t* sess = sessionMaster.lookup_session(sid);
+    if(NULL == sess){
+        return false;
+    }else{
+        // update session
+        (void)cookies;
+        // std::string newSid = regenerate_session(sid);
+    }
+    return false;
+}
 
 
-
+bool Core::newSession( std::map<std::string, std::string>& cookies)
+{
+    // new session
+    std::string newSid ;
+    if( (newSid = sessionMaster.create_session(cookies)).size() != 0 ) { // set up session varaiable 
+        std::pair<std::string, std::string > sid("SID", newSid);
+        cookies.insert(cookies.begin() , sid);
+        return true;
+    }else{
+        cookies.clear();
+        return false;
+    }
+}
