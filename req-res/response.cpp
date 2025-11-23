@@ -113,7 +113,7 @@ std::string getContentType(const std::string &path)
     return "application/octet-stream";
 }
 
-int buildFileResponse(std::string path, std::vector<char> &responseBuffer)
+int buildFileResponse(std::string path, std::vector<char> &responseBuffer, const HttpRequest &Req)
 {
     std::ifstream file(path.c_str(), std::ios::binary);
     if (!file)
@@ -128,6 +128,12 @@ int buildFileResponse(std::string path, std::vector<char> &responseBuffer)
     responseStream << "HTTP/1.1 200 OK\r\n";
     responseStream << "Content-Length: " << size << "\r\n";
     responseStream << "Content-Type: " << getContentType(path) << "\r\n";
+    if (Req.cookiesIndex)
+    {
+        std::map<std::string, std::string>::const_iterator it;
+        for (it = Req.cookies.begin(); it != Req.cookies.end(); it++)
+            responseStream << "Set-Cookie: " << it->first << "=" << it->second << "; Path=/" << "\r\n";
+    }
     responseStream << "\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
@@ -135,18 +141,24 @@ int buildFileResponse(std::string path, std::vector<char> &responseBuffer)
     return 0; 
 }
 
-void buildRedirectionResponse(const std::string &newLocation, std::vector<char> &responseBuffer)
+void buildRedirectionResponse(const std::string &newLocation, std::vector<char> &responseBuffer, const HttpRequest &Req)
 {
     std::ostringstream responseStream;
     responseStream << "HTTP/1.1 301 Moved Permanently\r\n";
     responseStream << "Location: " << newLocation << "\r\n";
     responseStream << "Content-Length: 0\r\n";
+    if (Req.cookiesIndex)
+    {
+        std::map<std::string, std::string>::const_iterator it;
+        for (it = Req.cookies.begin(); it != Req.cookies.end(); it++)
+            responseStream << "Set-Cookie: " << it->first << "=" << it->second << "; Path=/" << "\r\n";
+    }
     responseStream << "\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
 }
 
-int buildAutoIndexResponse(const std::string &directoryPath, const std::string &uri, std::vector<char> &responseBuffer)
+int buildAutoIndexResponse(const std::string &directoryPath, const std::string &uri, std::vector<char> &responseBuffer, const HttpRequest &Req)
 {
     std::vector<std::string> entries;
     DIR *dir = opendir(directoryPath.c_str());
@@ -182,6 +194,12 @@ int buildAutoIndexResponse(const std::string &directoryPath, const std::string &
     responseStream << "HTTP/1.1 200 OK\r\n";
     responseStream << "Content-Length: " << body.size() << "\r\n";
     responseStream << "Content-Type: text/html\r\n";
+    if (Req.cookiesIndex)
+    {
+        std::map<std::string, std::string>::const_iterator it;
+        for (it = Req.cookies.begin(); it != Req.cookies.end(); it++)
+            responseStream << "Set-Cookie: " << it->first << "=" << it->second << "; Path=/" << "\r\n";
+    }
     responseStream << "\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
@@ -219,14 +237,14 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
     }
     if (locationConfig.getRedirect().first)
     {
-        buildRedirectionResponse(locationConfig.getRedirect().second, responseBuffer);
+        buildRedirectionResponse(locationConfig.getRedirect().second, responseBuffer, Req);
         return;
     }
     if (S_ISDIR(pathType))
     {
         if ((!fileSystemPath.empty() && fileSystemPath[fileSystemPath.size() - 1] != '/'))
         {
-            buildRedirectionResponse(Req.uri + '/', responseBuffer);
+            buildRedirectionResponse(Req.uri + '/', responseBuffer, Req);
             return;
         }
         if (locationConfig.getHasIndexFile())
@@ -238,14 +256,14 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
                 pathType = checkPath(indexPath);
                 if (S_ISREG(pathType))
                 {
-                    if (!buildFileResponse(indexPath, responseBuffer))
+                    if (!buildFileResponse(indexPath, responseBuffer, Req))
                         return;
                 }
             }
         }
         if (locationConfig.getAutoIndex())
         {
-            if (!buildAutoIndexResponse(fileSystemPath, Req.uri, responseBuffer))
+            if (!buildAutoIndexResponse(fileSystemPath, Req.uri, responseBuffer, Req))
                 return;
         }
         responseBuffer = buildErrorResponse(403);
@@ -253,7 +271,7 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
     }
     else if (S_ISREG(pathType))
     {
-        if (!buildFileResponse(fileSystemPath, responseBuffer))
+        if (!buildFileResponse(fileSystemPath, responseBuffer, Req))
             return;
     }
     else
@@ -263,22 +281,34 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
     }
 }
 
-void buildPostResponse(std::vector<char> &responseBuffer)
+void buildPostResponse(std::vector<char> &responseBuffer, const HttpRequest &Req)
 {
     std::ostringstream responseStream;
     responseStream << "HTTP/1.1 201 Created\r\n";
     responseStream << "Content-Length: 32\r\n";
+    if (Req.cookiesIndex)
+    {
+        std::map<std::string, std::string>::const_iterator it;
+        for (it = Req.cookies.begin(); it != Req.cookies.end(); it++)
+            responseStream << "Set-Cookie: " << it->first << "=" << it->second << "; Path=/" << "\r\n";
+    }
     responseStream << "\r\n";
     responseStream << "Resource created successfully.\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
 }
 
-void buildProcessResponse(std::vector<char> &responseBuffer)
+void buildProcessResponse(std::vector<char> &responseBuffer, const HttpRequest &Req)
 {
     std::ostringstream responseStream;
     responseStream << "HTTP/1.1 200 OK\r\n";
     responseStream << "Content-Length: 32\r\n";
+    if (Req.cookiesIndex)
+    {
+        std::map<std::string, std::string>::const_iterator it;
+        for (it = Req.cookies.begin(); it != Req.cookies.end(); it++)
+            responseStream << "Set-Cookie: " << it->first << "=" << it->second << "; Path=/" << "\r\n";
+    }
     responseStream << "\r\n";
     responseStream << "Request processed succesfully.\r\n";
     std::string responseHeaders = responseStream.str();
@@ -391,16 +421,22 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
         outFile.close();
     }
     if (writeSuccess)
-        buildPostResponse(responseBuffer);
+        buildPostResponse(responseBuffer, Req);
     else
-        buildProcessResponse(responseBuffer);
+        buildProcessResponse(responseBuffer, Req);
 }
 
-void buildDelResponse(std::vector<char> &responseBuffer)
+void buildDelResponse(std::vector<char> &responseBuffer,const HttpRequest &Req)
 {
     std::ostringstream responseStream;
     responseStream << "HTTP/1.1 200 OK\r\n";
     responseStream << "Content-Length: 19\r\n";
+    if (Req.cookiesIndex)
+    {
+        std::map<std::string, std::string>::const_iterator it;
+        for (it = Req.cookies.begin(); it != Req.cookies.end(); it++)
+            responseStream << "Set-Cookie: " << it->first << "=" << it->second << "; Path=/" << "\r\n";
+    }
     responseStream << "\r\n";
     responseStream << "Resource deleted.\r\n";
     std::string responseHeaders = responseStream.str();
@@ -435,7 +471,7 @@ void HandleDeleteResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, s
             responseBuffer = buildErrorResponse(500);
             return;
         }
-        buildDelResponse(responseBuffer);
+        buildDelResponse(responseBuffer, Req);
             return;
     }
     else if (S_ISDIR(pathType))
@@ -445,7 +481,7 @@ void HandleDeleteResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, s
            responseBuffer = buildErrorResponse(409);
            return;
        }
-       buildDelResponse(responseBuffer);
+       buildDelResponse(responseBuffer, Req);
        return;
     }
     else
