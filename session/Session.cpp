@@ -131,6 +131,15 @@ std::string Session::make_set_cookie(const std::string& sid, unsigned int max_ag
     s << "; HttpOnly";
     s << "; SameSite=Lax";
     return s.str();
+
+    /*
+    SID=value;
+    Path=/";
+    Max-Age=max_age;
+    Expires=exp;
+    HttpOnly ;
+    SameSite=Lax;
+    */
 }
 
 std::string Session::make_delete_cookie(const std::string& name) const {

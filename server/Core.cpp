@@ -208,7 +208,8 @@ void Core::handleClientEvent(int client_fd, short events){
         std::cout <<  PINK << "readState " << readDataState << " times " <<  i <<DEF << std::endl;
         if( readDataState){
             client->setRequestReaded(true);
-            std::cout << RED << ">>>>>>>>>>>>>>\n"<<  client->getresBuffStringer() <<  DEF << std::endl; 
+            // std::cout << RED << ">>>>>>>>>>>>>>\n"<<  client->getresBuffStringer() <<  DEF << std::endl; 
+            std::cout << RED << ">>>>>>>>>>>>>>\n"<<  client->getRequest() <<  DEF << std::endl; 
             event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
             client->clearVectReq();
         }

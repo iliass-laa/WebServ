@@ -70,6 +70,7 @@ public:
     void setIsCGI(bool val){isCGI = val;};
     void setRequestReaded(bool);
     bool getRequestReaded(){return requestReaded;};
+    std::string getRequest() const;
     // session
     bool  handelSession();
 };

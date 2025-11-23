@@ -204,16 +204,30 @@ bool Client::handelSession(){
     std::map<std::string , std::string>::iterator obj ;
     if( (obj = cookie.find("SID")) != cookie.end() && cookie.size() > 1){
         // session exist
-        Req.cookiesIndex = theBase.updateSession(obj->first, cookie);
+        std::cout<< RED <<"[Update session]" << DEF <<std::endl;
+        return theBase.updateSession(obj->first, cookie);
+
     }else if( cookie.size() != 0){ // need to be tested  
         // new session
-        Req.cookiesIndex = theBase.newSession(cookie);
+        std::cout << RED <<"[New session]" << DEF << std::endl;
+        return theBase.newSession(cookie);
+        // std::cout << GREEN << "  cookie flag " << Req.cookiesIndex << DEF << std::endl;
+        // std::cout << RED << ">>>>>>>>>>>>>" << std::endl;
+        // for(std::map<std::string , std::string >::iterator it = cookie.begin() ; it != cookie.end() ; it++)
+        //     std::cout  << "[" + it->first + "][" + it->second + "]" << std::endl;
+        // std::cout << "<<<<<<<<<<<<<<" << DEF << std::endl;
+
     }
     else if(cookie.size() == 0)
-        Req.cookiesIndex = false;
+        return theBase.newSession(cookie);
+        // return false;
     else{
         // generate session
         ;
     }
     return false;
+}
+
+std::string Client::getRequest() const{
+    return std::string(reqBuff.begin(), reqBuff.end());
 }
