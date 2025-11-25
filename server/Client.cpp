@@ -204,9 +204,12 @@ bool Client::handelSession(){
     std::map<std::string , std::string>::iterator obj ;
     if( (obj = cookie.find("SID")) != cookie.end() && cookie.size() > 1){
         // session exist
-        std::cout<< RED <<"[Update session]" << DEF <<std::endl;
+        std::cout<< RED <<"[Update session ... cookies]" << DEF <<std::endl;
         return theBase.updateSession(obj->first, cookie);
-
+        
+    }else if( (obj = cookie.find("SID")) != cookie.end() && cookie.size() == 1){
+        std::cout<< RED <<"[Update session sid alone]" << DEF <<std::endl;
+        return theBase.updateSession(obj->first, cookie);
     }else if( cookie.size() != 0){ // need to be tested  
         // new session
         std::cout << RED <<"[New session]" << DEF << std::endl;
@@ -218,14 +221,11 @@ bool Client::handelSession(){
         // std::cout << "<<<<<<<<<<<<<<" << DEF << std::endl;
 
     }
-    else if(cookie.size() == 0)
+    else if(cookie.size() == 0){
+        std::cout << "generated session at first time visite"<< std::endl;
         return theBase.newSession(cookie);
-        // return false;
-    else{
-        // generate session
-        ;
     }
-    return false;
+    return (std::cout << "ta session a3zzy"<< std::endl,false);
 }
 
 std::string Client::getRequest() const{

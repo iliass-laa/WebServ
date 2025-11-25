@@ -186,8 +186,8 @@ void Core::handleClientEvent(int client_fd, short events){
     //             << "\n for the " <<nTime << " Times\n"
     //             << "Event ::" <<events << "\n"<<DEF;
     nTime++;
-    if (nTime == 500)
-        exit(22);
+    // if (nTime == 500)
+    //     exit(22);
     std::string stt[6] = {"READING_REQUEST", // 0
     "WAITTING_FOR_REQUEST", // 2
     "SENDING_RESPONSE", // 1
@@ -208,8 +208,8 @@ void Core::handleClientEvent(int client_fd, short events){
         std::cout <<  PINK << "readState " << readDataState << " times " <<  i <<DEF << std::endl;
         if( readDataState){
             client->setRequestReaded(true);
-            // std::cout << RED << ">>>>>>>>>>>>>>\n"<<  client->getresBuffStringer() <<  DEF << std::endl; 
-            std::cout << RED << ">>>>>>>>>>>>>>\n"<<  client->getRequest() <<  DEF << std::endl; 
+            // std::cout << PINK << ">>>>>>>>>>>>>>\n"<<  client->getresBuffStringer() <<  DEF << std::endl; 
+            // std::cout << RED << ">>>>>>>>>>>>>>\n"<<  client->getRequest() <<  DEF << std::endl; 
             event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
             client->clearVectReq();
         }
@@ -297,10 +297,23 @@ bool Core::updateSession(std::string sid, std::map<std::string, std::string>& co
 {
     Session_t* sess = sessionMaster.lookup_session(sid);
     if(NULL == sess){
-        return false;
+        std::cout << "had sid mkynch akhouya hhhhh destroyeh mn lbrowser" << std::endl ;
+        cookies.clear();
+
+        // std::pair<std::string , std::string> p0("Max-Age","0");
+        std::pair<std::string , std::string> p1("SID","");
+        std::pair<std::string , std::string> p2("Path","/");
+        std::pair<std::string , std::string> p3("Expires","Mon, 24 Nov 1970 10:00:00 GMT");
+        //Expires=Mon, 24 Nov 1970 10:00:00 GMT
+        cookies.insert(p1);
+        // cookies.insert(p0);
+        cookies.insert(p3);
+        cookies.insert(p2);
+        return true;
     }else{
         // update session
         (void)cookies;
+        std::cout << "maderna walo" << std::endl ;
         // std::string newSid = regenerate_session(sid);
     }
     return false;
@@ -313,8 +326,10 @@ bool Core::newSession( std::map<std::string, std::string>& cookies)
     std::string newSid ;
     if( (newSid = sessionMaster.create_session(cookies)).size() != 0 ) { // set up session varaiable 
         std::pair<std::string, std::string > sid("SID", newSid);
-        cookies.insert(cookies.begin() , sid);
-        return true;
+        cookies.insert(sid);
+        std::pair<std::string, std::string > sid1("Path", "/");
+        cookies.insert(sid1);
+        return (std::cout <<"sid generated successfuly !!" << std::endl, true);
     }else{
         cookies.clear();
         return false;
