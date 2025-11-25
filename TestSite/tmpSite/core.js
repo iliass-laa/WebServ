@@ -28,7 +28,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
      const aaa = document.getElementById("aaa");
     aaa.addEventListener("click", ()=>{
-        fetch("/cgi-bin/aaa")
+        fetch("/cgi-bin/sendVidPhp.php")
     })
     
     // PHP Script Button

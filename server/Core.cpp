@@ -178,15 +178,15 @@ Client* Core::isCgi(int fd_cgi){
 }
 
 //***************HANDEL**CLIENT**EVENT********************************************************************
-int nTime;
+// int nTime;
 int i = 0;
 void Core::handleClientEvent(int client_fd, short events){
     // std::cout << RED << "Client :" << client_fd 
     //             << "\n for the " <<nTime << " Times\n"
     //             << "Event ::" <<events << "\n"<<DEF;
-    nTime++;
-    if (nTime == 500)
-        exit(22);
+    // nTime++;
+    // if (nTime == 500)
+    //     exit(22);
     std::string stt[6] = {"READING_REQUEST", // 0
     "WAITTING_FOR_REQUEST", // 2
     "SENDING_RESPONSE", // 1
