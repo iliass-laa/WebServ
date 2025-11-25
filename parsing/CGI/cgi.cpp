@@ -31,29 +31,46 @@ cgiHandling::~cgiHandling (){}
 
 void cgiHandling::childStart(BaseNode *root,  HttpRequest &req)
 {
-    std::string  scriptOutPut;
+    std::string  scriptOutPut, postStrBody;
+    std::vector <char> postBody;
     char buff[1024];
     int rd, execRet;
+
+    
+    // int index = 0;
     close(sv[1]);
     std::cout << PINK <<"ALLOOO FROM THE CHILD\n"<<DEF;
     std::cout << PINK <<"FDS sv[0]:" << sv[0] << ", sv[1]:"<< sv[1]<<"\n"<<DEF;
     std::cout << PINK <<"SCRIPTFULL PATH" << scriptFullPath<<"\n"<<DEF;
-    if (!req.method.compare("POST"))
-        std::cout << "FROM CGI it's a POST :: \n";
-    if (!req.method.compare("GET"))
-        std::cout << "FROM CGI it's a GET :: \n";
     rd = 1;
-    if (!req.method.compare("POST"))
-    {
-    while (rd)
-        {
-            std::cout << "trying to read \n";
-            rd = read(sv[0], buff, 1024 - 1);
-            buff[rd] = '\0';
-            std::cout << buff << "<<\n";
-        }
-    }
+    // if (!req.method.compare("POST"))
+    // {
+    //     while (rd)
+    //     {
+    //         std::cout << "trying to read \n";
+    //         rd = read(sv[0], buff, 1024 - 1);
+    //         if (rd < 0)
+    //         {
+    //             int error = errno;
+    //             std::cerr << "Read return Negative\n" << strerror(error)<< std::endl ;
 
+    //             break ;
+    //         }
+    //         buff[rd] = '\0';
+    //         // std::cout << buff << "<<\n";
+    //         postStrBody.append(buff);
+    //     }
+    // }
+    // if (postStrBody.length())
+    // {
+    //     std::cerr << PINK 
+    //             << "\n/*******strBody of A Post******/\n"
+    //             <<  postStrBody 
+    //             << "\n/****************/\n"
+    //             << DEF;
+    // }
+    (void)rd;
+    (void)buff;
     // getFullScriptPath(root, req);
       std::cout<< GREEN
              <<"===============\n"
@@ -61,6 +78,8 @@ void cgiHandling::childStart(BaseNode *root,  HttpRequest &req)
             <<"==============\n"<<DEF;
     getEnvVars(req);
     close(1);
+    dup(sv[0]);
+    close(0);
     dup(sv[0]);
     std::vector<char*> tmpArgs;
     tmpArgs.push_back(const_cast<char*>(scriptFullPath.c_str()));  // argv[0] = script name
@@ -70,9 +89,8 @@ void cgiHandling::childStart(BaseNode *root,  HttpRequest &req)
     execRet = execve(scriptFullPath.c_str(), &tmpArgs[0], &Env[0]);
     close(sv[0]);
     std::cerr << PINK <<"CHILD exits by Failure ! code :" << execRet << "\n"<<DEF;
-    exit(010);
+    exit(1);
     (void)root;
-    (void)req;
 }
 
 void cgiHandling::setClient(Client *val){cl = val;}
@@ -120,6 +138,15 @@ int cgiHandling::handelCGI(BaseNode *root, HttpRequest &req)
     }
     if (childPID == 0)
         childStart(root, req);
+    else
+    {
+        std::string msgBody(req.body.begin(), req.body.end());
+        if (req.method.compare("POST") == 0)
+        {
+            write(sv[1], msgBody.c_str() , msgBody.size());            
+            // shutdown(sv[1], SHUT_WR);
+        }
+    }
     close(sv[0]);
     return sv[1];
 }
@@ -131,7 +158,9 @@ void cgiHandling::buildProperReponse(std::vector <char>& respoBuff)
     std::ostringstream responseStream;
     
     separatorPos =  strRespo.find("\n\n");
-    if (strRespo.compare(0 , 13, nessecaryHeader) && separatorPos > 13 && separatorPos < strRespo.length() - 2)
+    // if ()
+
+    if (separatorPos == std::string::npos || ( strRespo.compare(0 , 13, nessecaryHeader) && separatorPos > 13 && separatorPos < strRespo.length() - 2))
     {
         respoBuff = buildErrorResponse(500);
         return;
@@ -188,7 +217,8 @@ int cgiHandling::generateResponse(int sv, std::vector <char> &respoBuff)
         }
     }
 
-    std::cout << "Response Readed from the child CGI :\n";            
+    // std::cout << "Response Readed from the child CGI :\n";
+    //         printVecChar(respoBuff);            
     std::cout << "Now Generating a proper one :\n";            
     buildProperReponse(respoBuff);
     // printVecChar(respoBuff);
@@ -203,9 +233,9 @@ void cgiHandling::getFullScriptPath(BaseNode *root, HttpRequest &req)
     std::string hostFound = it->second;
     fillReqStruct(root, obj, req.uri, req.headers.at("Host") );
     scriptFullPath = obj.getRoot() + req.uri;
-    std::cout <<"===============\n"
-            << scriptFullPath << "\n"
-            <<"==============\n";
+    // std::cout <<"===============\n"
+    //         << scriptFullPath << "\n"
+    //         <<"==============\n";
     // p = obj.getRoot() + req.uri;
     // (void)p;
 }

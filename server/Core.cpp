@@ -97,7 +97,6 @@ void    Core::handelCgiResponce(int fd, short events, Client* client){
     client->setRequestReaded(true);
     event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
 
-
     std::cout << YELLOW<<"CGI ::AFTER WRITING DATA  \n"<< DEF;
     event_loop.removeSocket(fd);
     std::map<int, Client*> :: iterator it  = cgi.find(fd) ;
