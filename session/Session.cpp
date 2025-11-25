@@ -1,14 +1,5 @@
 #include "Session.hpp"
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sstream>
-#include <iomanip>
-#include <errno.h>
-#include <string.h>
-#include <vector>
-#include <stdio.h>
-#include <time.h>
+
 
 // Constructor
 Session::Session(unsigned int ttl_seconds)
@@ -54,7 +45,7 @@ std::string Session::gen_sid_hex() {
     return ss.str();
 }
 
-std::string Session::create_session() {
+std::string Session::create_session(std::map<std::string, std::string>& cookies) {
     std::string sid;
     // ensure uniqueness (loop a few times)
     for (int tries = 0; tries < 5; ++tries) {
@@ -70,6 +61,7 @@ std::string Session::create_session() {
     s.created = t;
     s.lastAccess = t;
     s.expirey = t + ttl;
+    s.data = cookies;
     sessions[sid] = s;
     return sid;
 }
@@ -139,6 +131,15 @@ std::string Session::make_set_cookie(const std::string& sid, unsigned int max_ag
     s << "; HttpOnly";
     s << "; SameSite=Lax";
     return s.str();
+
+    /*
+    SID=value;
+    Path=/";
+    Max-Age=max_age;
+    Expires=exp;
+    HttpOnly ;
+    SameSite=Lax;
+    */
 }
 
 std::string Session::make_delete_cookie(const std::string& name) const {

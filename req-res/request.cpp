@@ -1,4 +1,5 @@
 #include "request.hpp"
+#include "../server/Client.hpp"
 std::vector<char> buildErrorResponse(int status) {
     int code;
     std::string reason;
@@ -280,6 +281,7 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
             parseCookies(Req.headers["Cookie"], Req.cookies);
             Req.cookiesIndex = true;
             //implement funct fettah
+            Req.cookiesIndex = Req.thisClient->handelSession();
         }
         Req.headerParsed = true;
     }

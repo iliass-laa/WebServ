@@ -21,6 +21,7 @@ Client::Client(int fd,BaseNode* cnf, Core& core)
     Req.isChunked = false;
     Req.cookiesIndex = false;
     Req.headerEndPos = 0;
+    Req.thisClient = this;
 }
 
 Client::~Client() {
@@ -90,7 +91,7 @@ bool Client::readData(){
         }
         if(checkReq == COMPLETE || checkReq == COMPLETEDEF)
             return true;
-        return false;
+        return ((std::cout << RED <<"exit read here" << DEF<< std::endl),false);
     }
     else if (bytes <= 0){
         std::cout << "bytes readed " << bytes << std::endl;
@@ -183,3 +184,50 @@ void Client::clearReqStruct(){
     Req.headerParsed = false;
 }
 
+
+
+
+bool Client::handelSession(){
+    
+    // Approch of handling Session per client
+    /*
+        check is cookies exist on req , use boolean 
+            check for SID  = exist 
+                update session or remove it , regenerate new SID
+            check for SID  = not found
+                create new session generate new SID
+        update (clear or fill ) cookie vector + SID cookie
+        update boolean
+    */
+    // bool state;
+    std::map<std::string ,std::string>& cookie = Req.cookies; 
+    std::map<std::string , std::string>::iterator obj ;
+    if( (obj = cookie.find("SID")) != cookie.end() && cookie.size() > 1){
+        // session exist
+        std::cout<< RED <<"[Update session]" << DEF <<std::endl;
+        return theBase.updateSession(obj->first, cookie);
+
+    }else if( cookie.size() != 0){ // need to be tested  
+        // new session
+        std::cout << RED <<"[New session]" << DEF << std::endl;
+        return theBase.newSession(cookie);
+        // std::cout << GREEN << "  cookie flag " << Req.cookiesIndex << DEF << std::endl;
+        // std::cout << RED << ">>>>>>>>>>>>>" << std::endl;
+        // for(std::map<std::string , std::string >::iterator it = cookie.begin() ; it != cookie.end() ; it++)
+        //     std::cout  << "[" + it->first + "][" + it->second + "]" << std::endl;
+        // std::cout << "<<<<<<<<<<<<<<" << DEF << std::endl;
+
+    }
+    else if(cookie.size() == 0)
+        return theBase.newSession(cookie);
+        // return false;
+    else{
+        // generate session
+        ;
+    }
+    return false;
+}
+
+std::string Client::getRequest() const{
+    return std::string(reqBuff.begin(), reqBuff.end());
+}

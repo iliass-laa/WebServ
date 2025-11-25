@@ -1,15 +1,9 @@
 #pragma once
 #include "../headers/webserver.hpp"
 #include "../../req-res/response.hpp"
-#include "../../server/HttpRequest.hpp"
-// #include "../../server/Client.hpp"
-
 #define BUFFER_SIZE 4096
 
-
-// struct HttpRequest;
 class Client;
-
 class cgiHandling
 {
     DirectoryListing locationConfig;

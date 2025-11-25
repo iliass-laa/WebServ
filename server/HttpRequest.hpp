@@ -2,6 +2,7 @@
 
 #include "../parsing/headers/includes.hpp"
 
+class Client;
 struct HttpRequest {
     std::string method;
     std::string uri;
@@ -16,4 +17,5 @@ struct HttpRequest {
     bool   cookiesIndex;
     std::map<std::string, std::string> cookies;
     size_t maxBodySize;
+    Client *thisClient;
 };

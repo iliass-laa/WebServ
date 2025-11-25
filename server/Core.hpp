@@ -4,6 +4,7 @@
 #include"Client.hpp"
 #include"EventLoop.hpp"
 #include"../parsing/headers/webserver.hpp"
+#include"../session/Session.hpp"
 #include<vector>
 #include<set>
 #include<map>
@@ -12,7 +13,6 @@
 
 
 class ConfigFileError;
-// #include"../parsing/headers/AST.hpp"
 class BaseNode;
 class Client;
 
@@ -21,6 +21,7 @@ class Core {
         std::vector<Socket*> servers;
         std::map<int, Client*> clients;
         std::map<int, Client*> cgi;
+        Session sessionMaster;
         EventLoop event_loop;
         bool running;
         BaseNode* root;
@@ -50,6 +51,13 @@ class Core {
         void stop();
         void setPairs(std::set<std::string>&);
         void setCGI_FD(int , Client *);
+
+        // session handel
+        // std::string updateSession(std::string); 
+        bool updateSession(std::string , std::map<std::string, std::string>& );
+        bool newSession( std::map<std::string, std::string>& );
+
+
 };
 
 #endif

@@ -3,9 +3,10 @@
 #include<string>
 #include<iostream>
 #include<vector>
+#include<utility>
 #include <sys/socket.h>
 #include "../req-res/request.hpp"
-#include "../parsing/headers/webserver.hpp"
+// #include "../parsing/headers/webserver.hpp"
 #include "Core.hpp"
 #include "HttpRequest.hpp"
 #include "../parsing/CGI/cgi.hpp"
@@ -13,8 +14,8 @@
 
 class BaseNode;
 class Core;
-class cgiHandling;
-
+// class cgiHandling;
+// class HttpRequest;
 
 
 typedef enum clientState {
@@ -25,6 +26,7 @@ typedef enum clientState {
     INACTIVE,
     WAITTING,
 } cState;
+
 class Client {
 private:
     BaseNode* root;
@@ -68,5 +70,8 @@ public:
     void setIsCGI(bool val){isCGI = val;};
     void setRequestReaded(bool);
     bool getRequestReaded(){return requestReaded;};
+    std::string getRequest() const;
+    // session
+    bool  handelSession();
 };
 #endif // CLIENT_HPP

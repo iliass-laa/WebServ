@@ -2,6 +2,17 @@
 
 #include<string>
 #include<map>
+#include<ctime>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sstream>
+#include <iomanip>
+#include <errno.h>
+#include <string.h>
+#include <vector>
+#include <stdio.h>
+#include <time.h>
 // #include<string>
 
 typedef struct Session_strct {
@@ -25,7 +36,7 @@ class Session{
         Session(unsigned int ttl_seconds = 3600); // 1 hour default
 
         // Create a new session and return its ID
-        std::string create_session();
+        std::string create_session(std::map<std::string, std::string>&);
 
         // Lookup session by id. Returns pointer to Session or NULL if not found/expired.
         // If found, updates last_access and extends expires_at (sliding ttl).

@@ -1,0 +1,137 @@
+ * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Lato', 'Roboto', sans-serif;
+            background-color: #0a0a23;
+            color: #f5f6f7;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: #1b1b32;
+            padding: 40px 50px;
+            border-radius: 0;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            color: #f5f6f7;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .logo p {
+            color: #858591;
+            font-size: 16px;
+        }
+        
+        h2 {
+            color: #f5f6f7;
+            margin-bottom: 25px;
+            font-size: 22px;
+            font-weight: 400;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #f5f6f7;
+            font-size: 16px;
+            font-weight: 400;
+        }
+        
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #2a2a40;
+            background-color: #2a2a40;
+            color: #f5f6f7;
+            border-radius: 0;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #3b3b4f;
+            background-color: #3b3b4f;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #feac32;
+            color: #0a0a23;
+            border: none;
+            border-radius: 0;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #ffbf47;
+        }
+        
+        button:active {
+            background-color: #f89e1b;
+        }
+        
+        .links {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .links a {
+            color: #99c9ff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .links a:hover {
+            text-decoration: underline;
+        }
+        
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 0;
+            display: none;
+            font-size: 14px;
+        }
+        
+        .response.success {
+            background-color: #00471b;
+            color: #afffcb;
+            border: 1px solid #00471b;
+        }
+        
+        .response.error {
+            background-color: #4b1818;
+            color: #ffadad;
+            border: 1px solid #4b1818;
+        }

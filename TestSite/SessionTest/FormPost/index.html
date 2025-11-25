@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - freeCodeCamp</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script type="text/javascript" src="index.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>WebWhat</h1>
+            <p>Build With Love.</p>
+        </div>
+        
+        <h2>Sign in to your account</h2>
+        
+        <form id="loginForm" method="POST" action="http://localhost:8088">
+            <div class="form-group">
+                <label for="username">Username or Email</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <button type="submit">Sign In</button>
+        </form>
+        
+        <div class="links">
+            <a href="#">Forgot password?</a>
+        </div>
+        
+        <div id="response" class="response"></div>
+    </div>
+</body>
+</html>
