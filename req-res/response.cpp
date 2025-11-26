@@ -115,6 +115,7 @@ std::string getContentType(const std::string &path)
 
 int buildFileResponse(std::string path, std::vector<char> &responseBuffer, const HttpRequest &Req)
 {
+    (void)Req;
     std::ifstream file(path.c_str(), std::ios::binary);
     if (!file)
         return 1;

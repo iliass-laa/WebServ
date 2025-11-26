@@ -54,8 +54,8 @@ class Core {
 
         // session handel
         // std::string updateSession(std::string); 
-        bool checkSession(std::string , std::map<std::string, std::string>& );
-        void    findSID(Client&);
+        bool checkSession(std::string );
+        void    findSID(Client*);
 
 };
 

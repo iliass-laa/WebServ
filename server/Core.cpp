@@ -268,7 +268,7 @@ void Core::addToEventLoop(int newFd)
 /**************************SESSION***************** */
 /************************************************** */
 
-bool Core::checkSession(std::string sid, std::map<std::string, std::string>& cookies)
+bool Core::checkSession(std::string sid)
 {
     Session_t* sess = sessionMaster.lookup_session(sid);
     if(NULL == sess)
@@ -277,11 +277,11 @@ bool Core::checkSession(std::string sid, std::map<std::string, std::string>& coo
 }
 
 
-void Core::findSID(Client& cl){
-    std::string tmpRespo = cl.getresBuffStringer();
-    int pos ;
+void Core::findSID(Client* cl){
+    std::string tmpRespo = cl->getresBuffStringer();
+    std::string::size_type pos ;
     if( (pos= tmpRespo.find("SID=")) != std::string::npos ){
-        int lastSid;
+        std::string::size_type lastSid;
         if( (lastSid = tmpRespo.find_first_of(' ')) != std::string::npos){
             std::string sidCookie = tmpRespo.substr(pos + 4 , (lastSid - pos + 4));
             sessionMaster.create_session(sidCookie);
