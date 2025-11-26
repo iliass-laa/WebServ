@@ -100,6 +100,7 @@ void    Core::handelCgiResponce(int fd, short events, Client* client){
     client->setRequestReaded(true);
     event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
     // check the Vec char for the gen SID (set-Cookie) and add it to session ids map
+    findSID(client);
 
     std::cout << YELLOW<<"CGI ::AFTER WRITING DATA  \n"<< DEF;
     event_loop.removeSocket(fd);
@@ -267,45 +268,24 @@ void Core::addToEventLoop(int newFd)
 /**************************SESSION***************** */
 /************************************************** */
 
-bool Core::updateSession(std::string sid, std::map<std::string, std::string>& cookies)
+bool Core::checkSession(std::string sid, std::map<std::string, std::string>& cookies)
 {
     Session_t* sess = sessionMaster.lookup_session(sid);
-    if(NULL == sess){
-        std::cout << "had sid mkynch akhouya hhhhh destroyeh mn lbrowser" << std::endl ;
-        cookies.clear();
-
-        // std::pair<std::string , std::string> p0("Max-Age","0");
-        std::pair<std::string , std::string> p1("SID","");
-        std::pair<std::string , std::string> p2("Path","/");
-        std::pair<std::string , std::string> p3("Expires","Mon, 24 Nov 1970 10:00:00 GMT");
-        //Expires=Mon, 24 Nov 1970 10:00:00 GMT
-        cookies.insert(p1);
-        // cookies.insert(p0);
-        cookies.insert(p3);
-        cookies.insert(p2);
-        return true;
-    }else{
-        // update session
-        (void)cookies;
-        std::cout << "maderna walo" << std::endl ;
-        // std::string newSid = regenerate_session(sid);
-    }
-    return false;
+    if(NULL == sess)
+        return false;
+    return true;
 }
 
 
-bool Core::newSession( std::map<std::string, std::string>& cookies)
-{
-    // new session
-    std::string newSid ;
-    if( (newSid = sessionMaster.create_session(cookies)).size() != 0 ) { // set up session varaiable 
-        std::pair<std::string, std::string > sid("SID", newSid);
-        cookies.insert(sid);
-        std::pair<std::string, std::string > sid1("Path", "/");
-        cookies.insert(sid1);
-        return (std::cout << "sid generated successfuly !!" << std::endl, true);
-    }else{
-        cookies.clear();
-        return false;
+void Core::findSID(Client& cl){
+    std::string tmpRespo = cl.getresBuffStringer();
+    int pos ;
+    if( (pos= tmpRespo.find("SID=")) != std::string::npos ){
+        int lastSid;
+        if( (lastSid = tmpRespo.find_first_of(' ')) != std::string::npos){
+            std::string sidCookie = tmpRespo.substr(pos + 4 , (lastSid - pos + 4));
+            sessionMaster.create_session(sidCookie);
+            std::cout << "sid >>>>"  << sidCookie << std::endl;
+        }
     }
 }

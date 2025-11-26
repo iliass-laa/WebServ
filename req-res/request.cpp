@@ -281,11 +281,15 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
             parseCookies(Req.headers["Cookie"], Req.cookies);
             Req.cookiesIndex = true;
             //implement funct fettah
-            Req.cookiesIndex = Req.thisClient->handelSession();
-            std::cout << "after session handel" <<Req.cookiesIndex << std::endl;
+            Req.thisClient->handelSession();
         }else {
-            Req.cookiesIndex = Req.thisClient->handelSession();
+            // no cookies at all , means invalid session 
+            std::pair<std::string , std::string > header("valid","no");
+            Req.headers.insert(header);
+            Req.cookies.clear();
         }
+        Req.cookiesIndex = false;
+        Req.cookies.clear();
         Req.headerParsed = true;
     }
     if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) > Req.maxBodySize)
