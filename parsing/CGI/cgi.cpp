@@ -169,17 +169,17 @@ void cgiHandling::buildProperReponse(std::vector <char>& respoBuff)
     {
         contLength = respoBuff.size();
         // strRespo = successLine+ "Server: WebServer\r\n" + strRespo;
-        if (contLength < GIGABYTE)
-        {   
-            contLength = contLength - (separatorPos + 2);
-            responseStream << successLine
-                            << "Content-Length: " << contLength << "\r\n";
-            respoHeaders = responseStream.str();   
-            strRespo = respoHeaders + strRespo;
+        // if (contLength < GIGABYTE)
+        // {   
+        contLength = contLength - (separatorPos + 2);
+        responseStream << successLine
+                        << "Content-Length: " << contLength << "\r\n";
+        respoHeaders = responseStream.str();   
+        strRespo = respoHeaders + strRespo;
 
-        }
-        else
-            sendChuckedResponse_CGI();
+        // }
+        // else
+        //     sendChuckedResponse_CGI();
         std::vector <char> tmp(strRespo.begin(), strRespo.end());
         respoBuff = tmp;
     }

@@ -99,6 +99,7 @@ void    Core::handelCgiResponce(int fd, short events, Client* client){
     }
     client->setRequestReaded(true);
     event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
+    // check the Vec char for the gen SID (set-Cookie) and add it to session ids map
 
     std::cout << YELLOW<<"CGI ::AFTER WRITING DATA  \n"<< DEF;
     event_loop.removeSocket(fd);

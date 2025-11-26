@@ -13,7 +13,7 @@ import (
 func main() {
     const BS = 1024
     buf := make([]byte, BS)
-    fmt.Println("Content-Type: text/html\n\n")
+    fmt.Println("Content-Type: text/html\n")
     for {
         n, err := os.Stdin.Read(buf)
         if n > 0 {
