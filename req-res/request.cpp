@@ -103,12 +103,12 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
         std::cout << "Connection Not found \n";
     if (it == Req.headers.end() || Req.headers.at("Connection") == "close")
     { 
-        std::cout<< GREEN <<"AAALLO\n" << DEF;
+        // std::cout<< GREEN <<"AAALLO\n" << DEF;
         return COMPLETE;
     }
     else
     {
-        std::cout<< GREEN <<"WAAALLO\n" << DEF;
+        // std::cout<< GREEN <<"WAAALLO\n" << DEF;
         return COMPLETEDEF; 
     }
 }
@@ -281,8 +281,15 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
             parseCookies(Req.headers["Cookie"], Req.cookies);
             Req.cookiesIndex = true;
             //implement funct fettah
-            Req.cookiesIndex = Req.thisClient->handelSession();
+            Req.thisClient->handelSession();
+        }else {
+            // no cookies at all , means invalid session 
+            std::pair<std::string , std::string > header("valid","no");
+            Req.headers.insert(header);
+            Req.cookies.clear();
         }
+        Req.cookiesIndex = false;
+        Req.cookies.clear();
         Req.headerParsed = true;
     }
     if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) > Req.maxBodySize)

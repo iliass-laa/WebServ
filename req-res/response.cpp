@@ -128,12 +128,12 @@ int buildFileResponse(std::string path, std::vector<char> &responseBuffer, const
     responseStream << "HTTP/1.1 200 OK\r\n";
     responseStream << "Content-Length: " << size << "\r\n";
     responseStream << "Content-Type: " << getContentType(path) << "\r\n";
-    if (Req.cookiesIndex)
-    {
-        std::map<std::string, std::string>::const_iterator it;
-        for (it = Req.cookies.begin(); it != Req.cookies.end(); it++)
-            responseStream << "Set-Cookie: " << it->first << "=" << it->second << "; Path=/" << "\r\n";
-    }
+    // if (Req.cookiesIndex)
+    // {
+    //     std::map<std::string, std::string>::const_iterator it;
+    //     for (it = Req.cookies.begin(); it != Req.cookies.end(); it++)
+    //         responseStream << "Set-Cookie: " << it->first << "=" << it->second << "; Path=/" << "\r\n";
+    // }
     responseStream << "\r\n";
     std::string responseHeaders = responseStream.str();
     responseBuffer.insert(responseBuffer.end(), responseHeaders.begin(), responseHeaders.end());
