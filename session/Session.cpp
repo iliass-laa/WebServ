@@ -61,7 +61,6 @@ std::string Session::create_session(std::string sid) {
     s.created = t;
     s.lastAccess = t;
     s.expirey = t + ttl;
-    s.data = cookies;
     sessions[sid] = s;
     return sid;
 }

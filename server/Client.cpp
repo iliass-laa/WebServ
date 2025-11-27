@@ -195,11 +195,12 @@ void Client::handelSession(){
     std::map<std::string , std::string>::iterator obj ;
     if( (obj = cookie.find("SID")) != cookie.end() ){
         // session exist on req map
-        if(theBase.checkSession(obj->first, cookie))
-            Req.headers.insert(std::pair("valid","yes"));
+        if(theBase.checkSession(obj->first)){
+            Req.headers.insert(std::pair<std::string, std::string>("valid","yes"));
             return ;
+        }
     } 
-    Req.headers.insert(std::pair("valid","no"));
+    Req.headers.insert(std::pair<std::string, std::string>("valid","no"));
     return;
 }
 
