@@ -211,14 +211,21 @@ int buildAutoIndexResponse(const std::string &directoryPath, const std::string &
 void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)
 {
     DirectoryListing locationConfig;
-    // std::map
-
+    
+    std::map <std::string , std::string> ::const_iterator it;
     try{
-        fillReqStruct(ConfigNode, locationConfig, Req.uri, Req.headers.at("Host"));
+        it = Req.headers.find("Host");
+        if (it != Req.headers.end())
+            fillReqStruct(ConfigNode, locationConfig, Req.uri, Req.headers.at("Host"));
+        else{
+            std::cerr << "No Host Found While Building a Get Response for this URI :" 
+                    << Req.uri 
+                    <<std::endl;
+        }
     }
     catch (std::exception &e)
     {
-        std::cout << "==> Caugth this exception:" << e.what() << "\n";
+        std::cout << "==>'Get Response' Caugth this exception:" << e.what() << "\n";
     }
     std::vector<std::string> allowedMethods = locationConfig.getAllowedMethods();
     if (std::find(allowedMethods.begin(), allowedMethods.end(), "GET") == allowedMethods.end())

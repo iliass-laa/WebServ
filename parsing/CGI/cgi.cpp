@@ -151,17 +151,49 @@ int cgiHandling::handelCGI(BaseNode *root, HttpRequest &req)
     return sv[1];
 }
 
+bool validHeaders(std::string str, std::size_t pos)
+{
+    std::string line ,   nessecaryHeader("Content-Type:");
+    std::size_t np,semipos, index;
+    index = 0;
+
+    while (true)
+    {   
+        np = str.find("\n");
+        index += np;
+        if (np == std::string::npos)
+            break;
+        line = str.substr(0, np);
+        if (index == pos)
+            break;
+        semipos = line.find(":");
+        if (semipos == std::string::npos)
+        {
+            std::cout << "this line don't have a ':' ::" << line << "<<\n";
+            return false;
+        }
+        str = str.substr(np + 1, str.length());
+        index++;
+    }
+    np = line.find(nessecaryHeader);
+    std::cout << "last line:"<< line;
+    if (np != 0)
+        return false;
+    return true;
+}
+
 void cgiHandling::buildProperReponse(std::vector <char>& respoBuff)
 {
-    std::string   nessecaryHeader("Content-Type:"),successLine("HTTP/1.1 200 OK\r\n"),respoHeaders, strRespo(respoBuff.begin(), respoBuff.end());
+    std::string successLine("HTTP/1.1 200 OK\r\n"),respoHeaders, strRespo(respoBuff.begin(), respoBuff.end());
     std::size_t separatorPos, contLength;
     std::ostringstream responseStream;
     
     separatorPos =  strRespo.find("\n\n");
-    // if ()
 
-    if (separatorPos == std::string::npos || ( strRespo.compare(0 , 13, nessecaryHeader) && separatorPos > 13 && separatorPos < strRespo.length() - 2))
-    {
+    if (separatorPos == std::string::npos || !validHeaders(strRespo, separatorPos))
+    {   
+        std::cerr << CYAN << strRespo <<"\n"<< DEF ;
+
         respoBuff = buildErrorResponse(500);
         return;
     }
@@ -171,11 +203,11 @@ void cgiHandling::buildProperReponse(std::vector <char>& respoBuff)
         // strRespo = successLine+ "Server: WebServer\r\n" + strRespo;
         // if (contLength < GIGABYTE)
         // {   
-        contLength = contLength - (separatorPos + 2);
-        responseStream << successLine
-                        << "Content-Length: " << contLength << "\r\n";
-        respoHeaders = responseStream.str();   
-        strRespo = respoHeaders + strRespo;
+                contLength = contLength - (separatorPos + 2);
+                responseStream << successLine
+                                << "Content-Length: " << contLength << "\r\n";
+                respoHeaders = responseStream.str();   
+                strRespo = respoHeaders + strRespo;
 
         // }
         // else

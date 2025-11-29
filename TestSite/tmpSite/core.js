@@ -3,7 +3,24 @@ window.addEventListener("DOMContentLoaded", () => {
     
     // ========== CGI Button Handlers ==========
     
-     // ======= Cookie Btn Check:
+     
+    
+    
+    // __________Log In __________ //
+    // const LogInBtn = document.getElementById("LogIn");
+
+    // LogInBtn.addEventListener("click", ()=>{
+    //     fetch("/cgi-bin/logIn")
+    //     .then(response =>response.text())
+    //     .catch(err => {
+    //         console.log(err)
+    //     })
+    // })
+
+    // ======= Cookie Btn Check:
+
+
+
 
     const CookieBtn = document.getElementById("checkCookie");
     const OutputOfCookieCheck =document.getElementById("outputCookie");
@@ -26,9 +43,18 @@ window.addEventListener("DOMContentLoaded", () => {
     })
     
 
-     const aaa = document.getElementById("aaa");
-    aaa.addEventListener("click", ()=>{
-        fetch("/cgi-bin/sendVidPhp.php")
+    // const showInfo = document.getElementById("showInfo");
+    // showInfo.addEventListener("click", ()=>{
+    //     fetch("/cgi-bin/printinfo")
+    // //     const response = await fetch("/cgi-bin/printinfo");
+    // // const data = await response.text();
+    // // alert(data);
+    // })
+
+    showInfo.addEventListener("click", async () => {
+    const response = await fetch("/cgi-bin/printInfo");
+    const data = await response.text();
+    alert(data);
     })
     
     // PHP Script Button
@@ -107,7 +133,7 @@ window.addEventListener("DOMContentLoaded", () => {
         formData.append('age', age);
         
         // fetch('/cgi-bin/prog', {
-        fetch('/cgi-bin/goTest', {
+        fetch('/cgi-bin/auth', {
             method: 'POST',
             body: formData
         })

@@ -89,7 +89,7 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
     }
     catch (std::exception &e)
     {
-        std::cout << "==> Caugth this exception:" << e.what() << "\n";
+        std::cout << "==>'>>HandleReq<<' Caugth this exception:" << e.what() << "\n";
     }
     
     // printResponse(responseBuffer);
