@@ -25,10 +25,10 @@ func getNameValue( name , str string) string{
 func main(){
 	var msg string
 	ct_header := "Content-Type: text/html\n\n"
-	// str, i:= os.LookupEnv("HTTP_IS_LOGGED")
+	str, i:= os.LookupEnv("HTTP_IS_LOGGED")
 	cookies , j:= os.LookupEnv("HTTP_COOKIE")
 	
-	// if i && str == "true" {
+	if i && str == "true" {
 		if j {
 			// valCooki := strings.SplitN(cookie, "=",2)
 			fname := getNameValue("fname", cookies)
@@ -40,8 +40,8 @@ func main(){
 			msg = ct_header + "No infos Founded For this User!"
 			fmt.Println(msg)
 		}
-	// }else {
-	// 	msg = ct_header + "Need to log In First !"
-	// 	fmt.Println(msg)
-	// }
+	}else {
+		msg = ct_header + "Need to log In First !"
+		fmt.Println(msg)
+	}
 }
