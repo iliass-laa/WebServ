@@ -89,6 +89,15 @@ void   DirectoryListing::setMaxBodySize(size_t size)
     maxBodySize = size;
 }
 
+void replaceSpaces(std::string &uri)
+{
+    size_t pos = 0;
+    while ((pos = uri.find("%20", pos)) != std::string::npos)
+    {
+        uri.replace(pos, 3, " ");
+        pos += 1;
+    }
+}
 
 std::string getContentType(const std::string &path)
 {
@@ -100,6 +109,10 @@ std::string getContentType(const std::string &path)
         return "text/html";
     if (extension == "css")
         return "text/css";
+    if (extension == "py" || extension == "c" || extension == "cpp")
+        return "text/plain";
+    if (extension == "csv")
+        return "text/csv";
     if (extension == "js")
         return "application/javascript";
     if (extension == "png")
@@ -108,8 +121,14 @@ std::string getContentType(const std::string &path)
         return "image/jpeg";
     if (extension == "gif")
         return "image/gif";
+    if (extension == "mp4")
+        return "video/mp4";
     if (extension == "txt")
         return "text/plain";
+    if (extension == "mov")
+        return "video/quicktime";
+    if (extension == "webm")
+        return "video/webm";
     return "application/octet-stream";
 }
 
@@ -208,10 +227,13 @@ int buildAutoIndexResponse(const std::string &directoryPath, const std::string &
     return 0;
 }
 
-void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)
+void HandleGetResponse(BaseNode* ConfigNode, struct HttpRequest &Req, std::vector<char> &responseBuffer)
 {
     DirectoryListing locationConfig;
     
+    std::cout << Req.uri << std::endl;
+    replaceSpaces(Req.uri);
+    std::cout << Req.uri << std::endl;
     std::map <std::string , std::string> ::const_iterator it;
     try{
         it = Req.headers.find("Host");
@@ -260,8 +282,9 @@ void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std:
             std::vector<std::string> indexFiles = locationConfig.getIndexFile();
             for (size_t i = 0; i < indexFiles.size(); i++)
             {
-                std::string indexPath = fileSystemPath + '/' + indexFiles[i];
+                std::string indexPath = fileSystemPath + indexFiles[i];
                 pathType = checkPath(indexPath);
+                std::cout << indexPath;
                 if (S_ISREG(pathType))
                 {
                     if (!buildFileResponse(indexPath, responseBuffer, Req))
