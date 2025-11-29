@@ -231,9 +231,9 @@ void HandleGetResponse(BaseNode* ConfigNode, struct HttpRequest &Req, std::vecto
 {
     DirectoryListing locationConfig;
     
-    std::cout << Req.uri << std::endl;
+    // std::cout << Req.uri << std::endl;
     replaceSpaces(Req.uri);
-    std::cout << Req.uri << std::endl;
+    // std::cout << Req.uri << std::endl;
     std::map <std::string , std::string> ::const_iterator it;
     try{
         it = Req.headers.find("Host");

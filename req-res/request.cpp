@@ -100,7 +100,7 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
     std::map <std::string, std::string> ::iterator it;
     it= Req.headers.find("Connection");
     if (it == Req.headers.end())
-        std::cout << "Connection Not found \n";
+        std::cout << "";
     if (it == Req.headers.end() || Req.headers.at("Connection") == "close")
     { 
         // std::cout<< GREEN <<"AAALLO\n" << DEF;
@@ -220,7 +220,7 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
     std::map <std::string, std::string> ::iterator it;
     it= Req.headers.find("Connection");
     if (it == Req.headers.end())
-        std::cout << "Connection Not found \n";
+        std::cout << "";
     // std::clock_t startTime, checkTime, endTime;
     // startTime = std::clock();  
     // std::cout << GREEN<<"ParseReq\n" << DEF;
@@ -284,7 +284,7 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
             Req.thisClient->handelSession();
         }else {
             // no cookies at all , means invalid session 
-            std::pair<std::string , std::string > header("valid","no");
+            std::pair<std::string , std::string > header("is_logged","false" );
             Req.headers.insert(header);
             Req.cookies.clear();
         }

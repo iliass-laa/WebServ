@@ -85,9 +85,9 @@ void fillReqStruct(BaseNode*root, DirectoryListing &obj, std::string uri, std::s
     allowMethDef.push_back("DELETE");
     obj.setAllowedMethods(allowMethDef);
 
-    std::cout <<PINK << "URI :"<<uri
-                << "| HOST : "<< host
-                <<"\n"<<DEF ;
+    // std::cout <<PINK << "URI :"<<uri
+    //             << "| HOST : "<< host
+    //             <<"\n"<<DEF ;
 
     int iport;
     serverName = host.substr(0, host.find(":"));

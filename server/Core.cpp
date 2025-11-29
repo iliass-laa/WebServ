@@ -280,10 +280,11 @@ bool Core::checkSession(std::string sid)
 void Core::findSID(Client* cl){
     std::string tmpRespo = cl->getresBuffStringer();
     std::string::size_type pos ;
-    if( (pos= tmpRespo.find("SID=")) != std::string::npos ){
+    std::string token("session_id=");
+    if( (pos= tmpRespo.find(token )) != std::string::npos ){
         std::string::size_type lastSid;
-        if( (lastSid = tmpRespo.find_first_of(' ')) != std::string::npos){
-            std::string sidCookie = tmpRespo.substr(pos + 4 , (lastSid - pos + 4));
+        if( (lastSid = tmpRespo.find_first_of(',')) != std::string::npos){
+            std::string sidCookie = tmpRespo.substr(pos + token.size() , (lastSid - pos + token.size()));
             sessionMaster.create_session(sidCookie);
             std::cout << "sid >>>>"  << sidCookie << std::endl;
         }

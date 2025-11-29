@@ -106,7 +106,7 @@ bool Client::readData(){
 bool Client::writeData(){
 // to vector<char> of write_data
     if(requestReaded){
-        std::cout << CYAN << "Client ::About to clear Things\n"<<DEF;
+        // std::cout << CYAN << "Client ::About to clear Things\n"<<DEF;
         clearReqStruct();
         resBuffString.clear();
         resBuffString = getresBuffStringer();
@@ -193,14 +193,14 @@ void Client::handelSession(){
     // not exist => set valid=no on req.headers
     std::map<std::string ,std::string>& cookie = Req.cookies; 
     std::map<std::string , std::string>::iterator obj ;
-    if( (obj = cookie.find("SID")) != cookie.end() ){
+    if( (obj = cookie.find("session_id")) != cookie.end() ){
         // session exist on req map
         if(theBase.checkSession(obj->first)){
-            Req.headers.insert(std::pair<std::string, std::string>("valid","yes"));
+            Req.headers.insert(std::pair<std::string, std::string>("is_logged","true" ));
             return ;
         }
     } 
-    Req.headers.insert(std::pair<std::string, std::string>("valid","no"));
+    Req.headers.insert(std::pair<std::string, std::string>("is_logged","false"));
     return;
 }
 
