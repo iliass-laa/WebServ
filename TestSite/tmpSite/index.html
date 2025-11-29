@@ -58,6 +58,17 @@
         </div>
         <button type="submit" id="uploadBtn">Upload File</button>
     </form>
+    <div class="files-section">
+        <div class="section-header">
+            <h2>Uploaded Files (<span id="fileCount">0</span>)</h2>
+            <button type="button" class="delete-selected-btn" id="deleteSelectedBtn" style="display: none;">
+                Delete Selected
+            </button>
+        </div>
+        <div id="fileList" class="file-list">
+            <!-- Files will be displayed here dynamically -->
+        </div>
+    </div>
     <div id="message" class="message"></div>
     <button  id="checkCookie">Check this User</button>
     <button  id="imSaid">i am Said</button>
