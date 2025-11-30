@@ -102,7 +102,7 @@ void    Core::handelCgiResponce(int fd, short events, Client* client){
     // check the Vec char for the gen SID (set-Cookie) and add it to session ids map
     findSID(client);
 
-    std::cout << YELLOW<<"CGI ::AFTER WRITING DATA  \n"<< DEF;
+    std::cout << YELLOW<< ".......................CGI ::AFTER WRITING DATA  \n"<< DEF;
     event_loop.removeSocket(fd);
     std::map<int, Client*> :: iterator it  = cgi.find(fd) ;
     if (it != cgi.end())
@@ -199,8 +199,12 @@ void Core::handleClientEvent(int client_fd, short events){
     
     // send response
     else if(events & POLLOUT ){
-        if(client->writeData())
+        std::cout << RED << "alololololo------------------------" ;
+        printVecChar(client->getRespoBuffer() );
+        std::cout << "alololololo------------------------" << DEF;
+        if(client->writeData()){
             event_loop.updateSocketEvents(client->getFd() ,POLLIN );
+        }
     }
     
     // disconnect the client 
@@ -278,15 +282,18 @@ bool Core::checkSession(std::string sid)
 
 
 void Core::findSID(Client* cl){
+    std::cout <<  "herererererererer" << std::endl;
+      printVecChar(cl->getRespoBuffer()) ;
+    std::cout <<  "herererererererer" << std::endl;
     std::string tmpRespo = cl->getresBuffStringer();
     std::string::size_type pos ;
-    std::string token("session_id=");
+    std::string token("session-id=");
     if( (pos= tmpRespo.find(token )) != std::string::npos ){
         std::string::size_type lastSid;
-        if( (lastSid = tmpRespo.find_first_of(',')) != std::string::npos){
+        if( (lastSid = tmpRespo.find_first_of(pos + token.size() ,',')) != std::string::npos){
             std::string sidCookie = tmpRespo.substr(pos + token.size() , (lastSid - pos + token.size()));
-            sessionMaster.create_session(sidCookie);
             std::cout << "sid >>>>"  << sidCookie << std::endl;
+            sessionMaster.create_session(sidCookie);
         }
     }
 }
