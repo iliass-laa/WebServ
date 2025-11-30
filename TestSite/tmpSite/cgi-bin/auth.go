@@ -5,14 +5,24 @@ import (
 	"os"
 	"strings"
 	"github.com/google/uuid"
+	"bufio"
+	// "crypto/rand"
+    // "encoding/base64"
+    // "encoding/hex"
+
 )
-func GenerateSessionID() string {
-    return uuid.New().String()
-}
+
 type Auth struct{
 	F_name, L_name string
 	//Age int
 }
+
+
+func GenerateSessionID() string {
+    return uuid.New().String()
+}
+
+
 
 func isAlreadyLogedIn() bool{
 	res := false	
@@ -46,28 +56,24 @@ func fillStruct(usr *Auth){
 		index := strings.Index(miniStr, "fname")
 		if index >=0 {
 			usr.F_name = strings.Trim(splited[i + 2], "\n")
+			// usr.F_name = strings.Trim(usr.F_name, "\r")
+			usr.F_name = strings.TrimSpace(usr.F_name)
 		}else{
 			index = strings.Index(miniStr, "lname")
 		
 			if index >= 0{
 				usr.L_name = strings.Trim(splited[i + 2], "\n")
+				// usr.L_name = strings.Trim(usr.L_name, "\r")
+				usr.L_name = strings.TrimSpace(usr.L_name)
 
 			}
 		} 
 	}
-	fmt.Fprintf(os.Stderr, "Usr first Name:%s\n", usr.F_name)
-	fmt.Fprintf(os.Stderr, "Usr last Name:%s\n", usr.L_name)
 }
 
 func checkUser(usr Auth)bool{
 	res := false
-	usr.F_name = strings.TrimSpace(usr.F_name)
-	// usr.F_name = strings.Trim(usr.F_name, "\n")
-	usr.L_name = strings.TrimSpace(usr.L_name)
-	fmt.Fprintf (os.Stderr, "CHECK USR>>>>LNAME :%s\n", usr.L_name)
-	fmt.Fprintf (os.Stderr, "CHECK USR>>>>LNAME len:%d\n", len(usr.L_name))
 	if usr.F_name=="said" || usr.F_name == "hamid" {
-		fmt.Fprintf(os.Stderr,">>>ITS EITHER SAID OR HAMID <<\n")
 		if usr.F_name=="said" && usr.L_name == "lmachakil"{
 			res = true;
 		}
@@ -78,38 +84,30 @@ func checkUser(usr Auth)bool{
 	return res
 }
 
+
 func setCookie(s Auth) string{
 	sid := GenerateSessionID()
-	res := "Set-Cookie: session-id=" + sid+",fname="+s.F_name + ",lname=" + s.L_name
+	res := "Set-Cookie: session-id=" + sid + ",fname="+s.F_name + ",lname=" + s.L_name
 	return res 
-	// return fmt.Sprintf("Set-Cookie: session-id=%s,fname=%s,lname=%s",sid, s.F_name, s.L_name) 
-	//"Set-Cookie: " +"session-id=45" +",fname=" + s.F_name +",lname=" + s.L_name 
 }
-
 
 func main(){
 	var s Auth
+	w := bufio.NewWriter(os.Stdout)
+    defer w.Flush()
 	ct_header := "Content-Type: text/html\n\n" 
-	//var headers []string = []string{"", "Content-Type: text/html\n\n"}
 	b := isAlreadyLogedIn()
 	if b {
 		msg := ct_header + "ur Already logged In!"
 		fmt.Println(msg)
 	}else{	
 		fillStruct(&s)
-		fmt.Fprintf(os.Stderr, "F>>%s\n", s.F_name)
-		fmt.Fprintf(os.Stderr, "L>>%s\n", s.L_name)
 		if checkUser(s){
-			cookie_header := setCookie(s)
-			// cookie_header := "Set-Cookie: session-id=45,fname=said,lname=lmachakil"
-			fmt.Println(cookie_header)
-			fmt.Println(ct_header)
-			fmt.Println("Logged Successfully")
-			fmt.Fprintf(os.Stderr, "header[0]:%s\n", cookie_header)
-			fmt.Fprintf(os.Stderr, "header[1]:%s\n", ct_header)
+			cookie_header := setCookie(s)	
+			fmt.Fprintln(w, cookie_header)
+			fmt.Fprintln(w, ct_header)
+			fmt.Fprintln(w, "Logged Successfully")
 		}else{
-			fmt.Fprintf(os.Stderr, ">>>>fname ::%s\n", s.F_name)
-			fmt.Fprintf(os.Stderr, ">>>>fname ::%d\n", len(s.F_name))
 			fmt.Println(ct_header, "This User Is not Allowed!")
 		}
 	}

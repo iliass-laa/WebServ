@@ -208,6 +208,10 @@ void cgiHandling::buildProperReponse(std::vector <char>& respoBuff)
                                 << "Content-Length: " << contLength << "\r\n";
                 respoHeaders = responseStream.str();   
                 strRespo = respoHeaders + strRespo;
+                std::cout << RED <<"\n********************BUILD RIGHT RESPO ::********************\n"
+                        << strRespo
+                        <<"\n********************BUILD RIGHT RESPO ::********************\n"
+                        <<DEF;
 
         // }
         // else
@@ -221,30 +225,35 @@ int cgiHandling::generateResponse(int sv, std::vector <char> &respoBuff)
 {
     char buff[BUFFER_SIZE];
     int rd;
+    // bzero(buff, BUFFER_SIZE);
+
     // respoBuff.clear();
     while (1)
     {
         std::cout << RED << "Before ...\n ";
+        // bzero(buff, BUFFER_SIZE);
+        memset(buff, 0, BUFFER_SIZE);
+        // rd = read(sv, buff, BUFFER_SIZE - 1);
         rd = recv(sv, buff, BUFFER_SIZE - 1, 0);
         std::cout << "return :" << rd
                 << "\nAfter ...\n ";
         if (rd >=0)
         {
             buff[rd]='\0';
+            std::cout << PINK << "007>>>>>BUFF ::\n" << buff  << DEF << "\n";
             respoBuff.insert(respoBuff.end(), buff, buff + rd);
             if (rd == 0)
             {
-                std::cout << CYAN << "EOF Reached :\n"<<DEF ;
+                std::cout << CYAN << "EOF Reached :\n"
+                        << "Reslen :: " << respoBuff.size() << "\n"
+                        <<DEF ;
                 break;
             }
+            // bzero(buff, rd);
         }
         else
         {
             std::cout << ">>Errno: " << errno << " (" << strerror(errno) << ")\n";
-            if (errno== EAGAIN || errno == EWOULDBLOCK)
-            {
-                std::cout << "No data for the Moment to read\n";
-            }
             return 1;
         }
     }
