@@ -67,7 +67,7 @@ int checkTree::checkContext(BaseNode*Context, int Level)
             break;
         if (Cn->Childs[i] && Cn->Childs[i]->typeNode == isDirective)
             res = checkDirective(dynamic_cast<DirectiveNode*>(Cn->Childs[i]), Cn);
-        else if ((Cn->Childs[i]->typeNode == isContext))
+        else if (Cn->Childs[i]->typeNode == isContext)
             res = checkContext(Cn->Childs[i], Level + 1);
         if (res)
             return res;

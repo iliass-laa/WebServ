@@ -106,7 +106,7 @@ bool Client::readData(){
 bool Client::writeData(){
 // to vector<char> of write_data
     if(requestReaded){
-        std::cout << CYAN << "Client ::About to clear Things\n"<<DEF;
+        // std::cout << CYAN << "Client ::About to clear Things\n"<<DEF;
         clearReqStruct();
         resBuffString.clear();
         resBuffString = getresBuffStringer();
@@ -187,45 +187,22 @@ void Client::clearReqStruct(){
 
 
 
-bool Client::handelSession(){
-    
-    // Approch of handling Session per client
-    /*
-        check is cookies exist on req , use boolean 
-            check for SID  = exist 
-                update session or remove it , regenerate new SID
-            check for SID  = not found
-                create new session generate new SID
-        update (clear or fill ) cookie vector + SID cookie
-        update boolean
-    */
-    // bool state;
+void Client::handelSession(){
+    // check if the session id is exist in session map in core 
+    // exist => set valid=yes on req.headers
+    // not exist => set valid=no on req.headers
     std::map<std::string ,std::string>& cookie = Req.cookies; 
     std::map<std::string , std::string>::iterator obj ;
-    if( (obj = cookie.find("SID")) != cookie.end() && cookie.size() > 1){
-        // session exist
-        std::cout<< RED <<"[Update session]" << DEF <<std::endl;
-        return theBase.updateSession(obj->first, cookie);
-
-    }else if( cookie.size() != 0){ // need to be tested  
-        // new session
-        std::cout << RED <<"[New session]" << DEF << std::endl;
-        return theBase.newSession(cookie);
-        // std::cout << GREEN << "  cookie flag " << Req.cookiesIndex << DEF << std::endl;
-        // std::cout << RED << ">>>>>>>>>>>>>" << std::endl;
-        // for(std::map<std::string , std::string >::iterator it = cookie.begin() ; it != cookie.end() ; it++)
-        //     std::cout  << "[" + it->first + "][" + it->second + "]" << std::endl;
-        // std::cout << "<<<<<<<<<<<<<<" << DEF << std::endl;
-
-    }
-    else if(cookie.size() == 0)
-        return theBase.newSession(cookie);
-        // return false;
-    else{
-        // generate session
-        ;
-    }
-    return false;
+    if( (obj = cookie.find("session-id")) != cookie.end() ){
+        // session exist on req map
+        std::cout << "************* did session-id found "<< std::endl;
+        if(theBase.checkSession(obj->first)){
+            Req.headers.insert(std::pair<std::string, std::string>("is_logged","true" ));
+            return ;
+        }
+    } 
+    Req.headers.insert(std::pair<std::string, std::string>("is_logged","false"));
+    return;
 }
 
 std::string Client::getRequest() const{

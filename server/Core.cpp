@@ -70,7 +70,7 @@ void Core::run(){
 void Core::handleSocketEvent(int fd, short events){
     Client* cl = NULL;
     if(isServerSocket(fd)){
-        std::cout << "[server socket] " << fd << std::endl;
+        // std::cout << "[server socket] " << fd << std::endl;
         handleNewConnection(fd);
     }
     else if((cl = isCgi(fd))){
@@ -86,10 +86,10 @@ void    Core::handelCgiResponce(int fd, short events, Client* client){
 
     if (!(events & POLLIN))
         return;
-    std::cout << PINK << "handelCgiResponce><<< \n"
-            << "Fd i read from AS CGI:" << fd <<"\n"
-            << "events :" <<( events )<<"\n"
-            << "clFD:" << client->getFd()<<"\n";
+    // std::cout << PINK << "handelCgiResponce><<< \n"
+    //         << "Fd i read from AS CGI:" << fd <<"\n"
+    //         << "events :" <<( events )<<"\n"
+    //         << "clFD:" << client->getFd()<<"\n";
    
     int genresp = client->getCGI().generateResponse(fd, client->getRespoBuffer()); 
     if (genresp == 1)
@@ -99,9 +99,10 @@ void    Core::handelCgiResponce(int fd, short events, Client* client){
     }
     client->setRequestReaded(true);
     event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
+    // check the Vec char for the gen SID (set-Cookie) and add it to session ids map
+    findSID(client);
 
-
-    std::cout << YELLOW<<"CGI ::AFTER WRITING DATA  \n"<< DEF;
+    std::cout << YELLOW<< ".......................CGI ::AFTER WRITING DATA  \n"<< DEF;
     event_loop.removeSocket(fd);
     std::map<int, Client*> :: iterator it  = cgi.find(fd) ;
     if (it != cgi.end())
@@ -153,7 +154,7 @@ void Core::handleNewConnection(int server_fd){
         Client* cl = new Client(new_client, root, *this);
         event_loop.addSocket(new_client, POLLIN);
         clients[new_client] = cl;
-        std::cout << "\t\t[new client connected] [" << new_client << "] !!" << std::endl ;
+        // std::cout << "\t\t[new client connected] [" << new_client << "] !!" << std::endl ;
     }
     return ;
 }
@@ -179,22 +180,7 @@ Client* Core::isCgi(int fd_cgi){
 }
 
 //***************HANDEL**CLIENT**EVENT********************************************************************
-int nTime;
-int i = 0;
 void Core::handleClientEvent(int client_fd, short events){
-    // std::cout << RED << "Client :" << client_fd 
-    //             << "\n for the " <<nTime << " Times\n"
-    //             << "Event ::" <<events << "\n"<<DEF;
-    nTime++;
-    if (nTime == 500)
-        exit(22);
-    std::string stt[6] = {"READING_REQUEST", // 0
-    "WAITTING_FOR_REQUEST", // 2
-    "SENDING_RESPONSE", // 1
-    "WAITTING_FOR_RESPONSE", // 2
-    "INACTIVE",
-    "WAITTING"};
-    // retrive client from map 
     std::map<int, Client*>::iterator it = clients.find(client_fd) ;
     if(it == clients.end()){
         std::cout << "[HandelClientEvent][No Client Found]" << std::endl;
@@ -203,13 +189,9 @@ void Core::handleClientEvent(int client_fd, short events){
     Client* client = it->second;
     
     if( events & POLLIN ){
-        i++;
         int readDataState = client->readData(); 
-        std::cout <<  PINK << "readState " << readDataState << " times " <<  i <<DEF << std::endl;
         if( readDataState){
             client->setRequestReaded(true);
-            // std::cout << RED << ">>>>>>>>>>>>>>\n"<<  client->getresBuffStringer() <<  DEF << std::endl; 
-            std::cout << RED << ">>>>>>>>>>>>>>\n"<<  client->getRequest() <<  DEF << std::endl; 
             event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
             client->clearVectReq();
         }
@@ -217,19 +199,16 @@ void Core::handleClientEvent(int client_fd, short events){
     
     // send response
     else if(events & POLLOUT ){
-        if(client->writeData())
+        // std::cout << RED << "alololololo------------------------" ;
+        // printVecChar(client->getRespoBuffer() );
+        // std::cout << "alololololo------------------------" << DEF;
+        if(client->writeData()){
             event_loop.updateSocketEvents(client->getFd() ,POLLIN );
+        }
     }
     
     // disconnect the client 
-    // if ( !(client->isConnected()) || (events & (POLLERR | POLLHUP))){
     if ( !(client->isConnected())){
-        // std::cout << GREEN << "CORE :: \n"
-        //     <<"SEEMS like this client is"<< RED<<" Leaving Us  "
-        //     << GREEN<<":\n"
-        //     <<"CL Addr:" << client
-        //     << "\nCL fd :" <<client->getFd() << "\n"<<DEF;
-        // std::cout << RED << "client"<< client->getFd() <<  " lose tcp connection !!!" << DEF << std::endl;
         event_loop.removeSocket(client_fd);
         delete client;
         clients.erase(it);
@@ -293,30 +272,28 @@ void Core::addToEventLoop(int newFd)
 /**************************SESSION***************** */
 /************************************************** */
 
-bool Core::updateSession(std::string sid, std::map<std::string, std::string>& cookies)
+bool Core::checkSession(std::string sid)
 {
     Session_t* sess = sessionMaster.lookup_session(sid);
-    if(NULL == sess){
+    if(NULL == sess)
         return false;
-    }else{
-        // update session
-        (void)cookies;
-        // std::string newSid = regenerate_session(sid);
-    }
-    return false;
+    return true;
 }
 
 
-bool Core::newSession( std::map<std::string, std::string>& cookies)
-{
-    // new session
-    std::string newSid ;
-    if( (newSid = sessionMaster.create_session(cookies)).size() != 0 ) { // set up session varaiable 
-        std::pair<std::string, std::string > sid("SID", newSid);
-        cookies.insert(cookies.begin() , sid);
-        return true;
-    }else{
-        cookies.clear();
-        return false;
+void Core::findSID(Client* cl){
+    std::string tmpRespo = cl->getresBuffStringer();
+    std::string::size_type pos ;
+    std::string token("session-id=");
+    if( (pos= tmpRespo.find(token )) != std::string::npos ){
+        std::string::size_type lastSid;
+        // std::cout << ">>>>>>>>>>>>>>>>FIND SID "<<&tmpRespo[pos + token.size()] << std::endl;
+        if( (lastSid = tmpRespo.find_first_of(',' ,pos + token.size() )) != std::string::npos){
+
+            // std::cout << "lastVirgule["  << &tmpRespo[lastSid] << std::endl;
+            std::string sidCookie = tmpRespo.substr(pos + token.size() , (lastSid - token.size() - pos));
+            // std::cout <<RED<< "sid["<< ( lastSid - pos + token.size() ) << "]>>>>"  << sidCookie <<DEF<< std::endl;
+            sessionMaster.create_session(sidCookie);
+        }
     }
 }

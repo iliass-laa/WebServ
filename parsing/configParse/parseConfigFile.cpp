@@ -24,7 +24,7 @@ void printTokenz(TokenizerData &t)
         it++;
     }
     std::cout << "Those are braquets remaining  : ";
-    std::cout << t.braquets.size() <<  "\n";
+    // std::cout << t.braquets.size() <<  "\n";
     while(!t.braquets.empty())
     {
         std::cout << t.braquets.top() << "< | >";

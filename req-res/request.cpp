@@ -54,11 +54,17 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
     std::map <std::string, std::string> ::iterator it;
     it= Req.headers.find("Connection");
     if (it == Req.headers.end())
-        std::cout << "Connection Not found \n";
+        std::cout << "";
     if (it == Req.headers.end() || Req.headers.at("Connection") == "close")
+    { 
+        std::cout<< GREEN <<"AAALLO\n" << DEF;
         return COMPLETE;
+    }
     else
+    {
+        std::cout<< GREEN <<"WAAALLO\n" << DEF;
         return COMPLETEDEF; 
+    }
 }
 
 int parseChunkedBody(std::vector<char> &body) {
@@ -136,7 +142,6 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
     it= Req.headers.find("Connection");
     if (it == Req.headers.end())
         std::cout << "Connection Not found \n";
-
     if (!Req.headerParsed)
     {
         std::string requestString(requestBuffer.begin(), requestBuffer.end());
@@ -186,7 +191,9 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
         {
             parseCookies(Req.headers["Cookie"], Req.cookies);
             Req.cookiesIndex = true;
+            //implement funct fettah
             Req.cookiesIndex = Req.thisClient->handelSession();
+            //fix your shit akhay fettah o mat9issch liya lcode diali frfrf
         }
         Req.headerParsed = true;
     }

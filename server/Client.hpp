@@ -72,6 +72,6 @@ public:
     bool getRequestReaded(){return requestReaded;};
     std::string getRequest() const;
     // session
-    bool  handelSession();
+    void  handelSession();
 };
 #endif // CLIENT_HPP
