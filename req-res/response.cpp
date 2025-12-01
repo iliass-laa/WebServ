@@ -1,17 +1,12 @@
 #include "response.hpp"
 
-DirectoryListing::DirectoryListing() : hasIndexFile(false), autoIndex(false), _default(false){}
+DirectoryListing::DirectoryListing() : hasIndexFile(false), autoIndex(false){}
 
 DirectoryListing::~DirectoryListing() {}
 
 void    DirectoryListing::setRoot(const std::string &path)
 {
     root = path;
-}
-
-bool    DirectoryListing::getDefault() const
-{
-    return _default;
 }
 
 void    DirectoryListing::setAutoIndex(bool value)
@@ -61,11 +56,6 @@ void  DirectoryListing::setRedirect(std::pair <bool, std::string> rd)
     redirect = rd;
 }
 
-void   DirectoryListing::setDefault(bool value)
-{
-    _default = value;
-}
-
 void   DirectoryListing::setAllowedMethods(const std::vector<std::string> &methods)
 {
     allowedMethods = methods;
@@ -110,6 +100,10 @@ std::string getContentType(const std::string &path)
         return "image/gif";
     if (extension == "txt")
         return "text/plain";
+    if (extension == "mp4")
+        return "video/mp4";
+    if (extension == "mp3")
+        return "audio/mpeg";
     return "application/octet-stream";
 }
 
@@ -210,15 +204,10 @@ int buildAutoIndexResponse(const std::string &directoryPath, const std::string &
 void HandleGetResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std::vector<char> &responseBuffer)
 {
     DirectoryListing locationConfig;
-    // std::map
-
-    try{
+    if (Req.headers.find("Host") != Req.headers.end())
         fillReqStruct(ConfigNode, locationConfig, Req.uri, Req.headers.at("Host"));
-    }
-    catch (std::exception &e)
-    {
-        std::cout << "==> Caugth this exception:" << e.what() << "\n";
-    }
+    else
+        buildProcessResponse(responseBuffer, Req);
     std::vector<std::string> allowedMethods = locationConfig.getAllowedMethods();
     if (std::find(allowedMethods.begin(), allowedMethods.end(), "GET") == allowedMethods.end())
     {
