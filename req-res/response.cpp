@@ -240,9 +240,10 @@ void HandleGetResponse(BaseNode* ConfigNode, struct HttpRequest &Req, std::vecto
         if (it != Req.headers.end())
             fillReqStruct(ConfigNode, locationConfig, Req.uri, Req.headers.at("Host"));
         else{
-            std::cerr << "No Host Found While Building a Get Response for this URI :" 
-                    << Req.uri 
-                    <<std::endl;
+            // std::cerr << "No Host Found While Building a Get Response for this URI :" 
+            //         << Req.uri 
+            //         <<std::endl;
+            ;
         }
     }
     catch (std::exception &e)

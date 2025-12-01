@@ -193,8 +193,9 @@ void Client::handelSession(){
     // not exist => set valid=no on req.headers
     std::map<std::string ,std::string>& cookie = Req.cookies; 
     std::map<std::string , std::string>::iterator obj ;
-    if( (obj = cookie.find("session_id")) != cookie.end() ){
+    if( (obj = cookie.find("session-id")) != cookie.end() ){
         // session exist on req map
+        std::cout << "************* did session-id found "<< std::endl;
         if(theBase.checkSession(obj->first)){
             Req.headers.insert(std::pair<std::string, std::string>("is_logged","true" ));
             return ;

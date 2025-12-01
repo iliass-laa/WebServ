@@ -39,9 +39,9 @@ void cgiHandling::childStart(BaseNode *root,  HttpRequest &req)
     
     // int index = 0;
     close(sv[1]);
-    std::cout << PINK <<"ALLOOO FROM THE CHILD\n"<<DEF;
-    std::cout << PINK <<"FDS sv[0]:" << sv[0] << ", sv[1]:"<< sv[1]<<"\n"<<DEF;
-    std::cout << PINK <<"SCRIPTFULL PATH" << scriptFullPath<<"\n"<<DEF;
+    // std::cout << PINK <<"ALLOOO FROM THE CHILD\n"<<DEF;
+    // std::cout << PINK <<"FDS sv[0]:" << sv[0] << ", sv[1]:"<< sv[1]<<"\n"<<DEF;
+    // std::cout << PINK <<"SCRIPTFULL PATH" << scriptFullPath<<"\n"<<DEF;
     rd = 1;
     // if (!req.method.compare("POST"))
     // {
@@ -72,10 +72,10 @@ void cgiHandling::childStart(BaseNode *root,  HttpRequest &req)
     (void)rd;
     (void)buff;
     // getFullScriptPath(root, req);
-      std::cout<< GREEN
-             <<"===============\n"
-            << scriptFullPath << "\n"
-            <<"==============\n"<<DEF;
+    //   std::cout<< GREEN
+    //          <<"===============\n"
+    //         << scriptFullPath << "\n"
+    //         <<"==============\n"<<DEF;
     getEnvVars(req);
     close(1);
     dup(sv[0]);
@@ -176,7 +176,6 @@ bool validHeaders(std::string str, std::size_t pos)
         index++;
     }
     np = line.find(nessecaryHeader);
-    std::cout << "last line:"<< line;
     if (np != 0)
         return false;
     return true;
@@ -208,10 +207,10 @@ void cgiHandling::buildProperReponse(std::vector <char>& respoBuff)
                                 << "Content-Length: " << contLength << "\r\n";
                 respoHeaders = responseStream.str();   
                 strRespo = respoHeaders + strRespo;
-                std::cout << RED <<"\n********************BUILD RIGHT RESPO ::********************\n"
-                        << strRespo
-                        <<"\n********************BUILD RIGHT RESPO ::********************\n"
-                        <<DEF;
+                // std::cout << RED <<"\n********************BUILD RIGHT RESPO ::********************\n"
+                //         << strRespo
+                //         <<"\n********************BUILD RIGHT RESPO ::********************\n"
+                //         <<DEF;
 
         // }
         // else

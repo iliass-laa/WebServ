@@ -70,7 +70,7 @@ void Core::run(){
 void Core::handleSocketEvent(int fd, short events){
     Client* cl = NULL;
     if(isServerSocket(fd)){
-        std::cout << "[server socket] " << fd << std::endl;
+        // std::cout << "[server socket] " << fd << std::endl;
         handleNewConnection(fd);
     }
     else if((cl = isCgi(fd))){
@@ -86,10 +86,10 @@ void    Core::handelCgiResponce(int fd, short events, Client* client){
 
     if (!(events & POLLIN))
         return;
-    std::cout << PINK << "handelCgiResponce><<< \n"
-            << "Fd i read from AS CGI:" << fd <<"\n"
-            << "events :" <<( events )<<"\n"
-            << "clFD:" << client->getFd()<<"\n";
+    // std::cout << PINK << "handelCgiResponce><<< \n"
+    //         << "Fd i read from AS CGI:" << fd <<"\n"
+    //         << "events :" <<( events )<<"\n"
+    //         << "clFD:" << client->getFd()<<"\n";
    
     int genresp = client->getCGI().generateResponse(fd, client->getRespoBuffer()); 
     if (genresp == 1)
@@ -154,7 +154,7 @@ void Core::handleNewConnection(int server_fd){
         Client* cl = new Client(new_client, root, *this);
         event_loop.addSocket(new_client, POLLIN);
         clients[new_client] = cl;
-        std::cout << "\t\t[new client connected] [" << new_client << "] !!" << std::endl ;
+        // std::cout << "\t\t[new client connected] [" << new_client << "] !!" << std::endl ;
     }
     return ;
 }
@@ -199,9 +199,9 @@ void Core::handleClientEvent(int client_fd, short events){
     
     // send response
     else if(events & POLLOUT ){
-        std::cout << RED << "alololololo------------------------" ;
-        printVecChar(client->getRespoBuffer() );
-        std::cout << "alololololo------------------------" << DEF;
+        // std::cout << RED << "alololololo------------------------" ;
+        // printVecChar(client->getRespoBuffer() );
+        // std::cout << "alololololo------------------------" << DEF;
         if(client->writeData()){
             event_loop.updateSocketEvents(client->getFd() ,POLLIN );
         }
@@ -282,17 +282,17 @@ bool Core::checkSession(std::string sid)
 
 
 void Core::findSID(Client* cl){
-    std::cout <<  "herererererererer" << std::endl;
-      printVecChar(cl->getRespoBuffer()) ;
-    std::cout <<  "herererererererer" << std::endl;
     std::string tmpRespo = cl->getresBuffStringer();
     std::string::size_type pos ;
     std::string token("session-id=");
     if( (pos= tmpRespo.find(token )) != std::string::npos ){
         std::string::size_type lastSid;
-        if( (lastSid = tmpRespo.find_first_of(pos + token.size() ,',')) != std::string::npos){
-            std::string sidCookie = tmpRespo.substr(pos + token.size() , (lastSid - pos + token.size()));
-            std::cout << "sid >>>>"  << sidCookie << std::endl;
+        // std::cout << ">>>>>>>>>>>>>>>>FIND SID "<<&tmpRespo[pos + token.size()] << std::endl;
+        if( (lastSid = tmpRespo.find_first_of(',' ,pos + token.size() )) != std::string::npos){
+
+            // std::cout << "lastVirgule["  << &tmpRespo[lastSid] << std::endl;
+            std::string sidCookie = tmpRespo.substr(pos + token.size() , (lastSid - token.size() - pos));
+            // std::cout <<RED<< "sid["<< ( lastSid - pos + token.size() ) << "]>>>>"  << sidCookie <<DEF<< std::endl;
             sessionMaster.create_session(sidCookie);
         }
     }
