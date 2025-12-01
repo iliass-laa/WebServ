@@ -229,37 +229,37 @@ int cgiHandling::generateResponse(int sv, std::vector <char> &respoBuff)
     // respoBuff.clear();
     while (1)
     {
-        std::cout << RED << "Before ...\n ";
+        // std::cout << RED << "Before ...\n ";
         // bzero(buff, BUFFER_SIZE);
         memset(buff, 0, BUFFER_SIZE);
         // rd = read(sv, buff, BUFFER_SIZE - 1);
         rd = recv(sv, buff, BUFFER_SIZE - 1, 0);
-        std::cout << "return :" << rd
-                << "\nAfter ...\n ";
+        // std::cout << "return :" << rd
+        //         << "\nAfter ...\n ";
         if (rd >=0)
         {
             buff[rd]='\0';
-            std::cout << PINK << "007>>>>>BUFF ::\n" << buff  << DEF << "\n";
+            // std::cout << PINK << "007>>>>>BUFF ::\n" << buff  << DEF << "\n";
             respoBuff.insert(respoBuff.end(), buff, buff + rd);
             if (rd == 0)
             {
-                std::cout << CYAN << "EOF Reached :\n"
-                        << "Reslen :: " << respoBuff.size() << "\n"
-                        <<DEF ;
+                // // std::cout << CYAN << "EOF Reached :\n"
+                //         << "Reslen :: " << respoBuff.size() << "\n"
+                //         <<DEF ;
                 break;
             }
             // bzero(buff, rd);
         }
         else
         {
-            std::cout << ">>Errno: " << errno << " (" << strerror(errno) << ")\n";
+            // std::cout << ">>Errno: " << errno << " (" << strerror(errno) << ")\n";
             return 1;
         }
     }
 
     // std::cout << "Response Readed from the child CGI :\n";
     //         printVecChar(respoBuff);            
-    std::cout << "Now Generating a proper one :\n";            
+    // std::cout << "Now Generating a proper one :\n";            
     buildProperReponse(respoBuff);
     // printVecChar(respoBuff);
     return 0;

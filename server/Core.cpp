@@ -94,7 +94,7 @@ void    Core::handelCgiResponce(int fd, short events, Client* client){
     int genresp = client->getCGI().generateResponse(fd, client->getRespoBuffer()); 
     if (genresp == 1)
     {
-        std::cout << "here >>>>>>\n";
+        // std::cout << "here >>>>>>\n";
         return ;
     }
     client->setRequestReaded(true);
@@ -102,7 +102,7 @@ void    Core::handelCgiResponce(int fd, short events, Client* client){
     // check the Vec char for the gen SID (set-Cookie) and add it to session ids map
     findSID(client);
 
-    std::cout << YELLOW<< ".......................CGI ::AFTER WRITING DATA  \n"<< DEF;
+    // std::cout << YELLOW<< ".......................CGI ::AFTER WRITING DATA  \n"<< DEF;
     event_loop.removeSocket(fd);
     std::map<int, Client*> :: iterator it  = cgi.find(fd) ;
     if (it != cgi.end())
@@ -287,12 +287,9 @@ void Core::findSID(Client* cl){
     std::string token("session-id=");
     if( (pos= tmpRespo.find(token )) != std::string::npos ){
         std::string::size_type lastSid;
-        // std::cout << ">>>>>>>>>>>>>>>>FIND SID "<<&tmpRespo[pos + token.size()] << std::endl;
         if( (lastSid = tmpRespo.find_first_of(',' ,pos + token.size() )) != std::string::npos){
 
-            // std::cout << "lastVirgule["  << &tmpRespo[lastSid] << std::endl;
             std::string sidCookie = tmpRespo.substr(pos + token.size() , (lastSid - token.size() - pos));
-            // std::cout <<RED<< "sid["<< ( lastSid - pos + token.size() ) << "]>>>>"  << sidCookie <<DEF<< std::endl;
             sessionMaster.create_session(sidCookie);
         }
     }

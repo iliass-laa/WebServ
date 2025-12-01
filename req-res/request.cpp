@@ -74,8 +74,13 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
         responseBuffer = buildErrorResponse(status);
     // printRequest(Req);
     // ->>>> TILLAS Need to work on this :handleCGI_Premium();
-    if (!Req.uri.compare(0, 9, "/cgi-bin/"))
-            return CGI;
+    if (!Req.uri.compare(0, 9, "/cgi-bin/")){
+        if( Req.headers.find("IS_LOGGED") != Req.headers.end() )
+            std::cout << "value " << Req.headers.at("IS_LOGGED") << std::endl;
+        else
+            std::cout << "value !!!!!!"  << std::endl;
+        return CGI;
+    }
     // std::cout << PINK << Req.method << "\n" << DEF;
     
     try{
@@ -284,9 +289,9 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
             Req.thisClient->handelSession();
         }else {
             // no cookies at all , means invalid session 
-            std::pair<std::string , std::string > header("is_logged","false" );
+            std::cout << RED<< "Cookie not found i resuest header " <<DEF<< std::endl;
+            std::pair<std::string , std::string > header("IS_LOGGED","false" );
             Req.headers.insert(header);
-            Req.cookies.clear();
         }
         Req.cookiesIndex = false;
         Req.cookies.clear();

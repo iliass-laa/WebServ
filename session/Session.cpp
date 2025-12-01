@@ -67,7 +67,8 @@ std::string Session::create_session(std::string sid) {
 
 Session_t* Session::lookup_session(const std::string& id) {
     std::map<std::string, Session_t>::iterator it = sessions.find(id);
-    if (it == sessions.end()) return NULL;
+    if (it == sessions.end())
+        return NULL;
     time_t t = now();
     if (t > it->second.expirey) {
         // expired
@@ -189,6 +190,6 @@ void Session::gc() {
 //     return std::string();
 // }
 
-// size_t Session::store_size() const {
-//     return sessions.size();
-// }
+size_t Session::store_size() const {
+    return sessions.size();
+}

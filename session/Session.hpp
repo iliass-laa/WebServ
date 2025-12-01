@@ -1,6 +1,7 @@
 #pragma once
 
 #include<string>
+#include<iostream>
 #include<map>
 #include<ctime>
 #include <stdlib.h>
@@ -70,5 +71,5 @@ class Session{
         // static std::string parse_cookie_header(const std::string& cookie_header, const std::string& name);
 
         // Expose map size for tests/monitoring
-        // size_t store_size() const;
+        size_t store_size() const;
 };

@@ -188,20 +188,20 @@ void Client::clearReqStruct(){
 
 
 void Client::handelSession(){
-    // check if the session id is exist in session map in core 
-    // exist => set valid=yes on req.headers
-    // not exist => set valid=no on req.headers
     std::map<std::string ,std::string>& cookie = Req.cookies; 
     std::map<std::string , std::string>::iterator obj ;
+    
     if( (obj = cookie.find("session-id")) != cookie.end() ){
-        // session exist on req map
-        std::cout << "************* did session-id found "<< std::endl;
-        if(theBase.checkSession(obj->first)){
-            Req.headers.insert(std::pair<std::string, std::string>("is_logged","true" ));
+        std::string::size_type lastSid;
+        std::string sidCookie;
+        if( (lastSid = obj->second.find_first_of(',')) != std::string::npos )
+            sidCookie = obj->second.substr(0, (lastSid ));
+        if(theBase.checkSession(sidCookie)){
+            Req.headers.insert(std::pair<std::string, std::string>("IS_LOGGED","true" ));
             return ;
         }
-    } 
-    Req.headers.insert(std::pair<std::string, std::string>("is_logged","false"));
+    }
+    Req.headers.insert(std::pair<std::string, std::string>("IS_LOGGED","false"));
     return;
 }
 
