@@ -193,7 +193,6 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
             Req.cookiesIndex = true;
             //implement funct fettah
             Req.cookiesIndex = Req.thisClient->handelSession();
-            //fix your shit akhay fettah o mat9issch liya lcode diali frfrf
         }
         Req.headerParsed = true;
     }
