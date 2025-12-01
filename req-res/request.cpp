@@ -192,7 +192,13 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
             parseCookies(Req.headers["Cookie"], Req.cookies);
             Req.cookiesIndex = true;
             //implement funct fettah
-            Req.cookiesIndex = Req.thisClient->handelSession();
+            Req.thisClient->handelSession();
+        }
+        else
+        {
+            std::pair<std::string, std::string> header("is_logged", "false");
+            Req.headers.insert(header);
+            Req.cookies.clear();
         }
         Req.headerParsed = true;
     }
