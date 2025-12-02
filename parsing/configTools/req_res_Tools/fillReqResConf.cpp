@@ -6,7 +6,6 @@ void printThingsToCheck(DirectoryListing &obj)
     std::cout   << GREEN 
                 << "root :" << obj.getRoot() 
                 << "\nAutoIndex :" << obj.getAutoIndex()
-                << "\nDefault ?: " << obj.getDefault()
                 << "\nMax BodySize :" << obj.getMaxBodySize()
                 << "\nHas Index File:"<< obj.getHasIndexFile()
                 << DEF << "\n";
@@ -109,8 +108,6 @@ void fillReqStruct(BaseNode*root, DirectoryListing &obj, std::string uri, std::s
     //     throw(ConfigFileError("No Location Found"));
     // std::cout <<PINK << "VAL of Context:"<<cNode->val.back()<<"\n"<<DEF ;
     // if (!cNode)
-    if (cNode && cNode->val.size() && cNode->val.back().compare("/") == 0)
-        obj.setDefault(true);
     checkDirectiveChilds(cNode, obj);
     // obj.setDefault(true);
     std::vector <std::string> defIndex;

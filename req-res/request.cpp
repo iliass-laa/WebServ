@@ -32,124 +32,40 @@ std::vector<char> buildErrorResponse(int status) {
     return std::vector<char>(response.begin(), response.end());
 }
 
-// void printRequest(const struct HttpRequest &Req) {
-//     std::cout << "Method: " << Req.method << "\n";
-//     std::cout << "URI: " << Req.uri << "\n";
-//     std::cout << "Version: " << Req.version << "\n";
-//     std::cout << "Headers:\n";
-//     for (const auto &header : Req.headers) {
-//         std::cout << header.first << ": " << header.second << "\n";
-//     }
-//     std::cout << "Body (" << Req.body.size() << " bytes):\n";
-//     std::cout.write(Req.body.data(), Req.body.size());
-//     std::cout << "\n";
-// }
-
-void printResponse(const std::vector<char> &responseBuffer) {
-    std::cout << "Response (" << responseBuffer.size() << " bytes):\n";
-    std::cout.write(responseBuffer.data(), responseBuffer.size());
-    std::cout << "\n";
-}
-
 
 int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::vector<char> &responseBuffer, struct HttpRequest &Req) {
-    // std::clock_t startTime, endTime;
-    // startTime = std::clock();
     int status;
     status = parseRequest(ConfigNode, requestBuffer, Req);
-    // try {
-
-    // }
-    // catch(std::exception &e)
-    // {
-    //     std::cout << "==> Caugth this exception:" << e.what() << "\n";
-    // }
-    // endTime = std::clock();
-    // double seconds = double(endTime - startTime) / CLOCKS_PER_SEC;
-    // std::cout << std::fixed << std::setprecision(6);
-    // std::cout << "Time taken outside parse: " << seconds << " seconds" << std::endl;
     if (status == INCOMPLETE)
         return INCOMPLETE;
     else if (status != COMPLETE && status != COMPLETEDEF)
         responseBuffer = buildErrorResponse(status);
-    // printRequest(Req);
-    // ->>>> TILLAS Need to work on this :handleCGI_Premium();
-    if (!Req.uri.compare(0, 9, "/cgi-bin/")){
-        if( Req.headers.find("IS_LOGGED") != Req.headers.end() )
-            std::cout << "value " << Req.headers.at("IS_LOGGED") << std::endl;
-        else
-            std::cout << "value !!!!!!"  << std::endl;
-        return CGI;
-    }
-    // std::cout << PINK << Req.method << "\n" << DEF;
+    if (!Req.uri.compare(0, 9, "/cgi-bin/"))
+            return CGI;
     
-    try{
-
-        if (Req.method == "GET")
-            HandleGetResponse(ConfigNode, Req, responseBuffer);
-        else if (Req.method == "POST")
-            HandlePostResponse(ConfigNode, Req, responseBuffer);
-        else
-            HandleDeleteResponse(ConfigNode, Req, responseBuffer);
-    }
-    catch (std::exception &e)
-    {
-        std::cout << "==>'>>HandleReq<<' Caugth this exception:" << e.what() << "\n";
-    }
-    
-    // printResponse(responseBuffer);
+    if (Req.method == "GET")
+        HandleGetResponse(ConfigNode, Req, responseBuffer);
+    else if (Req.method == "POST")
+        HandlePostResponse(ConfigNode, Req, responseBuffer);
+     else
+        HandleDeleteResponse(ConfigNode, Req, responseBuffer);
 
 
-
-    // FIDRISS :: CHECK THIS it may throw an exception
     std::map <std::string, std::string> ::iterator it;
     it= Req.headers.find("Connection");
     if (it == Req.headers.end())
         std::cout << "";
     if (it == Req.headers.end() || Req.headers.at("Connection") == "close")
     { 
-        // std::cout<< GREEN <<"AAALLO\n" << DEF;
+        std::cout<< GREEN <<"AAALLO\n" << DEF;
         return COMPLETE;
     }
     else
     {
-        // std::cout<< GREEN <<"WAAALLO\n" << DEF;
+        std::cout<< GREEN <<"WAAALLO\n" << DEF;
         return COMPLETEDEF; 
     }
 }
-
-// int parseChunkedBody(std::vector<char> &body) {
-//     size_t pos = 0;
-//     std::vector<char> temp;
-
-//     while (true) {
-//         if (pos >= body.size())
-//             return INCOMPLETE;
-//         size_t lineEnd = std::string(body.begin() + pos, body.end()).find("\r\n");
-//         if (lineEnd == std::string::npos)
-//             return INCOMPLETE;
-//         std::string sizeStr(body.begin() + pos, body.begin() + pos + lineEnd);
-//         long chunkSize = strtol(sizeStr.c_str(), NULL, 16);
-//         pos += lineEnd + 2;
-//         if (chunkSize == 0) {
-//             if (pos + 2 > body.size())
-//                 return INCOMPLETE;
-//             if (body[pos] != '\r' || body[pos + 1] != '\n')
-//                 return ERROR;
-//             body = temp;
-//             return COMPLETE;
-//         }
-
-//         if (pos + chunkSize + 2 > body.size())
-//             return INCOMPLETE;
-//         temp.insert(temp.end(), body.begin() + pos, body.begin() + pos + chunkSize);
-
-//         pos += chunkSize;
-//         if (body[pos] != '\r' || body[pos + 1] != '\n')
-//             return ERROR;
-//         pos += 2;
-//     }
-// }
 
 int parseChunkedBody(std::vector<char> &body) {
     size_t pos = 0;
@@ -225,13 +141,9 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
     std::map <std::string, std::string> ::iterator it;
     it= Req.headers.find("Connection");
     if (it == Req.headers.end())
-        std::cout << "";
-    // std::clock_t startTime, checkTime, endTime;
-    // startTime = std::clock();  
-    // std::cout << GREEN<<"ParseReq\n" << DEF;
+        std::cout << "Connection Not found \n";
     if (!Req.headerParsed)
     {
-        // std::cout << "RequestBuffer = " << std::string(requestBuffer.begin(), requestBuffer.end()) << std::endl;
         std::string requestString(requestBuffer.begin(), requestBuffer.end());
         Req.headerEndPos = requestString.find("\r\n\r\n");
         if (Req.headerEndPos == std::string::npos)
@@ -252,12 +164,6 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
         {
             return ERROR;
         }
-        // if (Req.uri.length() >= 20)
-        // {
-        //     std::cout << GREEN << Req.uri << "\n" <<DEF;
-        //     exit(1); 
-        // }
-
 
         if (Req.version != "HTTP/1.1")
             return ERROR_BAD_VERSION;
@@ -276,7 +182,7 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
                 value.erase(value.size()-1);
             Req.headers[key] = value;
 
-            getMaxBodySize(ConfigNode, Req.maxBodySize, Req.headers.at("Host")); // implement ilyass
+            getMaxBodySize(ConfigNode, Req.maxBodySize, Req.headers.at("Host"));
         }
         if (Req.headers.find("Transfer-Encoding") != Req.headers.end() &&
             Req.headers["Transfer-Encoding"] == "chunked")
@@ -289,12 +195,9 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
             Req.thisClient->handelSession();
         }else {
             // no cookies at all , means invalid session 
-            std::cout << RED<< "Cookie not found i resuest header " <<DEF<< std::endl;
             std::pair<std::string , std::string > header("IS_LOGGED","false" );
             Req.headers.insert(header);
         }
-        Req.cookiesIndex = false;
-        Req.cookies.clear();
         Req.headerParsed = true;
     }
     if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) > Req.maxBodySize)
