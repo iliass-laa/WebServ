@@ -60,8 +60,7 @@ bool Socket::setNonBlocking()
         get the file flags first
         set it to be non-blocking
     */
-    int flags = fcntl(sockFd, F_GETFL, 0);
-    return fcntl(sockFd, F_SETFL, flags | O_NONBLOCK) == 0;
+    return fcntl(sockFd, F_SETFL, O_NONBLOCK) == 0;
 }
 
 bool Socket::listen(int backlog)
