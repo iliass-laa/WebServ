@@ -79,16 +79,6 @@ void   DirectoryListing::setMaxBodySize(size_t size)
     maxBodySize = size;
 }
 
-void replaceSpaces(std::string &uri)
-{
-    size_t pos = 0;
-    while ((pos = uri.find("%20", pos)) != std::string::npos)
-    {
-        uri.replace(pos, 3, " ");
-        pos += 1;
-    }
-}
-
 std::string getContentType(const std::string &path)
 {
     size_t dotPosition = path.find_last_of('.');
@@ -206,8 +196,6 @@ int buildAutoIndexResponse(const std::string &directoryPath, const std::string &
 void HandleGetResponse(BaseNode* ConfigNode, struct HttpRequest &Req, std::vector<char> &responseBuffer)
 {
     DirectoryListing locationConfig;
-    // std::map
-
     try{
         fillReqStruct(ConfigNode, locationConfig, Req.uri, Req.headers.at("Host"));
     }
@@ -224,7 +212,10 @@ void HandleGetResponse(BaseNode* ConfigNode, struct HttpRequest &Req, std::vecto
     std::string fileSystemPath = locationConfig.getRoot();
     if (fileSystemPath.length() != 0 && fileSystemPath[fileSystemPath.length() - 1] != '/')
         fileSystemPath += '/';
-    fileSystemPath += Req.uri.substr(1);
+    std::string uri = Req.uri;
+    if (uri.find(locationConfig.getRoot().substr(1)) == 0)
+        uri = uri.substr(locationConfig.getRoot().length() - 1);
+    fileSystemPath += uri;
     int pathType = checkPath(fileSystemPath);
     if (pathType == -1)
     {
@@ -307,6 +298,11 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
     DirectoryListing locationConfig;
     std::vector<std::string> parts;
 
+    if (Req.body.size() == 0 || Req.contentLength == 0)
+    {
+        buildProcessResponse(responseBuffer);
+        return;
+    }
     fillReqStruct(ConfigNode, locationConfig, Req.uri, Req.headers.at("Host"));
     std::vector<std::string> allowedMethods = locationConfig.getAllowedMethods();
     if (std::find(allowedMethods.begin(), allowedMethods.end(), "POST") == allowedMethods.end())

@@ -32,6 +32,15 @@ std::vector<char> buildErrorResponse(int status) {
     return std::vector<char>(response.begin(), response.end());
 }
 
+void replaceSpaces(std::string &uri)
+{
+    size_t pos = 0;
+    while ((pos = uri.find("%20", pos)) != std::string::npos)
+    {
+        uri.replace(pos, 3, " ");
+        pos += 1;
+    }
+}
 
 int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::vector<char> &responseBuffer, struct HttpRequest &Req) {
     int status;
@@ -42,15 +51,13 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
         responseBuffer = buildErrorResponse(status);
     if (!Req.uri.compare(0, 9, "/cgi-bin/"))
             return CGI;
-    
+    replaceSpaces(Req.uri);
     if (Req.method == "GET")
         HandleGetResponse(ConfigNode, Req, responseBuffer);
     else if (Req.method == "POST")
         HandlePostResponse(ConfigNode, Req, responseBuffer);
-     else
+    else
         HandleDeleteResponse(ConfigNode, Req, responseBuffer);
-
-
     std::map <std::string, std::string> ::iterator it;
     it= Req.headers.find("Connection");
     if (it == Req.headers.end())
