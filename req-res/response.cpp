@@ -213,9 +213,9 @@ void HandleGetResponse(BaseNode* ConfigNode, struct HttpRequest &Req, std::vecto
     if (fileSystemPath.length() != 0 && fileSystemPath[fileSystemPath.length() - 1] != '/')
         fileSystemPath += '/';
     std::string uri = Req.uri;
-    if (uri.find(locationConfig.getRoot().substr(1)) == 0)
-        uri = uri.substr(locationConfig.getRoot().length() - 1);
-    fileSystemPath += uri;
+    std::string prefix = locationConfig.getRoot().substr(1);
+    fileSystemPath += uri.substr(1);
+    std::cout << fileSystemPath << std::endl;
     int pathType = checkPath(fileSystemPath);
     if (pathType == -1)
     {
