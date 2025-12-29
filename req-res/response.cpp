@@ -300,7 +300,7 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
 
     if (Req.body.size() == 0 || Req.contentLength == 0)
     {
-        buildProcessResponse(responseBuffer);
+        responseBuffer = buildErrorResponse(400);
         return;
     }
     fillReqStruct(ConfigNode, locationConfig, Req.uri, Req.headers.at("Host"));

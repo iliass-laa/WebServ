@@ -56,22 +56,18 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
         HandleGetResponse(ConfigNode, Req, responseBuffer);
     else if (Req.method == "POST")
         HandlePostResponse(ConfigNode, Req, responseBuffer);
-    else
+    else if (Req.method == "DELETE")
         HandleDeleteResponse(ConfigNode, Req, responseBuffer);
+    else
+        responseBuffer == buildErrorResponse(405);
     std::map <std::string, std::string> ::iterator it;
     it= Req.headers.find("Connection");
     if (it == Req.headers.end())
         std::cout << "";
     if (it == Req.headers.end() || Req.headers.at("Connection") == "close")
-    { 
-        std::cout<< GREEN <<"AAALLO\n" << DEF;
         return COMPLETE;
-    }
     else
-    {
-        std::cout<< GREEN <<"WAAALLO\n" << DEF;
         return COMPLETEDEF; 
-    }
 }
 
 int parseChunkedBody(std::vector<char> &body) {
