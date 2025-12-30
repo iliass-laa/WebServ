@@ -86,15 +86,15 @@ bool Client::readData(){
                 return false;
             }
         }catch (std::exception& e){
-            std::cout << CYAN<< "return handel request " << checkReq << "  AFTER EXCEPTION \n"  <<DEF<< std::endl;
-            std::cout << e.what() << "/******/ " << std::endl;
+            // std::cout << CYAN<< "return handel request " << checkReq << "  AFTER EXCEPTION \n"  <<DEF<< std::endl;
+            // std::cout << e.what() << "/******/ " << std::endl;
         }
         if(checkReq == COMPLETE || checkReq == COMPLETEDEF)
             return true;
-        return ((std::cout << RED <<"exit read here" << DEF<< std::endl),false);
+        // return ((std::cout << RED <<"exit read here" << DEF<< std::endl),false);
     }
     else if (bytes <= 0){
-        std::cout << "bytes readed " << bytes << std::endl;
+        // std::cout << "bytes readed " << bytes << std::endl;
         // if (!isCGI)
         connected = false;
     }

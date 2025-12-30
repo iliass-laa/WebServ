@@ -199,10 +199,7 @@ void HandleGetResponse(BaseNode* ConfigNode, struct HttpRequest &Req, std::vecto
     try{
         fillReqStruct(ConfigNode, locationConfig, Req.uri, Req.headers.at("Host"));
     }
-    catch (std::exception &e)
-    {
-        std::cout << "==> Caugth this exception:" << e.what() << "\n";
-    }
+    catch (std::exception &e){}
     std::vector<std::string> allowedMethods = locationConfig.getAllowedMethods();
     if (std::find(allowedMethods.begin(), allowedMethods.end(), "GET") == allowedMethods.end())
     {
@@ -298,16 +295,16 @@ void HandlePostResponse(BaseNode* ConfigNode, const struct HttpRequest &Req, std
     DirectoryListing locationConfig;
     std::vector<std::string> parts;
 
-    if (Req.body.size() == 0 || Req.contentLength == 0)
-    {
-        responseBuffer = buildErrorResponse(400);
-        return;
-    }
     fillReqStruct(ConfigNode, locationConfig, Req.uri, Req.headers.at("Host"));
     std::vector<std::string> allowedMethods = locationConfig.getAllowedMethods();
     if (std::find(allowedMethods.begin(), allowedMethods.end(), "POST") == allowedMethods.end())
     {
         responseBuffer = buildErrorResponse(405);
+        return;
+    }
+    if (Req.body.size() == 0 || Req.contentLength == 0)
+    {
+        responseBuffer = buildErrorResponse(400);
         return;
     }
     std::string uploadPath;

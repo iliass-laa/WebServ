@@ -58,8 +58,8 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
         HandlePostResponse(ConfigNode, Req, responseBuffer);
     else if (Req.method == "DELETE")
         HandleDeleteResponse(ConfigNode, Req, responseBuffer);
-    else
-        responseBuffer == buildErrorResponse(405);
+    // else
+    //     responseBuffer == buildErrorResponse(405);
     std::map <std::string, std::string> ::iterator it;
     it= Req.headers.find("Connection");
     if (it == Req.headers.end())
@@ -143,8 +143,8 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
 
     std::map <std::string, std::string> ::iterator it;
     it= Req.headers.find("Connection");
-    if (it == Req.headers.end())
-        std::cout << "Connection Not found \n";
+    // if (it == Req.headers.end())
+    //     std::cout << "Connection Not found \n";
     if (!Req.headerParsed)
     {
         std::string requestString(requestBuffer.begin(), requestBuffer.end());
@@ -161,7 +161,7 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
         if (Req.method.empty() || Req.uri.empty() || Req.version.empty())
             return ERROR;
         if (Req.method != "GET" && Req.method != "POST" && Req.method != "DELETE")
-            return ERROR_BAD_METHOD;
+            return 405;
      
         if (Req.uri.compare("/.well-known/appspecific/com.chrome.devtools.json") == 0)
         {

@@ -31,7 +31,7 @@ void EventLoop::removeSocket(int fd){
     }
     poll_fds.pop_back();
     fd_to_index.erase(fd);
-    std::cout << RED << "CLOSING THIS FD  " << fd <<DEF <<"\n";
+    // std::cout << RED << "CLOSING THIS FD  " << fd <<DEF <<"\n";
     close(fd);
 }
 
