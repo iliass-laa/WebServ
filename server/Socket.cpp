@@ -4,11 +4,11 @@
 #include <cstdlib>
 
 
-Socket::Socket() : sockFd(-1) {};
+Socket::Socket() : sockFd(-1), res(NULL) {};
 
 Socket::~Socket() {};
 
-bool Socket::create()
+bool Socket::create(std::string pair)
 {
     // socket( domian , type, protocol)
     /*
@@ -16,40 +16,65 @@ bool Socket::create()
         type , tcp SOCK_STREAM , UDP SOCK_DGRAM
         protocol , not specified is 0
     */
-    sockFd = socket(AF_INET, SOCK_STREAM, 0); //
-    return sockFd != -1;
-}
+   	std::memset(&address, 0, sizeof(address));
 
-bool Socket::bind(std::string pair)
-{
+	address.ai_family = AF_INET;       
+	address.ai_socktype = SOCK_STREAM; 
+	address.ai_flags = AI_PASSIVE;   
+
     size_t colonPos = pair.find(':');
     std::string interface = pair.substr(0, colonPos);
     std::string port = pair.substr(colonPos + 1);
-    uint32_t inter;
-    parseIPv4(interface, inter);
-    address.sin_family = AF_INET;
-    address.sin_port = htons((uint16_t)atoi(port.c_str()));
-    address.sin_addr.s_addr = inter;
-    if (!interface.compare("0.0.0.0"))
-        address.sin_addr.s_addr = INADDR_ANY; // accept from any ip (0.0.0.0)
 
-    /*
-            set all the info assigned to address struct
-        to the socket pointed by sockFD
+    int status = getaddrinfo(interface.c_str(), port.c_str(), &address, &res);
+    if(status){
+		std::cerr << "error resolve HostName !"<< std::endl;
+		return 0;
+	}
+    sockFd = socket( res->ai_family , address.ai_socktype, res->ai_protocol ); //
+    return sockFd != -1;
+}
 
-        int setsockopt(int socket, int level, int option_name,
-            const void *option_value, socklen_t option_len);
-        socket , socket to setup
-        level   , configure in which layer (see notion)
-        option_name ,the option that want to setup (see notion)
-        *option_value ,the option value
-        option_len  , option size
+/*****************************OLD APPROCH PARSING IPv4**********************************/
+// bool Socket::bind(std::string pair)
+// {
 
-    */
+//     size_t colonPos = pair.find(':');
+//     std::string interface = pair.substr(0, colonPos);
+//     std::string port = pair.substr(colonPos + 1);
+//     uint32_t inter;
+//     parseIPv4(interface, inter);
+//     address.sin_family = AF_INET;
+//     address.sin_port = htons((uint16_t)atoi(port.c_str()));
+//     address.sin_addr.s_addr = inter;
+//     if (!interface.compare("0.0.0.0"))
+//         address.sin_addr.s_addr = INADDR_ANY; // accept from any ip (0.0.0.0)
+
+//     /*
+//             set all the info assigned to address struct
+//         to the socket pointed by sockFD
+
+//         int setsockopt(int socket, int level, int option_name,
+//             const void *option_value, socklen_t option_len);
+//         socket , socket to setup
+//         level   , configure in which layer (see notion)
+//         option_name ,the option that want to setup (see notion)
+//         *option_value ,the option value
+//         option_len  , option size
+
+//     */
+//     int opt = 1; // 1 enable , 0 disable
+//     setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
+//     return ::bind(sockFd, (struct sockaddr *)&address, sizeof(address)) == 0;
+// }
+
+bool Socket::bind()
+{
     int opt = 1; // 1 enable , 0 disable
     setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
-    return ::bind(sockFd, (struct sockaddr *)&address, sizeof(address)) == 0;
+    return ::bind(sockFd, (struct sockaddr *)res->ai_addr, res->ai_addrlen) == 0;
 }
 
 bool Socket::setNonBlocking()

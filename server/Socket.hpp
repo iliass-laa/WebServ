@@ -9,7 +9,9 @@
 #include <cstdlib>
 #include <cerrno>
 #include <vector>
-
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 class Socket
 {
     /*
@@ -18,17 +20,19 @@ class Socket
     */
     private:
         int sockFd;
-        struct sockaddr_in address;
+        // struct sockaddr_in address;
+        struct addrinfo *res;
+        struct addrinfo address;
         bool parseIPv4(const std::string& ip, uint32_t& result);
 
 
     public:
         Socket(); 
         ~Socket();
-        bool create();
-        bool bind(std::string);
+        bool create(std::string );
+        bool bind();
         bool setNonBlocking();
-        bool listen(int backlog);
+        bool listen(int );
         int getFd() const ;
         int accept();
 };

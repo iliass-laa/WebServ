@@ -219,10 +219,10 @@ void Core::handleClientEvent(int client_fd, short events){
 bool Core::addServers(){    
     for(std::set<std::string>::iterator it = pairs.begin() ; it != pairs.end() ; it++ ){
         Socket* server = new Socket();
-        if (!server->create()
+        if (!server->create(*it)
         || !server->setNonBlocking()
-        || !server->bind(*it) 
-        || server->listen(5) 
+        || !server->bind() 
+        || server->listen(128) 
         )
         {
             std::cerr << "[server][addServers] Failed to create server on port " << *it << std::endl;
