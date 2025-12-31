@@ -238,7 +238,6 @@ void HandleGetResponse(BaseNode* ConfigNode, struct HttpRequest &Req, std::vecto
             {
                 std::string indexPath = fileSystemPath + indexFiles[i];
                 pathType = checkPath(indexPath);
-                // std::cout << indexPath;
                 if (S_ISREG(pathType))
                 {
                     if (!buildFileResponse(indexPath, responseBuffer))

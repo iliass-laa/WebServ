@@ -58,8 +58,6 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
         HandlePostResponse(ConfigNode, Req, responseBuffer);
     else if (Req.method == "DELETE")
         HandleDeleteResponse(ConfigNode, Req, responseBuffer);
-    // else
-    //     responseBuffer == buildErrorResponse(405);
     std::map <std::string, std::string> ::iterator it;
     it= Req.headers.find("Connection");
     if (it == Req.headers.end())
@@ -143,8 +141,7 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
 
     std::map <std::string, std::string> ::iterator it;
     it= Req.headers.find("Connection");
-    // if (it == Req.headers.end())
-    //     std::cout << "Connection Not found \n";
+
     if (!Req.headerParsed)
     {
         std::string requestString(requestBuffer.begin(), requestBuffer.end());
@@ -194,10 +191,8 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
         {
             parseCookies(Req.headers["Cookie"], Req.cookies);
             Req.cookiesIndex = true;
-            //implement funct fettah
             Req.thisClient->handelSession();
         }else {
-            // no cookies at all , means invalid session 
             std::pair<std::string , std::string > header("IS_LOGGED","false" );
             Req.headers.insert(header);
         }
