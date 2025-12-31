@@ -2,5 +2,5 @@
 <?php
 	echo "Content-Type: text/html\n\n";
 
-	echo "<h2>hello World! FROM PHP!!(tmpSite/cgi-bin/*.php)</h2>";
+	echo "<h2>hello World! FROM PHP!!</h2>";
 ?>

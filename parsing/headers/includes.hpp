@@ -10,7 +10,6 @@
 #include <string>
 #include <string.h>
 #include <cstdlib>
-#include <cerrno>
 #include <map>
 #include <vector>
 #include <set>

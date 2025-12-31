@@ -7,7 +7,6 @@
 #include <string>
 #include <iostream>
 #include <cstdlib>
-#include <cerrno>
 #include <vector>
 #include <sys/types.h>
 #include <sys/socket.h>

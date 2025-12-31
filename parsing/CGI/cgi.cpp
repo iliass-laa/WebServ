@@ -1,16 +1,5 @@
 #include "cgi.hpp"
 
-
-
-///////////<<<<>>>>>>////
-
-#include <errno.h>
-
-///////////<<<<>>>>>>////
-
-
-
-
 void printCharP_Vec(std::vector <char *> &vec)
 {
     std::vector<char *>:: iterator it = vec.begin();
@@ -33,56 +22,17 @@ void cgiHandling::childStart(BaseNode *root,  HttpRequest &req)
 {
     std::string  scriptOutPut, postStrBody;
     std::vector <char> postBody;
-    char buff[1024];
-    int rd, execRet;
 
-    
-    // int index = 0;
+    int execRet;
     close(sv[1]);
-    // std::cout << PINK <<"ALLOOO FROM THE CHILD\n"<<DEF;
-    // std::cout << PINK <<"FDS sv[0]:" << sv[0] << ", sv[1]:"<< sv[1]<<"\n"<<DEF;
-    // std::cout << PINK <<"SCRIPTFULL PATH" << scriptFullPath<<"\n"<<DEF;
-    rd = 1;
-    // if (!req.method.compare("POST"))
-    // {
-    //     while (rd)
-    //     {
-    //         std::cout << "trying to read \n";
-    //         rd = read(sv[0], buff, 1024 - 1);
-    //         if (rd < 0)
-    //         {
-    //             int error = errno;
-    //             std::cerr << "Read return Negative\n" << strerror(error)<< std::endl ;
 
-    //             break ;
-    //         }
-    //         buff[rd] = '\0';
-    //         // std::cout << buff << "<<\n";
-    //         postStrBody.append(buff);
-    //     }
-    // }
-    // if (postStrBody.length())
-    // {
-    //     std::cerr << PINK 
-    //             << "\n/*******strBody of A Post******/\n"
-    //             <<  postStrBody 
-    //             << "\n/****************/\n"
-    //             << DEF;
-    // }
-    (void)rd;
-    (void)buff;
-    // getFullScriptPath(root, req);
-    //   std::cout<< GREEN
-    //          <<"===============\n"
-    //         << scriptFullPath << "\n"
-    //         <<"==============\n"<<DEF;
     getEnvVars(req);
     close(1);
     dup(sv[0]);
     close(0);
     dup(sv[0]);
     std::vector<char*> tmpArgs;
-    tmpArgs.push_back(const_cast<char*>(scriptFullPath.c_str()));  // argv[0] = script name
+    tmpArgs.push_back(const_cast<char*>(scriptFullPath.c_str()));
     tmpArgs.push_back(NULL); 
     Env.push_back(NULL);
 
@@ -118,11 +68,6 @@ int cgiHandling::handelCGI(BaseNode *root, HttpRequest &req)
         return 0;
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sv))
         throw (CustomizeError("SocketPair Failed!\n"));
-    
-    // fcntl(sv[0],F_SETFL, SOCK_NONBLOCK);
-    // fcntl(sv[1],F_SETFL ,SOCK_NONBLOCK);
-
-
     int flags = fcntl(sv[0], F_GETFL, 0);
     fcntl(sv[0], F_SETFL, flags | O_NONBLOCK);
 
@@ -144,7 +89,6 @@ int cgiHandling::handelCGI(BaseNode *root, HttpRequest &req)
         if (req.method.compare("POST") == 0)
         {
             write(sv[1], msgBody.c_str() , msgBody.size());            
-            // shutdown(sv[1], SHUT_WR);
         }
     }
     close(sv[0]);
@@ -199,22 +143,11 @@ void cgiHandling::buildProperReponse(std::vector <char>& respoBuff)
     else
     {
         contLength = respoBuff.size();
-        // strRespo = successLine+ "Server: WebServer\r\n" + strRespo;
-        // if (contLength < GIGABYTE)
-        // {   
-                contLength = contLength - (separatorPos + 2);
-                responseStream << successLine
-                                << "Content-Length: " << contLength << "\r\n";
-                respoHeaders = responseStream.str();   
-                strRespo = respoHeaders + strRespo;
-                // std::cout << RED <<"\n********************BUILD RIGHT RESPO ::********************\n"
-                //         << strRespo
-                //         <<"\n********************BUILD RIGHT RESPO ::********************\n"
-                //         <<DEF;
-
-        // }
-        // else
-        //     sendChuckedResponse_CGI();
+        contLength = contLength - (separatorPos + 2);
+        responseStream << successLine
+                        << "Content-Length: " << contLength << "\r\n";
+        respoHeaders = responseStream.str();   
+        strRespo = respoHeaders + strRespo;
         std::vector <char> tmp(strRespo.begin(), strRespo.end());
         respoBuff = tmp;
     }
@@ -224,44 +157,29 @@ int cgiHandling::generateResponse(int sv, std::vector <char> &respoBuff)
 {
     char buff[BUFFER_SIZE];
     int rd;
-    // bzero(buff, BUFFER_SIZE);
 
-    // respoBuff.clear();
     while (1)
     {
-        // std::cout << RED << "Before ...\n ";
-        // bzero(buff, BUFFER_SIZE);
+    
         memset(buff, 0, BUFFER_SIZE);
-        // rd = read(sv, buff, BUFFER_SIZE - 1);
         rd = recv(sv, buff, BUFFER_SIZE - 1, 0);
-        // std::cout << "return :" << rd
-        //         << "\nAfter ...\n ";
+
         if (rd >=0)
         {
             buff[rd]='\0';
-            // std::cout << PINK << "007>>>>>BUFF ::\n" << buff  << DEF << "\n";
             respoBuff.insert(respoBuff.end(), buff, buff + rd);
             if (rd == 0)
             {
-                // // std::cout << CYAN << "EOF Reached :\n"
-                //         << "Reslen :: " << respoBuff.size() << "\n"
-                //         <<DEF ;
                 break;
             }
-            // bzero(buff, rd);
         }
         else
         {
-            // std::cout << ">>Errno: " << errno << " (" << strerror(errno) << ")\n";
             return 1;
         }
     }
-
-    // std::cout << "Response Readed from the child CGI :\n";
-    //         printVecChar(respoBuff);            
-    // std::cout << "Now Generating a proper one :\n";            
+           
     buildProperReponse(respoBuff);
-    // printVecChar(respoBuff);
     return 0;
 }
 
@@ -273,11 +191,6 @@ void cgiHandling::getFullScriptPath(BaseNode *root, HttpRequest &req)
     std::string hostFound = it->second;
     fillReqStruct(root, obj, req.uri, req.headers.at("Host") );
     scriptFullPath = obj.getRoot() + req.uri;
-    // std::cout <<"===============\n"
-    //         << scriptFullPath << "\n"
-    //         <<"==============\n";
-    // p = obj.getRoot() + req.uri;
-    // (void)p;
 }
 
 std::string genNewForm(std::string &old)
@@ -326,6 +239,5 @@ void cgiHandling::getEnvVars(HttpRequest &req)
         Env.push_back(const_cast<char *>(strIt->c_str()));
         strIt++;
     }
-    // printCharP_Vec(Env);
 }
 

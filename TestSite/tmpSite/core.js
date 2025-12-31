@@ -62,7 +62,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const output1 = document.getElementById("output1");
     
     cgiBtnPhp.addEventListener("click", () => {
-        fetch("/cgi-bin/aaa")
+        fetch("/cgi-bin/index.php")
             .then(response => response.text())
             .then(data => {
                 output1.innerHTML = data;
