@@ -52,7 +52,7 @@ window.addEventListener("DOMContentLoaded", () => {
     // })
 
     showInfo.addEventListener("click", async () => {
-    const response = await fetch("/cgi-bin/showInfos");
+    const response = await fetch("/cgi-bin/showInfos2");
     const data = await response.text();
     alert(data);
     })
@@ -133,7 +133,7 @@ window.addEventListener("DOMContentLoaded", () => {
         formData.append('age', age);
         
         // fetch('/cgi-bin/prog', {
-        fetch('/cgi-bin/auth', {
+        fetch('/cgi-bin/auth2', {
             method: 'POST',
             body: formData
         })

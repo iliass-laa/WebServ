@@ -2,7 +2,7 @@
 
 Client::Client(int fd,BaseNode* cnf, Core& core)
     : root(cnf)   
-    , theBase(core)            // initialize in same order as declaration
+    , theBase(core)
     , client_fd(fd)
     , connected(true)
     , reqBuff()
@@ -14,7 +14,6 @@ Client::Client(int fd,BaseNode* cnf, Core& core)
     , requestReaded(false)
     , respoSize(0)
     , respoSended(0)
-    // Constructor implementation
 {
     Req.headerParsed = false;
     Req.contentLength = 0;
@@ -24,12 +23,9 @@ Client::Client(int fd,BaseNode* cnf, Core& core)
     Req.thisClient = this;
 }
 
-Client::~Client() {
-    // Destructor implementation
-}
+Client::~Client() {}
 
 Client::Client(const Client& other):theBase(other.theBase) {
-    // Copy constructor implementation
     (void)other;
 }
 
@@ -91,7 +87,7 @@ bool Client::readData(){
         }
         if(checkReq == COMPLETE || checkReq == COMPLETEDEF)
             return true;
-        // return ((std::cout << RED <<"exit read here" << DEF<< std::endl),false);
+        return false;
     }
     else if (bytes <= 0){
         // std::cout << "bytes readed " << bytes << std::endl;
