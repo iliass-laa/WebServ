@@ -16,7 +16,7 @@ bool Socket::create(std::string pair)
         type , tcp SOCK_STREAM , UDP SOCK_DGRAM
         protocol , not specified is 0
     */
-   	std::memset(&address, 0, sizeof(address));
+  memset(&address, 0, sizeof(address));
 
 	address.ai_family = AF_INET;       
 	address.ai_socktype = SOCK_STREAM; 
