@@ -204,6 +204,7 @@ void Core::handleClientEvent(int client_fd, short events){
         // std::cout << "alololololo------------------------" << DEF;
         if(client->writeData()){
             event_loop.updateSocketEvents(client->getFd() ,POLLIN );
+
         }
     }
     

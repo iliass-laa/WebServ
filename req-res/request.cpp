@@ -42,13 +42,34 @@ void replaceSpaces(std::string &uri)
     }
 }
 
+void printVecCharr( std::vector<char> Vec)
+{
+    int i = 0;
+    std::vector<char>:: iterator it = Vec.begin(); 
+    while (it != Vec.end())
+    {
+        if (i == 1000)
+        {
+            std::cout << "....\n" ; 
+            break;
+        }
+        std::cout << *it ; 
+        it++;
+        i++;
+    }
+}
+
 int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::vector<char> &responseBuffer, struct HttpRequest &Req) {
     int status;
     status = parseRequest(ConfigNode, requestBuffer, Req);
     if (status == INCOMPLETE)
         return INCOMPLETE;
     else if (status != COMPLETE && status != COMPLETEDEF)
+    {
         responseBuffer = buildErrorResponse(status);
+        printVecCharr(responseBuffer);
+        return COMPLETE;
+    }
     if (!Req.uri.compare(0, 9, "/cgi-bin/"))
             return CGI;
     replaceSpaces(Req.uri);
@@ -182,8 +203,8 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
                 value.erase(value.size()-1);
             Req.headers[key] = value;
 
-            getMaxBodySize(ConfigNode, Req.maxBodySize, Req.headers.at("Host"));
         }
+        getMaxBodySize(ConfigNode, Req.maxBodySize, Req.headers.at("Host"));
         if (Req.headers.find("Transfer-Encoding") != Req.headers.end() &&
             Req.headers["Transfer-Encoding"] == "chunked")
             Req.isChunked = true;
@@ -198,20 +219,26 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
         }
         Req.headerParsed = true;
     }
-    if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) > Req.maxBodySize)
-        return ERROR_BODY_TOO_LARGE;
+    // if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) > Req.maxBodySize)
+    // {
+    //     std::cout << Req.maxBodySize << std::endl;
+    //     return ERROR_BODY_TOO_LARGE;
+    // }
+    if (Req.headers.find("Content-Length") != Req.headers.end()) {
+        Req.contentLength = std::strtoul(Req.headers.at("Content-Length").c_str(), NULL, 10); 
+        if (Req.contentLength > Req.maxBodySize)
+        {
+            std::cout << "rj3 t9wd\n";
+            return ERROR_BODY_TOO_LARGE;
+        }
+        if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) < Req.contentLength)
+            return INCOMPLETE;
+                
+    }
     if (Req.isChunked)
     {
         if (!isChunkedBodyComplete(requestBuffer))
             return INCOMPLETE;
-    }
-    if (Req.headers.find("Content-Length") != Req.headers.end()) {
-        Req.contentLength = std::strtoul(Req.headers.at("Content-Length").c_str(), NULL, 10);  
-            if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) < Req.contentLength)
-            {
-                return INCOMPLETE;
-            }
-                
     }
     std::vector<char> bodyPart(requestBuffer.begin() + Req.headerEndPos + 4, requestBuffer.end());
     if (Req.isChunked){

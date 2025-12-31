@@ -86,7 +86,11 @@ bool Client::readData(){
             // std::cout << e.what() << "/******/ " << std::endl;
         }
         if(checkReq == COMPLETE || checkReq == COMPLETEDEF)
+        {
+            if (checkReq == COMPLETE)
+                connected = 0;
             return true;
+        }
         return false;
     }
     else if (bytes <= 0){

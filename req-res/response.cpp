@@ -212,7 +212,6 @@ void HandleGetResponse(BaseNode* ConfigNode, struct HttpRequest &Req, std::vecto
     std::string uri = Req.uri;
     std::string prefix = locationConfig.getRoot().substr(1);
     fileSystemPath += uri.substr(1);
-    std::cout << fileSystemPath << std::endl;
     int pathType = checkPath(fileSystemPath);
     if (pathType == -1)
     {
