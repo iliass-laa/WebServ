@@ -189,8 +189,10 @@ void Core::handleClientEvent(int client_fd, short events){
     Client* client = it->second;
     
     if( events & POLLIN ){
-        int readDataState = client->readData(); 
+        int readDataState = client->readData();
+        // std::cout << "cha7l ktqra mn merra \n"; 
         if( readDataState){
+            // std::cout << "mama salit request \n"; 
             client->setRequestReaded(true);
             event_loop.updateSocketEvents(client->getFd() ,POLLOUT );
             client->clearVectReq();
@@ -203,13 +205,15 @@ void Core::handleClientEvent(int client_fd, short events){
         // printVecChar(client->getRespoBuffer() );
         // std::cout << "alololololo------------------------" << DEF;
         if(client->writeData()){
+            std::cout << "seft respo kho fd [" << client_fd<< "]\n" ;
+            client->setDsiconnect();
             event_loop.updateSocketEvents(client->getFd() ,POLLIN );
-
         }
     }
     
     // disconnect the client 
     if ( !(client->isConnected())){
+        std::cout << "ms7 fd connection!!\n";
         event_loop.removeSocket(client_fd);
         delete client;
         clients.erase(it);
