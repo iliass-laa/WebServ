@@ -219,11 +219,6 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
         }
         Req.headerParsed = true;
     }
-    // if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) > Req.maxBodySize)
-    // {
-    //     std::cout << Req.maxBodySize << std::endl;
-    //     return ERROR_BODY_TOO_LARGE;
-    // }
     if (Req.headers.find("Content-Length") != Req.headers.end()) {
         Req.contentLength = std::strtoul(Req.headers.at("Content-Length").c_str(), NULL, 10); 
         if (Req.contentLength > Req.maxBodySize)
@@ -239,9 +234,16 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
     {
         if (!isChunkedBodyComplete(requestBuffer))
             return INCOMPLETE;
+        // if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) > Req.maxBodySize)
+        // {
+        //     std::cout << Req.maxBodySize << std::endl;
+        //     return ERROR_BODY_TOO_LARGE;
+        // }
     }
     std::vector<char> bodyPart(requestBuffer.begin() + Req.headerEndPos + 4, requestBuffer.end());
     if (Req.isChunked){
+        if (bodyPart.size() > Req.maxBodySize)
+            return ERROR_BODY_TOO_LARGE;
         int status = (parseChunkedBody(bodyPart));
         if (status != COMPLETE)
             return status;
