@@ -87,18 +87,19 @@ bool Client::readData(){
         }
         if(checkReq == COMPLETE || checkReq == COMPLETEDEF)
         {
-            if (checkReq == COMPLETE)
-                connected = 0;
+            // if (checkReq == COMPLETE)
+            //     connected = false;
             return true;
         }
-        return false;
+        return (std::cout << "baqi mcompletch \n" ,false);
     }
     else if (bytes <= 0){
         // std::cout << "bytes readed " << bytes << std::endl;
         // if (!isCGI)
         connected = false;
+        return ( std::cout << "mqrash walo\n" ,false);
     }
-    return true;   
+    return (std::cout << "lkher d func \n" ,false);   
 }
 
 
@@ -115,8 +116,10 @@ bool Client::writeData(){
         respoSize = respoBuff.size();
         respoSended = 0;
     }
-    if(!respoSize)
+    if(!respoSize){
+        // connected = false;
         return true; // nothing to send
+    }
     resOffset = BUFFER;
     if(respoSize > 0 && respoSize < BUFFER)
         resOffset = respoSize ;
@@ -148,12 +151,6 @@ std::string Client::getresBuffStringer(){
 void Client::setRequestReaded(bool val){
     this->requestReaded = val;
 }
-
-void Client::setClientState(int state){
-    this->state = state;
-}
-
-int Client::getClientState() const { return state;}
 
 void Client::setReqStruct (struct HttpRequest& req){
     this->Req = req;
@@ -207,4 +204,8 @@ void Client::handelSession(){
 
 std::string Client::getRequest() const{
     return std::string(reqBuff.begin(), reqBuff.end());
+}
+
+void Client::setDsiconnect(){
+    connected = false;
 }

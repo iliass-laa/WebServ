@@ -38,7 +38,6 @@ private:
     std::string resBuffString; // for response
     std::vector<char> respoBuff; // for response
     ssize_t resOffset;
-    int state;
     struct HttpRequest Req;
     bool isCGI;
     bool requestReaded;
@@ -51,6 +50,7 @@ public:
     Client(const Client& other);
     Client& operator=(const Client& other);
     bool isConnected() const ;
+    void setDsiconnect();
     int getFd() const ;
     bool writeData();
     bool readData();
@@ -58,9 +58,6 @@ public:
     std::string getresBuffStringer();
     void setReqStruct (struct HttpRequest& req);
     struct HttpRequest& getReqStruct ();
-
-    void setClientState(int );
-    int getClientState() const;
 
     void clearReqStruct();
     void clearVectReq();

@@ -67,7 +67,6 @@ int handleRequest(BaseNode* ConfigNode, std::vector<char> &requestBuffer, std::v
     else if (status != COMPLETE && status != COMPLETEDEF)
     {
         responseBuffer = buildErrorResponse(status);
-        printVecCharr(responseBuffer);
         return COMPLETE;
     }
     if (!Req.uri.compare(0, 9, "/cgi-bin/"))
@@ -228,7 +227,7 @@ int parseRequest(BaseNode *ConfigNode, std::vector<char> &requestBuffer, struct 
         Req.contentLength = std::strtoul(Req.headers.at("Content-Length").c_str(), NULL, 10); 
         if (Req.contentLength > Req.maxBodySize)
         {
-            std::cout << "rj3 t9wd\n";
+            std::cout << "content length " << Req.contentLength << " maxsb " << Req.maxBodySize << " rj3 t9wd driss parseReq\n";
             return ERROR_BODY_TOO_LARGE;
         }
         if ((size_t)(requestBuffer.end() - (requestBuffer.begin() + Req.headerEndPos + 4)) < Req.contentLength)
